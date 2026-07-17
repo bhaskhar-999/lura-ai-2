@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lura Studio | Premium</title>
+    <!-- 🟢 Tailwind v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .hidden-panel { display: none !important; }
+
+        /* =========================================
+           💎 APPLE-LEVEL LIQUID GLASS ENGINE
+           ========================================= */
+        .liquid-glass {
+            background: rgba(20, 20, 28, 0.55);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .liquid-glass-visible {
+            background: rgba(20, 20, 28, 0.75);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+
+        .glass-content { position: relative; z-index: 10; }
+
+        /* 🌐 LOGIN GRID PATTERN */
+        .bg-grid-pattern {
+            background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* 🎬 PREMIUM UI ANIMATIONS */
+        .apple-float { animation: appleFloat 6s ease-in-out infinite; }
+        @keyframes appleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        .animate-chat-drop { animation: chatDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes chatDrop { from { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(5px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        .error-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; border-color: rgba(239, 68, 68, 0.8) !important; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
+
+        .dynamic-bg { background: radial-gradient(circle at 50% 50%, #110d22 0%, #07070a 100%); background-size: 200% 200%; animation: bgShift 15s ease infinite alternate; }
+        @keyframes bgShift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+        /* BOUNCY GREETING ANIMATION */
+        .bounce-in { animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+        @keyframes bounceIn { 0% { opacity: 0; transform: translateY(20px) scale(0.8); filter: blur(4px); } 60% { transform: translateY(-5px) scale(1.02); filter: blur(0); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        .stagger-btn { opacity: 0; transform: translateX(-15px); animation: slideInLeft 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .stagger-1 { animation-delay: 0.1s; } .stagger-2 { animation-delay: 0.2s; } .stagger-3 { animation-delay: 0.3s; } .stagger-4 { animation-delay: 0.4s; }
+        @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
+
+        .toast-enter { animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -50px) scale(0.8); filter: blur(5px); } to { opacity: 1; transform: translate(-50%, 0) scale(1); filter: blur(0); } }
+
+        /* 💬 TYPING BOUNCE DOTS */
+        .typing-dot {
+            width: 6px; height: 6px; background-color: currentColor; border-radius: 50%; opacity: 0.7;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+        
+        /* SYNTAX HIGHLIGHT BOX SCROLLBAR */
+        .code-box::-webkit-scrollbar { height: 6px; }
+        .code-box::-webkit-scrollbar-track { background: transparent; }
+        .code-box::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .code-box::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+    </style>
+</head>
+<body class="bg-black text-gray-200 font-sans h-[100dvh] w-full relative overflow-hidden selection:bg-cyan-500/40 dynamic-bg">
+
+    <section id="login-view" class="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 bg-grid-pattern backdrop-blur-xl transition-all duration-700 ease-in-out">
+        <div id="login-card" class="liquid-glass-visible apple-float w-full max-w-md p-8 md:p-10 rounded-[2.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.9)] border border-white/10 transition-all duration-500">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-600 rounded-[1.5rem] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,211,238,0.5)]">
+                    <i data-lucide="infinity" class="w-10 h-10 text-white drop-shadow-lg"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">System Auth</h2>
+                <p class="text-xs text-cyan-400 mt-2 font-bold tracking-widest uppercase">Encrypted Neural Link</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5">
+                <div class="relative">
+                    <label class="text-[10px] md:text-xs font-bold text-cyan-400 block mb-2 tracking-widest uppercase">Identity</label>
+                    <div class="relative flex items-center">
+                        <i data-lucide="user" class="absolute left-4 w-5 h-5 text-gray-400"></i>
+                        <input id="auth-user" type="text" placeholder="Enter Any Name" class="w-full bg-black/50 rounded-2xl pl-12 pr-5 py-4 text-sm md:text-base text-white outline-none border border-white/10 focus:border-cyan-400 focus:bg-black/80 transition-all shadow-inner" autocomplete="off"/>
+                    </div>
+                </div>
+                <div class="relative">
+                    <label class="text-[10px] md:text-xs font-bold text-cyan-400 block mb-2 tracking-widest uppercase">Passcode</label>
+                    <div class="relative flex items-center">
+                        <i data-lucide="key" class="absolute left-4 w-5 h-5 text-gray-400"></i>
+                        <input id="auth-pass" type="password" placeholder="••••••••" class="w-full bg-black/50 rounded-2xl pl-12 pr-5 py-4 text-sm md:text-base text-white outline-none border border-white/10 focus:border-cyan-400 focus:bg-black/80 transition-all shadow-inner"/>
+                    </div>
+                </div>
+                <button id="login-btn" type="submit" class="w-full mt-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold rounded-2xl text-sm transition-all duration-300 active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.5)] border border-cyan-400/50 uppercase tracking-widest cursor-pointer flex justify-center items-center h-14">
+                    <span>Initialize Link</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <div id="app-workspace" class="hidden-panel w-full h-full flex-col-reverse md:flex-row relative z-10">
+        
+        <aside class="w-full h-20 md:w-24 md:h-full flex flex-row md:flex-col justify-between items-center px-6 md:px-0 py-2 md:py-8 bg-black/60 backdrop-blur-2xl border-t md:border-t-0 md:border-r border-white/10 z-40 shrink-0 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+            <div class="flex flex-row md:flex-col items-center gap-6 md:gap-8 w-auto">
+                <button onclick="switchView('chat-view')" id="sidebar-chat-btn" class="stagger-btn stagger-1 p-3 md:p-4 text-cyan-400 liquid-glass-active rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(34,211,238,0.4)]" title="Chat Interface">
+                    <i data-lucide="sparkles" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+                <button onclick="resetChatLayout()" class="stagger-btn stagger-2 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-white rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="New Chat (Clear Memory)">
+                    <i data-lucide="square-pen" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+                <button onclick="switchView('admin-view')" id="sidebar-admin-btn" class="stagger-btn stagger-3 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-purple-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="Admin System">
+                    <i data-lucide="shield-alert" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+                <button onclick="exportChat()" class="stagger-btn stagger-3 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-emerald-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="Export Chat Log">
+                    <i data-lucide="download" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+            </div>
+            <div class="flex flex-row md:flex-col items-center gap-6 md:gap-8 w-auto">
+                <button onclick="toggleSettingsModal()" class="stagger-btn stagger-4 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-white rounded-2xl cursor-pointer transition-all duration-500 hover:rotate-90 active:scale-90" title="Settings">
+                    <i data-lucide="settings" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+                <div id="user-avatar" class="stagger-btn stagger-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-gray-500 to-gray-700 flex items-center justify-center text-sm md:text-base font-extrabold text-white shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/20">
+                    U
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 relative flex flex-col h-full w-full bg-transparent overflow-hidden z-10">
+
+            <section id="chat-view" class="flex-1 flex flex-col view-spring-transition relative h-full">
+                
+                <div class="absolute top-4 right-4 md:top-8 md:right-10 flex items-center gap-3 z-30">
+                    <button onclick="switchView('admin-view')" class="liquid-glass hover:bg-cyan-600/80 text-cyan-200 text-[10px] md:text-xs font-bold px-4 py-2.5 md:px-5 md:py-3 rounded-full flex items-center gap-2 shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-cyan-500/60 cursor-pointer backdrop-blur-xl">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
+                        </span>
+                        <span class="glass-content hidden sm:inline tracking-wide uppercase">System Control</span>
+                    </button>
+                </div>
+
+                <div id="chat-center-wrapper" class="flex-1 flex flex-col items-center justify-center px-4 md:px-6 max-w-5xl mx-auto w-full h-full pt-16 pb-4 md:pt-20 md:pb-6">
+                    
+                    <div id="title-anim-box" class="w-full text-center pb-6 md:pb-8 border-b border-white/5 transition-all duration-500 mb-8 md:mb-12">
+                        <div id="greeting-container" class="opacity-0">
+                            <h1 id="greeting-text" class="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-white via-cyan-100 to-gray-500 bg-clip-text text-transparent select-none drop-shadow-xl min-h-[4rem]"></h1>
+                        </div>
+                    </div>
+
+                    <div id="message-container" class="w-full hidden overflow-y-auto pr-2 md:pr-4 flex-col justify-start mb-4 md:mb-6 flex-1 space-y-8 md:space-y-10"></div>
+
+                    <!-- SEARCH BAR & WARNING TEXT -->
+                    <div class="relative w-full z-40 flex flex-col">
+                        
+                        <div id="search-wrapper" class="relative w-full rounded-[3.5rem] p-[2px] overflow-hidden group shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-300 focus-within:shadow-[0_10px_40px_rgba(0,255,255,0.25),0_0_60px_rgba(139,92,246,0.15)] focus-within:scale-[1.01] focus-within:-translate-y-1">
+                            
+                            <!-- 🟢 FIXED WOBBLE-FREE NEON LOOP ENGINE -->
+                            <div class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] animate-[spin_3s_linear_infinite] pointer-events-none z-0 opacity-40 group-focus-within:opacity-100 transition-opacity duration-500">
+                                <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_70%,#00ffff_85%,#8b5cf6_100%)]"></div>
+                            </div>
+
+                            <div id="cursor-glow" class="absolute w-[250px] h-[250px] bg-[radial-gradient(circle,rgba(34,211,238,0.4)_0%,transparent_60%)] -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" style="top: 50%; left: 50%;"></div>
+
+                            <form onsubmit="event.preventDefault(); handleSend();" id="search-bar-box" class="relative z-20 w-full bg-[#0a0f18] rounded-[3.4rem] p-2 md:p-3 flex items-center gap-2 md:gap-4 cursor-text border border-white/5">
+                                <input type="file" id="system-file-upload" class="hidden" multiple onchange="handleAttachment(this)" />
+                                
+                                <button type="button" onclick="document.getElementById('system-file-upload').click()" class="glass-content w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-cyan-500 hover:text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shadow-sm shrink-0">
+                                    <i data-lucide="paperclip" class="w-5 h-5 md:w-6 md:h-6"></i>
+                                </button>
+                                
+                                <input id="chat-input" type="text" placeholder="Ask Lura..." class="glass-content flex-1 bg-transparent border-none outline-none text-white placeholder-gray-400 text-[16px] md:text-lg focus:ring-0 pl-2 font-medium" autocomplete="off"/>
+                                
+                                <div class="relative glass-content hidden sm:block">
+                                    <button type="button" onclick="toggleModelDropdown(event)" class="flex items-center gap-2 bg-white/5 border border-white/20 hover:border-cyan-400 text-white px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm uppercase tracking-wide">
+                                        <span id="current-model-label">Lura 1.0 Core</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300 text-cyan-400" id="dropdown-arrow"></i>
+                                    </button>
+                                </div>
+                                
+                                <button type="submit" class="glass-content w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0">
+                                    <i data-lucide="send-horizontal" class="w-5 h-5 md:w-6 md:h-6 relative -ml-1"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="w-full text-center mt-3 z-10 opacity-70">
+                            <span class="text-[10px] md:text-[11px] text-gray-400 font-medium tracking-wide">Lura AI can make mistakes. Please double-check responses.</span>
+                        </div>
+
+                        <div id="model-dropdown" class="absolute bottom-[calc(100%+35px)] right-4 sm:right-24 w-52 md:w-60 liquid-glass-visible rounded-2xl p-2 space-y-1 hidden z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.9)] border border-white/20 transition-all duration-300">
+                            <button type="button" onclick="selectModel('Lura 1.0 Core')" class="w-full text-left text-xs md:text-sm px-5 py-4 hover:bg-cyan-500/40 rounded-xl transition-all text-cyan-200 font-bold cursor-pointer hover:pl-6 uppercase tracking-wider flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Lura 1.0 Core</button>
+                            <button type="button" onclick="selectModel('Bhavyasri Beta Agent')" class="w-full text-left text-xs md:text-sm px-5 py-4 hover:bg-purple-500/40 rounded-xl transition-all text-purple-200 font-bold cursor-pointer hover:pl-6 uppercase tracking-wider flex items-center gap-2"><i data-lucide="orbit" class="w-4 h-4"></i> Bhavyasri Beta</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="admin-view" class="flex-1 p-4 md:p-12 bg-transparent hidden-panel view-spring-transition overflow-y-auto w-full relative z-10">
+                <div class="max-w-6xl mx-auto pb-12">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 md:mb-12 gap-6">
+                        <div>
+                            <h1 class="text-4xl md:text-5xl font-extrabold text-white flex items-center gap-4 tracking-tight drop-shadow-lg">
+                                <i data-lucide="terminal" class="text-purple-400 w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"></i> System Admin
+                            </h1>
+                            <p class="text-sm md:text-base text-cyan-400 mt-2 font-medium tracking-wide uppercase">Owner Override Active: Realtime network routing.</p>
+                        </div>
+                        <button onclick="switchView('chat-view')" class="liquid-glass hover:bg-white/10 text-white px-6 py-3.5 md:px-8 md:py-4 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-3 border border-white/20 font-bold text-xs md:text-sm shadow-xl uppercase tracking-widest">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i> Return to Chat
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10 md:mb-12">
+                        <div class="liquid-glass p-6 md:p-8 rounded-[2rem] transition-all hover:-translate-y-2 hover:shadow-2xl">
+                            <span class="text-[10px] md:text-xs text-cyan-300 font-bold tracking-widest uppercase">Total Users</span>
+                            <div class="text-4xl md:text-5xl font-extrabold text-white mt-3">3</div>
+                        </div>
+                        <div class="liquid-glass p-6 md:p-8 rounded-[2rem] transition-all hover:-translate-y-2 hover:shadow-2xl">
+                            <span class="text-[10px] md:text-xs text-cyan-300 font-bold tracking-widest uppercase">Active Now</span>
+                            <div class="text-4xl md:text-5xl font-extrabold text-emerald-400 mt-3 flex items-center gap-3 drop-shadow-[0_0_20px_rgba(52,211,153,0.5)]">
+                                <span>1</span> <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="liquid-glass p-8 md:p-10 rounded-[2.5rem] border-t-2 border-red-500/40">
+                        <h3 class="text-xl md:text-2xl font-extrabold text-red-400 mb-4 flex items-center gap-3"><i data-lucide="alert-triangle"></i> Danger Zone</h3>
+                        <p class="text-sm text-gray-400 mb-8">Destructive platform actions. Irreversible.</p>
+                        <button type="button" onclick="showToast('System Cache Cleared')" class="w-full py-4 bg-red-950/70 hover:bg-red-900/90 text-red-300 border border-red-900/70 rounded-2xl text-sm font-bold tracking-widest uppercase transition-all active:scale-95 cursor-pointer">
+                            Flush System Cache
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-50 p-4">
+                <div class="liquid-glass-visible w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] animate-chat-drop border border-white/20">
+                    <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
+                        <h3 class="text-2xl font-extrabold text-white flex items-center gap-4"><i data-lucide="sliders" class="text-cyan-400"></i> Parameters</h3>
+                        <button type="button" onclick="toggleSettingsModal()" class="text-gray-400 hover:text-white cursor-pointer bg-white/10 p-3 rounded-full hover:rotate-90 transition-all"><i data-lucide="x"></i></button>
+                    </div>
+                    <div class="space-y-6">
+                        <label class="text-xs font-bold text-cyan-400 tracking-widest uppercase">Current Role</label>
+                        <input id="settings-role-display" type="text" readonly class="w-full bg-white/5 rounded-2xl px-5 py-4 text-white font-bold outline-none border border-white/10"/>
+                    </div>
+                    <button type="button" onclick="saveSettings()" class="w-full mt-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold rounded-2xl text-sm transition-all active:scale-95 cursor-pointer uppercase tracking-widest">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        let session = { active: false, name: '', role: 'guest', avatar: 'U', color: 'from-gray-500 to-gray-700' };
+        let hasConversationStarted = false;
+        let currentAgent = "Lura 1.0 Core"; 
+        let chatHistory = []; 
+
+        // 🔦 GLOBALLY BOUND CURSOR FLASHLIGHT 
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('cursor-glow');
+            const wrapper = document.getElementById('search-wrapper');
+            if(glow && wrapper) {
+                const rect = wrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                glow.style.left = `${x}px`;
+                glow.style.top = `${y}px`;
+            }
+        });
+
+        // 📋 GLOBAL COPY CODE FUNCTION
+        window.copyCode = function(elementId) {
+            const preElement = document.getElementById(elementId);
+            if (preElement) {
+                const text = preElement.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("Code Copied to Clipboard!");
+                }).catch(err => {
+                    showToast("Failed to copy code.");
+                });
+            }
+        };
+
+        // 🔐 OPEN LOGIN SYSTEM (Bhaskhar & Bhavyasri Owners)
+        function handleLogin() {
+            const user = document.getElementById('auth-user').value.trim();
+            const pass = document.getElementById('auth-pass').value.trim();
+            const loginCard = document.getElementById('login-card');
+            const loginView = document.getElementById('login-view');
+            const loginBtn = document.getElementById('login-btn');
+
+            if (!user || !pass) {
+                loginCard.classList.remove('error-shake');
+                void loginCard.offsetWidth; 
+                loginCard.classList.add('error-shake');
+                showToast("Please enter an Identity and Passcode.");
+                return;
+            }
+
+            loginBtn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-white"></i>`;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                session = { 
+                    active: true, name: user, role: 'user', 
+                    avatar: user.charAt(0).toUpperCase(), color: 'from-gray-500 to-gray-700' 
+                };
+
+                if ((user.toLowerCase() === 'bhaskhar' || user.toLowerCase() === 'bhavyasri') && pass === '85@@7&5!83') {
+                    session.role = 'owner'; session.name = user.charAt(0).toUpperCase() + user.slice(1); session.color = 'from-cyan-400 to-blue-600';
+                } 
+
+                const avatar = document.getElementById('user-avatar');
+                avatar.innerText = session.avatar;
+                avatar.className = `stagger-btn stagger-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center text-sm md:text-base font-extrabold text-white shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/20`;
+                
+                document.getElementById('settings-role-display').value = session.role.toUpperCase() + " ACCOUNT";
+
+                loginCard.classList.add('scale-90', '-translate-y-10', 'opacity-0');
+                loginView.style.backdropFilter = "blur(0px)";
+                loginView.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    loginView.classList.add('hidden-panel');
+                    document.getElementById('app-workspace').classList.remove('hidden-panel');
+                    document.getElementById('app-workspace').classList.add('flex');
+                    
+                    setGreeting(); 
+                    loadChatHistory(); 
+                    showToast(`Auth Success. Welcome, ${session.name}.`);
+                }, 500);
+            }, 800); 
+        }
+
+        // --- BOUNCY GREETING ANIMATION ---
+        function setGreeting() {
+            if(!session.active) return;
+            const hour = new Date().getHours();
+            let greeting = "Good evening";
+            if (hour < 12) greeting = "Good morning";
+            else if (hour < 18) greeting = "Good afternoon";
+            
+            document.getElementById('greeting-text').innerText = `${greeting}, ${session.name}`;
+            const container = document.getElementById('greeting-container');
+            container.classList.remove('opacity-0');
+            container.classList.add('bounce-in'); 
+        }
+
+        function saveMessage(role, text, styleClass) {
+            chatHistory.push({ role, text, styleClass });
+            localStorage.setItem(`lura_chat_${session.name}`, JSON.stringify(chatHistory));
+        }
+
+        // 🛠️ MARKDOWN PARSER FOR LOCAL MEMORY
+        function formatTextWithCode(text) {
+            const parts = text.split(/```/g);
+            let html = '';
+            for (let i = 0; i < parts.length; i++) {
+                if (i % 2 === 0) {
+                    html += parts[i].replace(/\n/g, '<br>'); // Regular text
+                } else {
+                    // Code Block Builder
+                    let codeContent = parts[i];
+                    let firstNewline = codeContent.indexOf('\n');
+                    let lang = firstNewline !== -1 ? codeContent.substring(0, firstNewline).trim() : '';
+                    let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent;
+                    const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
+                    
+                    html += `
+                        <div class="my-4 w-full rounded-xl overflow-hidden bg-[#0d1117] border border-white/10 shadow-2xl code-box">
+                            <div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${lang || 'Code'}</span>
+                                <button onclick="copyCode('${codeId}')" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-cyan-400 hover:text-white transition-all cursor-pointer relative z-50">
+                                    <i data-lucide="copy" class="w-4 h-4"></i> Copy
+                                </button>
+                            </div>
+                            <div class="p-4 overflow-x-auto text-sm text-cyan-200 font-mono leading-relaxed">
+                                <pre id="${codeId}"><code>${actualCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            return html;
+        }
+
+        // 🌟 INSTANT RENDER (For History & User Messages) 🌟
+        function appendMessageToDOM(role, text, styleClass) {
+            const container = document.getElementById('message-container');
+            const div = document.createElement('div');
+            
+            if (role === 'user') {
+                div.className = "w-full flex justify-end animate-chat-drop z-10 gap-3 mb-2";
+                div.innerHTML = `
+                    <div class="bg-gradient-to-br ${styleClass} text-white text-[15px] md:text-base px-6 py-4 rounded-[2rem] rounded-tr-sm max-w-[85%] border border-white/20 font-medium leading-relaxed shadow-[0_15px_40px_rgba(34,211,238,0.3)]">${text.replace(/\n/g, '<br>')}</div>
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center shrink-0 shadow-lg border border-white/20 font-extrabold text-xs md:text-sm text-white self-start mt-1">${session.avatar}</div>
+                `;
+            } else {
+                const isBhavyasri = styleClass && styleClass.includes("purple");
+                const iconColor = isBhavyasri ? "from-purple-600 to-pink-600" : "from-cyan-600 to-blue-600";
+                const iconSymbol = isBhavyasri ? "orbit" : "sparkles";
+                const textColor = isBhavyasri ? "text-purple-100" : "text-gray-200";
+                
+                div.className = "w-full flex justify-start animate-chat-drop z-10 gap-4 mb-4";
+                div.innerHTML = `
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
+                        <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
+                    </div>
+                    <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4">
+                        ${formatTextWithCode(text)}
+                    </div>
+                `;
+            }
+            container.appendChild(div);
+            lucide.createIcons();
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        }
+
+        function loadChatHistory() {
+            const saved = localStorage.getItem(`lura_chat_${session.name}`);
+            const container = document.getElementById('message-container');
+            const titleBox = document.getElementById('title-anim-box');
+            const wrapper = document.getElementById('chat-center-wrapper');
+            
+            if(saved) {
+                chatHistory = JSON.parse(saved);
+                if(chatHistory.length > 0) {
+                    hasConversationStarted = true;
+                    titleBox.classList.add('hidden');
+                    container.classList.remove('hidden');
+                    container.classList.add('flex', 'flex-1'); 
+                    wrapper.classList.remove('justify-center');
+
+                    chatHistory.forEach(msg => {
+                        appendMessageToDOM(msg.role, msg.text, msg.styleClass);
+                    });
+                }
+            } else {
+                chatHistory = [];
+            }
+        }
+
+        function resetChatLayout() {
+            if(confirm("Are you sure you want to clear your chat history? This cannot be undone.")) {
+                localStorage.removeItem(`lura_chat_${session.name}`);
+                chatHistory = [];
+                hasConversationStarted = false;
+                
+                const titleBox = document.getElementById('title-anim-box');
+                titleBox.classList.remove('hidden');
+                
+                const containerBox = document.getElementById('greeting-container');
+                containerBox.classList.remove('bounce-in');
+                void containerBox.offsetWidth;
+                containerBox.classList.add('bounce-in');
+                
+                const container = document.getElementById('message-container');
+                container.classList.add('hidden');
+                container.classList.remove('flex', 'flex-1');
+                container.innerHTML = '';
+                document.getElementById('chat-center-wrapper').classList.add('justify-center');
+                switchView('chat-view');
+                showToast("Chat History Cleared");
+            }
+        }
+
+        function exportChat() {
+            if (chatHistory.length === 0) {
+                showToast("No history to export.");
+                return;
+            }
+            let text = `--- Studio X Chat Log ---\nUser: ${session.name}\nDate: ${new Date().toLocaleString()}\n\n`;
+            chatHistory.forEach(msg => {
+                const speaker = msg.role === 'user' ? session.name : "AI Agent";
+                text += `[${speaker}]: ${msg.text}\n\n`;
+            });
+            const blob = new Blob([text], {type: "text/plain"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `LuraStudio_Log_${new Date().getTime()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Chat Log Exported Successfully!");
+        }
+
+        function switchView(viewId) {
+            if(viewId === 'admin-view' && session.role === 'user') {
+                showToast("Access Denied. Admin privileges required.");
+                return;
+            }
+            document.getElementById('chat-view').classList.add('hidden-panel');
+            document.getElementById('admin-view').classList.add('hidden-panel');
+            const inactiveClass = "p-3 md:p-4 text-gray-400 hover:bg-white/10 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95";
+            document.getElementById('sidebar-chat-btn').className = inactiveClass;
+            document.getElementById('sidebar-admin-btn').className = inactiveClass;
+            const targetView = document.getElementById(viewId);
+            targetView.classList.remove('hidden-panel');
+            if (viewId === 'chat-view') {
+                document.getElementById('sidebar-chat-btn').classList.add('text-cyan-400', 'liquid-glass-active', 'shadow-[0_0_20px_rgba(34,211,238,0.4)]');
+            } else {
+                document.getElementById('sidebar-admin-btn').classList.add('text-purple-400', 'liquid-glass-active', 'shadow-[0_0_20px_rgba(168,85,247,0.4)]');
+            }
+            targetView.classList.remove('view-spring-transition');
+            void targetView.offsetWidth; 
+            targetView.classList.add('view-spring-transition');
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-6 md:top-10 left-1/2 transform -translate-x-1/2 liquid-glass-visible px-6 py-4 rounded-full text-sm font-bold tracking-widest text-white shadow-[0_15px_50px_rgba(0,0,0,0.9)] z-[100] toast-enter flex items-center gap-3 uppercase';
+            toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-cyan-400"></i> ${msg}`;
+            document.body.appendChild(toast);
+            lucide.createIcons(); 
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -40px) scale(0.9)';
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        function toggleModelDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('model-dropdown');
+            const arrow = document.getElementById('dropdown-arrow');
+            const isHidden = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden', !isHidden);
+            if(arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        window.addEventListener('click', () => {
+            const dropdown = document.getElementById('model-dropdown');
+            const arrow = document.getElementById('dropdown-arrow');
+            if(dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+                if(arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        function selectModel(modelName) {
+            currentAgent = modelName;
+            const label = document.getElementById('current-model-label');
+            const input = document.getElementById('chat-input');
+            if(modelName.includes("Bhavyasri")) {
+                label.innerText = "Bhavyasri Beta";
+                input.placeholder = "Ask Bhavyasri...";
+                showToast("Routed to Bhavyasri Beta");
+            } else {
+                label.innerText = "Lura 1.0 Core";
+                input.placeholder = "Ask Lura...";
+                showToast("Routed to Lura Core");
+            }
+        }
+
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        function saveSettings() {
+            toggleSettingsModal();
+            showToast("System Settings Saved");
+        }
+
+        function handleAttachment(input) {
+            if(input.files && input.files.length > 0) {
+                showToast(`${input.files.length} file(s) attached and secured.`);
+                input.value = ""; 
+            }
+        }
+
+        // 🔥 FIRE TO LIVE CLOUD SERVER & TYPEWRITER + CODE BOX ENGINE 🔥
+        async function handleSend() {
+            const input = document.getElementById('chat-input');
+            const container = document.getElementById('message-container');
+            const titleBox = document.getElementById('title-anim-box');
+            const wrapper = document.getElementById('chat-center-wrapper');
+            const userText = input.value.trim();
+            
+            if (userText === "") return;
+
+            if (!hasConversationStarted) {
+                hasConversationStarted = true;
+                titleBox.style.opacity = '0';
+                titleBox.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    titleBox.classList.add('hidden');
+                    container.classList.remove('hidden');
+                    container.classList.add('flex', 'flex-1'); 
+                    wrapper.classList.remove('justify-center');
+                }, 300);
+            }
+
+            const isBhavyasri = currentAgent.includes("Bhavyasri");
+            const botColor = isBhavyasri ? "text-purple-400 border-purple-500/30" : "text-cyan-400 border-white/20";
+            const userGrad = isBhavyasri ? "from-purple-600 to-pink-600 shadow-[0_15px_40px_rgba(168,85,247,0.4)]" : "from-cyan-600 to-blue-600 shadow-[0_15px_40px_rgba(34,211,238,0.4)]";
+
+            saveMessage('user', userText, userGrad);
+            appendMessageToDOM('user', userText, userGrad);
+            
+            input.value = "";
+            input.blur(); 
+
+            // Show Typing Indicator
+            const loaderId = 'typing-indicator-' + Date.now();
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = loaderId;
+            loadingDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-4 mb-4";
+            const iconColor = isBhavyasri ? "from-purple-600 to-pink-600" : "from-cyan-600 to-blue-600";
+            const iconSymbol = isBhavyasri ? "orbit" : "sparkles";
+            const textColor = isBhavyasri ? "text-purple-100" : "text-gray-200";
+            
+            loadingDiv.innerHTML = `
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
+                    <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
+                </div>
+                <div class="flex items-center gap-2 h-[32px] md:h-[40px] px-2 ${textColor} pt-1 md:pt-2">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(loadingDiv);
+            lucide.createIcons();
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+
+            try {
+                let systemPrompt = `You are Lura, a highly advanced but incredibly friendly, warm, and highly expressive AI companion. You are talking to ${session.name}. Talk in a natural, conversational, and emotionally engaging way. Do not sound robotic, corporate, or overly formal. Use casual language and occasionally use relatable expressions. Keep answers accurate but delivered with personality.`;
+                
+                let fetchModel = "meta/llama-3.1-70b-instruct"; 
+                if (isBhavyasri) {
+                    systemPrompt = `You are Bhavyasri Beta, a highly intelligent, empathetic, and sweet AI agent. You are talking to ${session.name}. Be incredibly friendly, warm, and conversational. Do not sound like a robot.`;
+                }
+
+                const apiMessages = [];
+                chatHistory.slice(-6).forEach(msg => { 
+                    apiMessages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.text });
+                });
+
+                // 🚀 LIVE CLOUD URL 🚀
+                const response = await fetch("[https://lura-backend-bkuu.onrender.com/api/chat](https://lura-backend-bkuu.onrender.com/api/chat)", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: fetchModel,
+                        systemPrompt: systemPrompt,
+                        messages: apiMessages
+                    })
+                });
+
+                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+                const data = await response.json();
+                if(data.error) throw new Error(data.error);
+                
+                const aiReply = data.reply;
+                document.getElementById(loaderId).remove();
+
+                // 🌟 TYPEWRITER + CODE BOX PARSER 🌟
+                const botDiv = document.createElement('div');
+                botDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-4 mb-4";
+                botDiv.innerHTML = `
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
+                        <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
+                    </div>
+                    <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide type-target w-full pr-4"></div>
+                `;
+                container.appendChild(botDiv);
+                lucide.createIcons();
+                
+                const textTarget = botDiv.querySelector('.type-target');
+                const parts = aiReply.split(/```/g);
+                
+                for (let i = 0; i < parts.length; i++) {
+                    if (i % 2 === 0) {
+                        // Stream Normal Text Word by Word
+                        const words = parts[i].split(" ");
+                        for (let word of words) {
+                            textTarget.innerHTML += (word.includes('\n') ? word.replace(/\n/g, '<br>') : word) + " ";
+                            container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
+                            await new Promise(r => setTimeout(r, 45)); // Typing Speed
+                        }
+                    } else {
+                        // Instantly Render Beautiful Code Box
+                        let codeContent = parts[i];
+                        let firstNewline = codeContent.indexOf('\n');
+                        let lang = firstNewline !== -1 ? codeContent.substring(0, firstNewline).trim() : '';
+                        let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent;
+                        const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
+                        
+                        textTarget.innerHTML += `
+                            <div class="my-4 w-full rounded-xl overflow-hidden bg-[#0d1117] border border-white/10 shadow-2xl code-box">
+                                <div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${lang || 'Code'}</span>
+                                    <button onclick="copyCode('${codeId}')" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-cyan-400 hover:text-white transition-all cursor-pointer relative z-50">
+                                        <i data-lucide="copy" class="w-4 h-4"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-4 overflow-x-auto text-sm text-cyan-200 font-mono leading-relaxed">
+                                    <pre id="${codeId}"><code>${actualCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+                                </div>
+                            </div>
+                        `;
+                        lucide.createIcons();
+                        container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
+                        await new Promise(r => setTimeout(r, 150)); // Brief pause after code block loads
+                    }
+                }
+                saveMessage('bot', aiReply, botColor);
+
+            } catch (error) {
+                console.error("API Error:", error);
+                document.getElementById(loaderId).innerHTML = `
+                    <div class="bg-red-950/80 text-red-300 text-sm md:text-base px-6 py-5 rounded-[2rem] rounded-tl-sm max-w-[90%] border border-red-500/60 font-bold shadow-2xl flex items-center gap-3">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i> Cloud Server Offline. Check your Render logs!
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>
