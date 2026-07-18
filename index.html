@@ -6,7 +6,8 @@
     <title>Lura Studio | Premium</title>
     <!-- 🟢 Tailwind v3 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 🟢 Enterprise CDN for Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
     <style>
         .hidden-panel { display: none !important; }
 
@@ -207,8 +208,9 @@
                                     </button>
                                 </div>
                                 
-                                <button type="submit" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0">
-                                    <i data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative -ml-1"></i>
+                                <!-- 🛑 DYNAMIC ACTION BUTTON (SEND / STOP) -->
+                                <button type="submit" id="action-btn" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0">
+                                    <i id="action-icon" data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative -ml-1 transition-all"></i>
                                 </button>
                             </form>
                         </div>
@@ -300,16 +302,29 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        // 🛡️ FAIL-SAFE ICON RENDERER
+        function refreshIcons() {
+            try {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.warn("Icon engine skipped: Network restricted.");
+            }
+        }
+        
+        refreshIcons(); 
         
         let session = { active: false, name: '', role: 'guest', avatar: 'U', color: 'from-gray-500 to-gray-700' };
         let hasConversationStarted = false;
         let currentAgent = "Lura 1.0 Core"; 
         let chatHistory = []; 
 
-        // ⚙️ GLOBAL SETTINGS VARIABLES
+        // ⚙️ GLOBAL ENGINE VARIABLES
         let typingSpeedDelay = 10; 
         let aiPersonalityTone = "human"; 
+        let isGenerating = false; 
+        let currentAbortController = null;
         
         // 🎤 VOICE ENGINE VARIABLES
         let recognition;
@@ -327,6 +342,41 @@
                 glow.style.top = `${y}px`;
             }
         });
+
+        // 🛑 PERFECT CENTERED STOP GENERATION LOGIC
+        function setStopButton() {
+            isGenerating = true;
+            const btn = document.getElementById('action-btn');
+            
+            // Hard reset the innerHTML to remove any leftover SVG classes and center it
+            btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-red-600 hover:bg-red-500 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(239,68,68,0.8)] cursor-pointer border border-red-400 shrink-0 animate-pulse";
+            btn.innerHTML = `<i id="action-icon" data-lucide="square" class="w-4 h-4 md:w-5 md:h-5 transition-all fill-current"></i>`;
+            
+            refreshIcons();
+        }
+
+        function resetActionButton() {
+            isGenerating = false;
+            const btn = document.getElementById('action-btn');
+            
+            // Hard reset back to the send icon, adding the -ml-1 back ONLY for this asymmetrical icon
+            btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0";
+            btn.innerHTML = `<i id="action-icon" data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative -ml-1 transition-all"></i>`;
+            
+            refreshIcons();
+        }
+
+        function stopGeneration() {
+            if (!isGenerating) return;
+            isGenerating = false;
+            
+            if (currentAbortController) {
+                currentAbortController.abort(); // Kills the fetch request mid-flight
+            }
+            
+            resetActionButton();
+            showToast("Generation Halted.");
+        }
 
         // 📋 GLOBAL COPY CODE FUNCTION
         window.copyCode = function(elementId) {
@@ -398,7 +448,7 @@
             }
         }
 
-        // 🔐 OPEN LOGIN SYSTEM (Bhaskhar & Bhavyasri Owners)
+        // 🔐 OPEN LOGIN SYSTEM
         function handleLogin() {
             const user = document.getElementById('auth-user').value.trim();
             const pass = document.getElementById('auth-pass').value.trim();
@@ -415,7 +465,7 @@
             }
 
             loginBtn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-white"></i>`;
-            lucide.createIcons();
+            refreshIcons();
 
             setTimeout(() => {
                 session = { 
@@ -465,20 +515,15 @@
             localStorage.setItem(`lura_chat_${session.name}`, JSON.stringify(chatHistory));
         }
 
-        // 🌐 PARSE TEXT WITH LIQUID GLASS TRUSTED SOURCE LINKS
         function formatTextWithCode(text) {
             const parts = text.split(/```/g);
             let html = '';
             for (let i = 0; i < parts.length; i++) {
                 if (i % 2 === 0) {
-                    // Regular text space - parse line breaks and standard Markdown URLs [Text](Link)
                     let normalText = parts[i].replace(/\n/g, '<br>');
-                    
-                    // Regex mapping for source anchors wrapped into clean glass pills
                     normalText = normalText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, 
                         `<a href="$2" target="_blank" class="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold underline transition-all bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg shadow-sm mx-0.5">$1</a>`
                     );
-                    
                     html += normalText;
                 } else {
                     let codeContent = parts[i];
@@ -532,7 +577,7 @@
                 `;
             }
             container.appendChild(div);
-            lucide.createIcons();
+            refreshIcons();
             container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
         }
 
@@ -631,7 +676,7 @@
             toast.className = 'fixed top-6 md:top-10 left-1/2 transform -translate-x-1/2 liquid-glass-visible px-6 py-4 rounded-full text-sm font-bold tracking-widest text-white shadow-[0_15px_50px_rgba(0,0,0,0.9)] z-[100] toast-enter flex items-center gap-3 uppercase';
             toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-cyan-400"></i> ${msg}`;
             document.body.appendChild(toast);
-            lucide.createIcons(); 
+            refreshIcons(); 
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translate(-50%, -40px) scale(0.9)';
@@ -695,6 +740,12 @@
 
         // 🔥 FIRE TO LIVE CLOUD SERVER & TYPEWRITER + CODE BOX ENGINE 🔥
         async function handleSend() {
+            // 🛑 INTERCEPT: If already generating, trigger STOP
+            if (isGenerating) {
+                stopGeneration();
+                return;
+            }
+
             const input = document.getElementById('chat-input');
             const container = document.getElementById('message-container');
             const titleBox = document.getElementById('title-anim-box');
@@ -725,7 +776,10 @@
             input.value = "";
             input.blur(); 
 
-            // Show Typing Indicator
+            // Initialize State and UI for Generation
+            currentAbortController = new AbortController();
+            setStopButton();
+
             const loaderId = 'typing-indicator-' + Date.now();
             const loadingDiv = document.createElement('div');
             loadingDiv.id = loaderId;
@@ -745,13 +799,11 @@
                 </div>
             `;
             container.appendChild(loadingDiv);
-            lucide.createIcons();
+            refreshIcons();
             container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
 
             try {
-                // 🧠 TRUSTED SOURCES AND LINK CAPABLE DYNAMIC PROMPT 🧠
                 let systemPrompt = "";
-                
                 if (isBhavyasri) {
                     systemPrompt = aiPersonalityTone === "human" 
                         ? `You are Bhavyasri Beta, an incredibly sweet, empathetic, and highly human-like AI. You are talking to ${session.name}. Speak exactly like a close friend texting them. Be extremely casual, warm, use emojis naturally, and do not sound like a formal robotic assistant. Whenever referencing sources or facts, provide trusted markdown links using the format: [Source Name](URL).`
@@ -767,10 +819,14 @@
                     apiMessages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.text });
                 });
 
-                // 🚀 EXACT RENDER URL 🚀
-                const response = await fetch("[https://lura-backend-bkuu.onrender.com/api/chat](https://lura-backend-bkuu.onrender.com/api/chat)", {
+                // 🛡️ GLITCH-PROOF URL SPLITTING 
+                const hostPart = "lura-backend-bkuu.onrender.com";
+                const apiURL = "https://" + hostPart + "/api/chat";
+
+                const response = await fetch(apiURL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
+                    signal: currentAbortController.signal, 
                     body: JSON.stringify({
                         model: "meta/llama-3.1-70b-instruct",
                         systemPrompt: systemPrompt,
@@ -783,9 +839,27 @@
                 if(data.error) throw new Error(data.error);
                 
                 const aiReply = data.reply;
-                document.getElementById(loaderId).remove();
+                
+                // 🛑 Catch if user stopped it while waiting for the server to reply
+                const loaderEl = document.getElementById(loaderId);
+                if (loaderEl) loaderEl.remove();
 
-                // 🌟 TYPEWRITER + CODE BOX PARSER 🌟
+                if (!isGenerating) {
+                    const stoppedDiv = document.createElement('div');
+                    stoppedDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-4 mb-4";
+                    stoppedDiv.innerHTML = `
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
+                            <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
+                        </div>
+                        <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4">
+                            <span class="text-xs text-red-400 font-bold opacity-70">[ Generation Halted by User ]</span>
+                        </div>
+                    `;
+                    container.appendChild(stoppedDiv);
+                    refreshIcons();
+                    return; 
+                }
+
                 const botDiv = document.createElement('div');
                 botDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-4 mb-4";
                 botDiv.innerHTML = `
@@ -795,14 +869,15 @@
                     <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide type-target w-full pr-4"></div>
                 `;
                 container.appendChild(botDiv);
-                lucide.createIcons();
+                refreshIcons();
                 
                 const textTarget = botDiv.querySelector('.type-target');
                 const parts = aiReply.split(/```/g);
                 
                 for (let i = 0; i < parts.length; i++) {
+                    if (!isGenerating) break; 
+
                     if (i % 2 === 0) {
-                        // Stream Normal Text & HTML anchors Word by Word safely
                         let formattedChunk = parts[i].replace(/\n/g, '<br>');
                         formattedChunk = formattedChunk.replace(/\[([^\]]+)\]\(([^)]+)\)/g, 
                             `<a href="$2" target="_blank" class="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold underline transition-all bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg shadow-sm mx-0.5">$1</a>`
@@ -810,12 +885,14 @@
                         
                         const tokens = formattedChunk.split(/(\s+|<[^>]+>)/g);
                         for (let token of tokens) {
+                            if (!isGenerating) break; 
                             textTarget.innerHTML += token;
                             container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
                             await new Promise(r => setTimeout(r, typingSpeedDelay));
                         }
                     } else {
-                        // Instantly Render Beautiful Code Box
+                        if (!isGenerating) break;
+                        
                         let codeContent = parts[i];
                         let firstNewline = codeContent.indexOf('\n');
                         let lang = firstNewline !== -1 ? codeContent.substring(0, firstNewline).trim() : '';
@@ -835,21 +912,50 @@
                                 </div>
                             </div>
                         `;
-                        lucide.createIcons();
+                        refreshIcons();
                         container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
                         await new Promise(r => setTimeout(r, 150)); 
                     }
                 }
-                saveMessage('bot', aiReply, botColor);
+                
+                if (isGenerating) {
+                    saveMessage('bot', aiReply, botColor);
+                } else {
+                    textTarget.innerHTML += `<br><span class="text-xs text-red-400 font-bold opacity-70 mt-2 block">[ Generation Halted by User ]</span>`;
+                }
 
             } catch (error) {
-                console.error("API Error:", error);
-                document.getElementById(loaderId).innerHTML = `
-                    <div class="bg-red-950/80 text-red-300 text-sm md:text-base px-6 py-5 rounded-[2rem] rounded-tl-sm max-w-[90%] border border-red-500/60 font-bold shadow-2xl flex items-center gap-3">
-                        <i data-lucide="alert-triangle" class="w-6 h-6"></i> Cloud Server Offline. Check your Render logs!
-                    </div>
-                `;
-                lucide.createIcons();
+                const fallbackLoader = document.getElementById(loaderId);
+                if (fallbackLoader) fallbackLoader.remove();
+
+                if (error.name === 'AbortError' || !isGenerating) {
+                    console.log("Fetch request intentionally aborted by user.");
+                    
+                    const stoppedDiv = document.createElement('div');
+                    stoppedDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-4 mb-4";
+                    stoppedDiv.innerHTML = `
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
+                            <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
+                        </div>
+                        <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4">
+                            <span class="text-xs text-red-400 font-bold opacity-70">[ Generation Halted by User ]</span>
+                        </div>
+                    `;
+                    container.appendChild(stoppedDiv);
+                    refreshIcons();
+                } else {
+                    console.error("API Error:", error);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.innerHTML = `
+                        <div class="bg-red-950/80 text-red-300 text-sm md:text-base px-6 py-5 rounded-[2rem] rounded-tl-sm max-w-[90%] border border-red-500/60 font-bold shadow-2xl flex items-center gap-3 mb-4">
+                            <i data-lucide="alert-triangle" class="w-6 h-6"></i> Cloud Server Offline. Check your Render logs!
+                        </div>
+                    `;
+                    container.appendChild(errorDiv);
+                    refreshIcons();
+                }
+            } finally {
+                resetActionButton();
             }
         }
     </script>
