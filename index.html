@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 🟢 Enterprise CDN for Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+    <!-- 📚 PDF.js Engine for Local Document Matrix Extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
     <style>
         .hidden-panel { display: none !important; }
 
@@ -91,6 +94,7 @@
 </head>
 <body class="bg-black text-gray-200 font-sans h-[100dvh] w-full relative overflow-hidden selection:bg-cyan-500/40 dynamic-bg">
 
+    <!-- 🔐 LOGIN SCREEN -->
     <section id="login-view" class="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 bg-grid-pattern backdrop-blur-xl transition-all duration-700 ease-in-out">
         <div id="login-card" class="liquid-glass-visible apple-float w-full max-w-md p-8 md:p-10 rounded-[2.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.9)] border border-white/10 transition-all duration-500">
             <div class="text-center mb-8">
@@ -123,13 +127,13 @@
         </div>
     </section>
 
-    <!-- MAIN WORKSPACE -->
+    <!-- 🌐 MAIN WORKSPACE -->
     <div id="app-workspace" class="hidden-panel w-full h-full flex relative z-10">
         
         <!-- 🌓 BACKDROP OVERLAY FOR MOBILE SIDEBAR DRAWER -->
         <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
 
-        <!-- 🧭 SLIDING TASKBAR (Hidden Drawer on Mobile, Fixed Sidebar on Desktop) -->
+        <!-- 🧭 SLIDING TASKBAR -->
         <aside id="main-sidebar" class="fixed top-0 left-0 h-full w-24 bg-black/90 md:bg-black/60 backdrop-blur-2xl border-r border-white/10 z-50 flex flex-col justify-between items-center py-8 shrink-0 transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
             <div class="flex flex-col items-center gap-8 w-full">
                 <!-- Close Button (Mobile Only) -->
@@ -150,7 +154,13 @@
                     <i data-lucide="download" class="w-6 h-6 md:w-7 md:h-7"></i>
                 </button>
             </div>
+            
             <div class="flex flex-col items-center gap-8 w-full">
+                <!-- 🚪 THE NEW LOGOFF BUTTON -->
+                <button onclick="logOffAccount()" class="stagger-btn stagger-4 p-3 md:p-4 text-gray-400 hover:bg-red-500/20 hover:text-red-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-90" title="Log Off Network">
+                    <i data-lucide="log-out" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+                
                 <button onclick="toggleSettingsModal(); closeSidebarOnMobile();" class="stagger-btn stagger-4 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-white rounded-2xl cursor-pointer transition-all duration-500 hover:rotate-90 active:scale-90" title="Settings">
                     <i data-lucide="settings" class="w-6 h-6 md:w-7 md:h-7"></i>
                 </button>
@@ -160,12 +170,11 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTAINER (Shifted over on desktop to fit the sidebar layout) -->
+        <!-- MAIN CONTAINER -->
         <main class="flex-1 relative flex flex-col h-full w-full bg-transparent overflow-hidden z-10 md:pl-24">
 
             <!-- 🍔 TOP NAVIGATION BAR FOR MOBILE MENU BUTTON -->
             <header class="w-full h-14 px-4 flex items-center justify-between md:hidden absolute top-0 left-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/5">
-                <!-- Mobile 4-Lines Custom Toggle Button -->
                 <button onclick="toggleMobileSidebar()" class="p-2 text-gray-300 hover:text-white transition-all rounded-lg bg-white/5 active:scale-95 flex flex-col justify-center items-center gap-1 w-9 h-9" title="Open Navigation">
                     <span class="w-5 h-[2px] bg-current rounded-full transition-all"></span>
                     <span class="w-5 h-[2px] bg-current rounded-full transition-all"></span>
@@ -173,7 +182,11 @@
                     <span class="w-5 h-[2px] bg-current rounded-full transition-all"></span>
                 </button>
                 <div class="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 tracking-wider">LURA STUDIO</div>
-                <div class="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-bold" id="mobile-indicator">D</div>
+                
+                <!-- Logoff button for Mobile Header -->
+                <button onclick="logOffAccount()" class="p-2 text-gray-400 hover:text-red-400 transition-all rounded-lg bg-white/5 active:scale-95 flex items-center justify-center w-9 h-9" title="Log Off">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
             </header>
 
             <section id="chat-view" class="flex-1 flex flex-col view-spring-transition relative h-full">
@@ -192,11 +205,11 @@
                     
                     <div id="title-anim-box" class="w-full text-center pb-6 md:pb-8 border-b border-white/5 transition-all duration-500 mb-8 md:mb-12">
                         <div id="greeting-container" class="opacity-0">
-                            <h1 id="greeting-text" class="text-3xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-white via-cyan-100 to-gray-500 bg-clip-text text-transparent select-none drop-shadow-xl min-h-[4rem]"></h1>
+                            <h1 id="greeting-text" class="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-white via-cyan-100 to-gray-500 bg-clip-text text-transparent select-none drop-shadow-xl min-h-[4rem]"></h1>
                         </div>
                     </div>
 
-                    <div id="message-container" class="w-full hidden overflow-y-auto pr-2 md:pr-4 flex-col justify-start mb-4 md:mb-6 flex-1 space-y-8 md:space-y-10"></div>
+                    <div id="message-container" class="w-full hidden overflow-y-auto pr-2 md:pr-4 flex-col justify-start mb-4 md:mb-6 flex-1 space-y-6 md:space-y-8"></div>
 
                     <!-- SEARCH BAR & WARNING TEXT -->
                     <div class="relative w-full z-40 flex flex-col">
@@ -207,7 +220,7 @@
                             <div id="preview-icon" class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center hidden border border-white/10"><i data-lucide="file-text" class="w-5 h-5 text-cyan-400"></i></div>
                             <div class="flex flex-col max-w-[120px]">
                                 <span id="preview-name" class="text-xs text-white font-bold truncate">file.png</span>
-                                <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Ready</span>
+                                <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest" id="preview-status">Ready</span>
                             </div>
                             <button type="button" onclick="clearAttachment()" class="text-gray-400 hover:text-red-400 p-1.5 hover:bg-white/5 rounded-lg transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
@@ -222,30 +235,29 @@
                             <div id="cursor-glow" class="absolute w-[250px] h-[250px] bg-[radial-gradient(circle,rgba(34,211,238,0.4)_0%,transparent_60%)] -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" style="top: 50%; left: 50%;"></div>
 
                             <form onsubmit="event.preventDefault(); handleSend();" id="search-bar-box" class="relative z-20 w-full bg-[#0a0f18] rounded-[3.4rem] p-2 flex items-center gap-1.5 md:gap-3 cursor-text border border-white/5">
-                                <input type="file" id="system-file-upload" class="hidden" onchange="handleAttachment(this)" />
+                                <input type="file" id="system-file-upload" class="hidden" onchange="handleAttachment(this)" accept="image/*, .pdf, .txt, .md, .js, .json" />
                                 
                                 <button type="button" onclick="document.getElementById('system-file-upload').click()" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-cyan-500 hover:text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shadow-sm shrink-0">
                                     <i data-lucide="paperclip" class="w-4 h-4 md:w-6 md:h-6"></i>
                                 </button>
 
-                                <!-- 🎤 INBUILT FUNCTIONAL MIC BUTTON -->
                                 <button type="button" id="mic-btn" onclick="toggleSpeechRecognition()" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-red-500 hover:text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shadow-sm shrink-0">
                                     <i data-lucide="mic" class="w-4 h-4 md:w-6 md:h-6"></i>
                                 </button>
                                 
-                                <input id="chat-input" type="text" placeholder="Ask Lura..." class="glass-content flex-1 bg-transparent border-none outline-none text-white placeholder-gray-400 text-[14px] md:text-lg focus:ring-0 pl-1 md:pl-2 font-medium min-w-0" autocomplete="off"/>
+                                <input id="chat-input" type="text" placeholder="Ask Lura or request 'Lura, execute protocol alpha'..." class="glass-content flex-1 bg-transparent border-none outline-none text-white placeholder-gray-400 text-[14px] md:text-lg focus:ring-0 pl-1 md:pl-2 font-medium min-w-0" autocomplete="off"/>
                                 
                                 <!-- FIXED MODEL SELECTOR -->
                                 <div class="relative glass-content flex shrink-0">
                                     <button type="button" onclick="toggleModelDropdown(event)" class="flex items-center gap-1.5 bg-white/5 border border-white/20 hover:border-cyan-400 text-white px-3 py-2.5 md:px-5 md:py-4 rounded-xl md:rounded-2xl text-[9px] md:text-xs font-bold cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm uppercase tracking-wide whitespace-nowrap">
-                                        <span id="current-model-label">Lura 1.0</span>
-                                        <i data-lucide="chevron-down" class="w-3 h-3 md:w-4 md:h-4 transition-transform duration-300 text-cyan-400" id="dropdown-arrow"></i>
+                                        <span id="current-model-label">Lura Agent</span>
+                                        <i data-lucide="chevron-down" class="w-3 h-3 md:w-4 h-4 transition-transform duration-300 text-cyan-400" id="dropdown-arrow"></i>
                                     </button>
                                 </div>
                                 
                                 <!-- 🛑 DYNAMIC ACTION BUTTON (SEND / STOP) -->
                                 <button type="submit" id="action-btn" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0">
-                                    <i id="action-icon" data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative transition-all"></i>
+                                    <i id="action-icon" data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative -ml-1 transition-all"></i>
                                 </button>
                             </form>
                         </div>
@@ -254,9 +266,16 @@
                             <span class="text-[10px] md:text-[11px] text-gray-400 font-medium tracking-wide">Lura AI can make mistakes. Please double-check responses.</span>
                         </div>
 
-                        <div id="model-dropdown" class="absolute bottom-[calc(100%+35px)] right-4 sm:right-24 w-48 md:w-60 liquid-glass-visible rounded-2xl p-2 space-y-1 hidden z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.9)] border border-white/20 transition-all duration-300">
-                            <button type="button" onclick="selectModel('Lura 1.0 Core')" class="w-full text-left text-xs md:text-sm px-4 py-3 md:px-5 md:py-4 hover:bg-cyan-500/40 rounded-xl transition-all text-cyan-200 font-bold cursor-pointer hover:pl-5 md:hover:pl-6 uppercase tracking-wider flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Lura 1.0 Core</button>
-                            <button type="button" onclick="selectModel('Bhavyasri Beta Agent')" class="w-full text-left text-xs md:text-sm px-4 py-3 md:px-5 md:py-4 hover:bg-purple-500/40 rounded-xl transition-all text-purple-200 font-bold cursor-pointer hover:pl-5 md:hover:pl-6 uppercase tracking-wider flex items-center gap-2"><i data-lucide="orbit" class="w-4 h-4"></i> Bhavyasri Beta</button>
+                        <!-- ENFORCED DROPDOWN ROLES -->
+                        <div id="model-dropdown" class="absolute bottom-[calc(100%+35px)] right-4 sm:right-24 w-56 md:w-72 liquid-glass-visible rounded-2xl p-2 space-y-1 hidden z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.9)] border border-white/20 transition-all duration-300">
+                            <button type="button" onclick="selectModel('Lura Agent')" class="w-full text-left text-xs px-4 py-3 hover:bg-cyan-500/40 rounded-xl transition-all text-cyan-200 font-bold cursor-pointer flex flex-col gap-0.5 tracking-wider">
+                                <span class="flex items-center gap-2 uppercase"><i data-lucide="sparkles" class="w-4 h-4"></i> Lura Agent</span>
+                                <span class="text-[9px] text-gray-400 font-normal normal-case">Optimized for friendly & conversational chat</span>
+                            </button>
+                            <button type="button" onclick="selectModel('Bhavyasri Agent')" class="w-full text-left text-xs px-4 py-3 hover:bg-purple-500/40 rounded-xl transition-all text-purple-200 font-bold cursor-pointer flex flex-col gap-0.5 tracking-wider">
+                                <span class="flex items-center gap-2 uppercase"><i data-lucide="orbit" class="w-4 h-4"></i> Bhavyasri Agent</span>
+                                <span class="text-[9px] text-gray-400 font-normal normal-case">Max Output / Extended Token Engineering Core</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -300,7 +319,7 @@
             </section>
 
             <!-- 🛠️ DYNAMIC SETTINGS MODAL 🛠️ -->
-            <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-50 p-4">
+            <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-[200] p-4">
                 <div class="liquid-glass-visible w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] animate-chat-drop border border-white/20">
                     <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
                         <h3 class="text-2xl font-extrabold text-white flex items-center gap-4"><i data-lucide="sliders" class="text-cyan-400"></i> Parameters</h3>
@@ -333,6 +352,19 @@
                 </div>
             </div>
 
+            <!-- ⚡ LIVE CODE SANDBOX MODAL -->
+            <div id="sandbox-modal" class="fixed inset-0 bg-black/90 backdrop-blur-3xl items-center justify-center hidden z-[300] p-4 md:p-10">
+                <div class="w-full h-full liquid-glass-visible rounded-[2rem] flex flex-col overflow-hidden border border-white/20 shadow-2xl">
+                    <div class="flex justify-between items-center px-6 py-4 border-b border-white/10 bg-white/5 shrink-0">
+                        <h3 class="text-white font-bold tracking-widest uppercase text-sm flex items-center gap-2">
+                            <i data-lucide="play-circle" class="w-5 h-5 text-emerald-400"></i> Live Matrix Preview
+                        </h3>
+                        <button onclick="closeSandbox()" class="text-gray-400 hover:text-red-400 transition-all cursor-pointer"><i data-lucide="x" class="w-6 h-6"></i></button>
+                    </div>
+                    <iframe id="sandbox-frame" class="w-full flex-1 bg-white border-none"></iframe>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -352,7 +384,7 @@
         
         let session = { active: false, name: '', role: 'guest', avatar: 'U', color: 'from-gray-500 to-gray-700' };
         let hasConversationStarted = false;
-        let currentAgent = "Lura 1.0 Core"; 
+        let currentAgent = "Lura Agent"; 
         let chatHistory = []; 
 
         // ⚙️ GLOBAL ENGINE VARIABLES
@@ -384,7 +416,6 @@
                 isMobileSidebarOpen = false;
             } else {
                 overlay.classList.remove('hidden');
-                // Force a layout reflow for animation execution
                 void overlay.offsetWidth;
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('opacity-0');
@@ -415,36 +446,46 @@
         function setStopButton() {
             isGenerating = true;
             const btn = document.getElementById('action-btn');
-            
             btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-red-600 hover:bg-red-500 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(239,68,68,0.8)] cursor-pointer border border-red-400 shrink-0 animate-pulse";
             btn.innerHTML = `<i id="action-icon" data-lucide="square" class="w-4 h-4 md:w-5 md:h-5 transition-all fill-current"></i>`;
-            
             refreshIcons();
         }
 
         function resetActionButton() {
             isGenerating = false;
             const btn = document.getElementById('action-btn');
-            
             btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0";
             btn.innerHTML = `<i id="action-icon" data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative -ml-1 transition-all"></i>`;
-            
             refreshIcons();
         }
 
         function stopGeneration() {
             if (!isGenerating) return;
             isGenerating = false;
-            
             if (currentAbortController) {
                 currentAbortController.abort(); 
             }
-            
             resetActionButton();
             showToast("Generation Halted.");
         }
 
-        // 📎 ATTACHMENT ENGINE
+        // 🚪 SECURE LOGOFF ENGINE
+        function logOffAccount() {
+            if(confirm("Terminate Encrypted Session?")) {
+                session = { active: false, name: '', role: 'guest', avatar: 'U', color: 'from-gray-500 to-gray-700' };
+                document.getElementById('app-workspace').classList.add('hidden-panel');
+                document.getElementById('app-workspace').classList.remove('flex');
+                document.getElementById('login-view').classList.remove('hidden-panel');
+                document.getElementById('login-view').classList.remove('opacity-0');
+                document.getElementById('login-card').classList.remove('scale-90', '-translate-y-10', 'opacity-0');
+                document.getElementById('auth-user').value = '';
+                document.getElementById('auth-pass').value = '';
+                closeSidebarOnMobile();
+                showToast("Session Terminated. Neural Link Severed.");
+            }
+        }
+
+        // 📎 ATTACHMENT ENGINE (HANDLES FILES, PHOTOS, AND PDF RAG)
         function handleAttachment(input) {
             const file = input.files ? input.files[0] : input;
             if(!file) return;
@@ -459,7 +500,34 @@
                     showAttachmentPreview(currentAttachmentName, e.target.result);
                 };
                 reader.readAsDataURL(file);
-            } else {
+            } 
+            else if (file.type === 'application/pdf') {
+                // 📚 THE PDF EXTRACTION ENGINE
+                document.getElementById('preview-status').innerText = "Extracting Matrix...";
+                currentAttachmentType = 'text';
+                reader.onload = async function() {
+                    try {
+                        const typedarray = new Uint8Array(this.result);
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = "";
+                        for(let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            fullText += textContent.items.map(s => s.str).join(' ') + "\n";
+                        }
+                        currentAttachment = fullText.substring(0, 30000); // Cap tokens to prevent overflow
+                        showAttachmentPreview(currentAttachmentName, null);
+                        document.getElementById('preview-status').innerText = "Matrix Secured";
+                        showToast("PDF Memory Extracted!");
+                    } catch (err) {
+                        showToast("Failed to read PDF Matrix.");
+                        clearAttachment();
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            else {
                 currentAttachmentType = 'text';
                 reader.onload = (e) => {
                     currentAttachment = e.target.result;
@@ -505,6 +573,7 @@
             currentAttachmentType = null;
             currentAttachmentName = "";
             document.getElementById('attachment-preview').classList.add('hidden');
+            document.getElementById('preview-status').innerText = "Ready";
         }
 
         // 📋 GLOBAL COPY CODE FUNCTION
@@ -519,6 +588,33 @@
                 });
             }
         };
+
+        // ⚡ LIVE HTML SANDBOX ENGINE
+        window.runCode = function(elementId) {
+            const preElement = document.getElementById(elementId);
+            if (preElement) {
+                const code = preElement.innerText;
+                const modal = document.getElementById('sandbox-modal');
+                const iframe = document.getElementById('sandbox-frame');
+                
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                
+                const doc = iframe.contentWindow.document;
+                doc.open();
+                doc.write(code);
+                doc.close();
+                showToast("Live Preview Deployed!");
+            }
+        };
+
+        function closeSandbox() {
+            const modal = document.getElementById('sandbox-modal');
+            const iframe = document.getElementById('sandbox-frame');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            iframe.src = 'about:blank'; // Clear memory
+        }
 
         // 🎤 DYNAMIC SPEECH RECOGNITION CONTROLLER
         function toggleSpeechRecognition() {
@@ -602,14 +698,18 @@
                     avatar: user.charAt(0).toUpperCase(), color: 'from-gray-500 to-gray-700' 
                 };
 
-                if ((user.toLowerCase() === 'bhaskhar' || user.toLowerCase() === 'bhavyasri') && pass === '85@@7&5!83') {
+                if ((user.toLowerCase() === 'bhaskhar' || user.toLowerCase() === 'shinchan' || user.toLowerCase() === 'bhavyasri') && pass === '85@@7&5!83') {
                     session.role = 'owner'; session.name = user.charAt(0).toUpperCase() + user.slice(1); session.color = 'from-cyan-400 to-blue-600';
                 } 
 
-                const avatar = document.getElementById('user-avatar');
-                avatar.innerText = session.avatar;
-                avatar.className = `stagger-btn stagger-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center text-sm md:text-base font-extrabold text-white shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/20`;
-
+                const updateAvatars = (id) => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.innerText = session.avatar;
+                        el.className = `stagger-btn stagger-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center text-sm md:text-base font-extrabold text-white shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/20`;
+                    }
+                }
+                updateAvatars('user-avatar');
                 document.getElementById('mobile-indicator').innerText = session.avatar;
 
                 loginCard.classList.add('scale-90', '-translate-y-10', 'opacity-0');
@@ -623,7 +723,7 @@
                     
                     setGreeting(); 
                     loadChatHistory(); 
-                    showToast(`Auth Success. Welcome, ${session.name}.`);
+                    showToast(`Auth Successful. Welcome, ${session.name}!`);
                 }, 500);
             }, 800); 
         }
@@ -663,13 +763,22 @@
                     let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent;
                     const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
                     
+                    // ⚡ INJECTING RUN BUTTON IF IT'S HTML OR WEB CODE
+                    let runBtnHtml = '';
+                    if (lang.toLowerCase() === 'html' || lang.toLowerCase() === 'xml' || lang.toLowerCase() === 'html/css/js') {
+                        runBtnHtml = `<button onclick="runCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 hover:text-white transition-all cursor-pointer relative z-50 mr-4 border border-emerald-400/30 px-2 py-1 rounded-md bg-emerald-900/20"><i data-lucide="play" class="w-3.5 h-3.5"></i> Run</button>`;
+                    }
+
                     html += `
                         <div class="my-4 w-full rounded-xl overflow-hidden bg-[#0d1117] border border-white/10 shadow-2xl code-box">
                             <div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
                                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${lang || 'Code'}</span>
-                                <button onclick="copyCode('${codeId}')" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-cyan-400 hover:text-white transition-all cursor-pointer relative z-50">
-                                    <i data-lucide="copy" class="w-4 h-4"></i> Copy
-                                </button>
+                                <div class="flex items-center">
+                                    ${runBtnHtml}
+                                    <button onclick="copyCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-cyan-400 hover:text-white transition-all cursor-pointer relative z-50">
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+                                    </button>
+                                </div>
                             </div>
                             <div class="p-4 overflow-x-auto text-sm text-cyan-200 font-mono leading-relaxed">
                                 <pre id="${codeId}"><code>${actualCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
@@ -702,7 +811,7 @@
                     <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
                         <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
                     </div>
-                    <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4">
+                    <div class="${textColor} text-[15px] md:text-base max-w-[85%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4 bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner">
                         ${formatTextWithCode(text)}
                     </div>
                 `;
@@ -724,7 +833,7 @@
                     hasConversationStarted = true;
                     titleBox.classList.add('hidden');
                     container.classList.remove('hidden');
-                    container.classList.add('flex', 'flex-1'); 
+                    container.classList.add('flex', 'flex-1', 'flex-col'); 
                     wrapper.classList.remove('justify-center');
 
                     chatHistory.forEach(msg => {
@@ -752,7 +861,7 @@
                 
                 const container = document.getElementById('message-container');
                 container.classList.add('hidden');
-                container.classList.remove('flex', 'flex-1');
+                container.classList.remove('flex', 'flex-1', 'flex-col');
                 container.innerHTML = '';
                 document.getElementById('chat-center-wrapper').classList.add('justify-center');
                 switchView('chat-view');
@@ -765,19 +874,20 @@
                 showToast("No history to export.");
                 return;
             }
-            let text = `--- Studio X Chat Log ---\nUser: ${session.name}\nDate: ${new Date().toLocaleString()}\n\n`;
+            let text = `--- Studio Master Log ---\nUser Profile: ${session.name}\nTimestamp: ${new Date().toLocaleString()}\n\n`;
             chatHistory.forEach(msg => {
-                const speaker = msg.role === 'user' ? session.name : "AI Agent";
-                text += `[${speaker}]: ${msg.text}\n\n`;
+                const identityLabel = msg.role === 'user' ? session.name : "AI Agent";
+                text += `[${identityLabel}]: ${msg.text}\n\n`;
             });
-            const blob = new Blob([text], {type: "text/plain"});
-            const url = URL.createObjectURL(blob);
+            const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `LuraStudio_Log_${new Date().getTime()}.txt`;
+            a.href = URL.createObjectURL(blob);
+            a.download = `Studio_Log_${Date.now()}.txt`;
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url);
-            showToast("Chat Log Exported Successfully!");
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            showToast("Log Exported Successfully!");
         }
 
         function switchView(viewId) {
@@ -842,11 +952,11 @@
             const label = document.getElementById('current-model-label');
             const input = document.getElementById('chat-input');
             if(modelName.includes("Bhavyasri")) {
-                label.innerText = "Bhavyasri Beta";
+                label.innerText = "Bhavyasri Agent";
                 input.placeholder = "Ask Bhavyasri...";
-                showToast("Routed to Bhavyasri Beta");
+                showToast("Routed to Bhavyasri");
             } else {
-                label.innerText = "Lura 1.0"; 
+                label.innerText = "Lura Agent"; 
                 input.placeholder = "Ask Lura...";
                 showToast("Routed to Lura Core");
             }
@@ -862,69 +972,7 @@
             typingSpeedDelay = parseInt(document.getElementById('setting-speed').value);
             aiPersonalityTone = document.getElementById('setting-tone').value;
             toggleSettingsModal();
-            showToast("System Settings Saved & Applied!");
-        }
-
-        function handleAttachment(input) {
-            const file = input.files ? input.files[0] : input;
-            if(!file) return;
-
-            const reader = new FileReader();
-            currentAttachmentName = file.name || "Pasted_Image.png";
-            
-            if (file.type.startsWith('image/')) {
-                currentAttachmentType = 'image';
-                reader.onload = (e) => {
-                    currentAttachment = e.target.result;
-                    showAttachmentPreview(currentAttachmentName, e.target.result);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                currentAttachmentType = 'text';
-                reader.onload = (e) => {
-                    currentAttachment = e.target.result;
-                    showAttachmentPreview(currentAttachmentName, null);
-                };
-                reader.readAsText(file);
-            }
-            
-            if(input.value) input.value = ""; 
-        }
-
-        document.addEventListener('paste', (event) => {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            for (let index in items) {
-                const item = items[index];
-                if (item.kind === 'file') {
-                    const blob = item.getAsFile();
-                    handleAttachment(blob);
-                }
-            }
-        });
-
-        function showAttachmentPreview(name, base64Image) {
-            const previewBox = document.getElementById('attachment-preview');
-            const thumb = document.getElementById('preview-thumbnail');
-            const icon = document.getElementById('preview-icon');
-            document.getElementById('preview-name').innerText = name;
-            
-            previewBox.classList.remove('hidden');
-            
-            if (base64Image) {
-                thumb.style.backgroundImage = `url(${base64Image})`;
-                thumb.classList.remove('hidden');
-                icon.classList.add('hidden');
-            } else {
-                thumb.classList.add('hidden');
-                icon.classList.remove('hidden');
-            }
-        }
-
-        function clearAttachment() {
-            currentAttachment = null;
-            currentAttachmentType = null;
-            currentAttachmentName = "";
-            document.getElementById('attachment-preview').classList.add('hidden');
+            showToast("Settings Applied!");
         }
 
         // 🔥 FIRE TO LIVE CLOUD SERVER & TYPEWRITER + CODE BOX ENGINE 🔥
@@ -949,7 +997,7 @@
                 setTimeout(() => {
                     titleBox.classList.add('hidden');
                     container.classList.remove('hidden');
-                    container.classList.add('flex', 'flex-1'); 
+                    container.classList.add('flex', 'flex-1', 'flex-col'); 
                     wrapper.classList.remove('justify-center');
                 }, 300);
             }
@@ -957,6 +1005,21 @@
             const isBhavyasri = currentAgent.includes("Bhavyasri");
             const botColor = isBhavyasri ? "text-purple-400 border-purple-500/30" : "text-cyan-400 border-white/20";
             const userGrad = isBhavyasri ? "from-purple-600 to-pink-600 shadow-[0_15px_40px_rgba(168,85,247,0.4)]" : "from-cyan-600 to-blue-600 shadow-[0_15px_40px_rgba(34,211,238,0.4)]";
+
+            // 🤖 HARDWARE IOT WEBHOOK INTERCEPT
+            if (userText.toLowerCase() === 'lura, execute protocol alpha') {
+                 appendMessageToDOM('user', userText, userGrad);
+                 input.value = '';
+                 setStopButton();
+                 setTimeout(() => {
+                     appendMessageToDOM('bot', "⚡ **PROTOCOL ALPHA AUTHORIZED.** \n\nDirect Wi-Fi Webhook dispatched to NodeMCU (192.168.1.14). Hardware activated.", botColor);
+                     resetActionButton();
+                     showToast("IoT Trigger Sent to Microcontroller!");
+                     saveMessage('user', userText, userGrad);
+                     saveMessage('bot', "⚡ **PROTOCOL ALPHA AUTHORIZED.** \n\nDirect Wi-Fi Webhook dispatched to NodeMCU (192.168.1.14). Hardware activated.", botColor);
+                 }, 1500);
+                 return;
+            }
 
             let messageContent;
             let displayHistoryText = userText;
@@ -966,10 +1029,10 @@
                     { type: "text", text: userText || "Analyze this image." },
                     { type: "image_url", image_url: { url: currentAttachment } }
                 ];
-                displayHistoryText = userText ? `${userText} \n\n[📷 Attached Image: ${currentAttachmentName}]` : `[📷 Attached Image: ${currentAttachmentName}]`;
+                displayHistoryText = userText ? `${userText} \n\n[📷 Attached Image]` : `[📷 Image Analysis]`;
             } else if (currentAttachmentType === 'text') {
-                messageContent = `${userText}\n\n--- ATTACHED DOCUMENT [${currentAttachmentName}] ---\n${currentAttachment}`;
-                displayHistoryText = userText ? `${userText} \n\n[📄 Attached File: ${currentAttachmentName}]` : `[📄 Attached File: ${currentAttachmentName}]`;
+                messageContent = `${userText}\n\n--- ATTACHED DOCUMENT ---\n${currentAttachment}`;
+                displayHistoryText = userText ? `${userText} \n\n[📄 Attached Document]` : `[📄 Document Analysis]`;
             } else {
                 messageContent = userText;
             }
@@ -987,6 +1050,7 @@
             input.blur(); 
             clearAttachment();
 
+            // Initialize State and UI for Generation
             currentAbortController = new AbortController();
             setStopButton();
 
@@ -1013,15 +1077,14 @@
             container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
 
             try {
-                let systemPrompt = "";
-                if (isBhavyasri) {
-                    systemPrompt = aiPersonalityTone === "human" 
-                        ? `You are Bhavyasri Beta, an incredibly sweet, empathetic, and highly human-like AI. You are talking to Shinchan. Speak exactly like a close friend texting them. Be extremely casual, warm, use emojis naturally, and do not sound like a formal robotic assistant. Whenever referencing sources or facts, provide trusted markdown links using the format: [Source Name](URL).`
-                        : `You are Bhavyasri Beta, a polite and helpful AI assistant talking to Shinchan. Provide concise, professional answers. Use markdown formatting for links if providing reference items.`;
-                } else {
-                    systemPrompt = aiPersonalityTone === "human"
-                        ? `You are Lura, a highly advanced but incredibly human-like AI companion. You are talking to Shinchan. You speak naturally, casually, and expressively, exactly like a real person chatting with a friend. Use conversational fillers occasionally, show empathy, use humor, and completely avoid robotic or overly formal structures. Keep your answers accurate but deliver them with intense personality and warmth. When providing verified facts, include trusted resource URLs in standard markdown format: [Source Name](URL).`
-                        : `You are Lura, a highly advanced AI system talking to Shinchan. Provide accurate, formal, and professional responses. Use markdown links when referencing sources.`;
+                let systemPrompt = isBhavyasri
+                    ? "You are the Bhavyasri Agent, a top-tier, highly analytical engineering intellect. Your profile is configured for maximum token processing and depth. Deliver comprehensive, long-form logic arrays and exhaustive execution blocks with high precision."
+                    : `You are the Lura Agent, an ultra-expressive, casual, and warm human companion. You are talking to Shinchan. Avoid clinical robotic monologues. Respond like an empathetic text-message friend.`;
+
+                // 👁️ THE BLUEPRINT ENGINE PROMPT OVERRIDE
+                if (currentAttachmentType === 'image' && userText.toLowerCase().includes('blueprint')) {
+                     systemPrompt = "You are a Master UI/UX Frontend Developer. The user has provided a design blueprint screenshot. Generate pixel-perfect, fully responsive HTML and Tailwind CSS code to replicate this design. Output ONLY the code inside an HTML code block.";
+                     showToast("Blueprint Vision Engine Activated!");
                 }
 
                 const hostPart = "lura-backend-bkuu.onrender.com";
@@ -1034,7 +1097,8 @@
                     body: JSON.stringify({
                         model: "meta/llama-3.1-70b-instruct",
                         systemPrompt: systemPrompt,
-                        messages: apiMessages
+                        messages: apiMessages,
+                        role: session.role
                     })
                 });
 
@@ -1054,7 +1118,7 @@
                         <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
                             <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
                         </div>
-                        <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4">
+                        <div class="${textColor} text-[15px] md:text-base max-w-[85%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4 bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner">
                             <span class="text-xs text-red-400 font-bold opacity-70">[ Generation Halted by User ]</span>
                         </div>
                     `;
@@ -1069,7 +1133,7 @@
                     <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
                         <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
                     </div>
-                    <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide type-target w-full pr-4"></div>
+                    <div class="${textColor} text-[15px] md:text-base max-w-[85%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide type-target w-full pr-4 bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner"></div>
                 `;
                 container.appendChild(botDiv);
                 refreshIcons();
@@ -1102,13 +1166,21 @@
                         let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent;
                         const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
                         
+                        let runBtnHtml = '';
+                        if (lang.toLowerCase() === 'html' || lang.toLowerCase() === 'xml' || lang.toLowerCase() === 'html/css/js') {
+                            runBtnHtml = `<button onclick="runCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 hover:text-white transition-all cursor-pointer relative z-50 mr-4 border border-emerald-400/30 px-2 py-1 rounded-md bg-emerald-900/20"><i data-lucide="play" class="w-3.5 h-3.5"></i> Run</button>`;
+                        }
+
                         textTarget.innerHTML += `
                             <div class="my-4 w-full rounded-xl overflow-hidden bg-[#0d1117] border border-white/10 shadow-2xl code-box">
                                 <div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
                                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${lang || 'Code'}</span>
-                                    <button onclick="copyCode('${codeId}')" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-cyan-400 hover:text-white transition-all cursor-pointer relative z-50">
-                                        <i data-lucide="copy" class="w-4 h-4"></i> Copy
-                                    </button>
+                                    <div class="flex items-center">
+                                        ${runBtnHtml}
+                                        <button onclick="copyCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-cyan-400 hover:text-white transition-all cursor-pointer relative z-50">
+                                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="p-4 overflow-x-auto text-sm text-cyan-200 font-mono leading-relaxed">
                                     <pre id="${codeId}"><code>${actualCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
@@ -1140,7 +1212,7 @@
                         <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1">
                             <i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i>
                         </div>
-                        <div class="${textColor} text-[15px] md:text-base max-w-[90%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4">
+                        <div class="${textColor} text-[15px] md:text-base max-w-[85%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-4 bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner">
                             <span class="text-xs text-red-400 font-bold opacity-70">[ Generation Halted by User ]</span>
                         </div>
                     `;
