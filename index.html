@@ -15,7 +15,7 @@
         .hidden-panel { display: none !important; }
 
         /* =========================================
-           💎 APPLE-LEVEL LIQUID GLASS ENGINE
+           💎 SOLID LIQUID GLASS ENGINE
            ========================================= */
         .liquid-glass {
             background: rgba(20, 20, 28, 0.55);
@@ -127,13 +127,13 @@
         </div>
     </section>
 
-    <!-- 🌐 MAIN WORKSPACE -->
+    <!-- MAIN WORKSPACE -->
     <div id="app-workspace" class="hidden-panel w-full h-full flex relative z-10">
         
         <!-- 🌓 BACKDROP OVERLAY FOR MOBILE SIDEBAR DRAWER -->
         <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
 
-        <!-- 🧭 SLIDING TASKBAR -->
+        <!-- 🧭 SLIDING TASKBAR (Hidden Drawer on Mobile, Fixed Sidebar on Desktop) -->
         <aside id="main-sidebar" class="fixed top-0 left-0 h-full w-24 bg-black/90 md:bg-black/60 backdrop-blur-2xl border-r border-white/10 z-50 flex flex-col justify-between items-center py-8 shrink-0 transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
             <div class="flex flex-col items-center gap-8 w-full">
                 <!-- Close Button (Mobile Only) -->
@@ -319,7 +319,7 @@
             </section>
 
             <!-- 🛠️ DYNAMIC SETTINGS MODAL 🛠️ -->
-            <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-[200] p-4">
+            <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-50 p-4">
                 <div class="liquid-glass-visible w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] animate-chat-drop border border-white/20">
                     <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
                         <h3 class="text-2xl font-extrabold text-white flex items-center gap-4"><i data-lucide="sliders" class="text-cyan-400"></i> Parameters</h3>
@@ -416,6 +416,7 @@
                 isMobileSidebarOpen = false;
             } else {
                 overlay.classList.remove('hidden');
+                // Force a layout reflow for animation execution
                 void overlay.offsetWidth;
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('opacity-0');
@@ -446,25 +447,33 @@
         function setStopButton() {
             isGenerating = true;
             const btn = document.getElementById('action-btn');
+            
+            // Hard reset the innerHTML to remove any leftover SVG classes and center it
             btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-red-600 hover:bg-red-500 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(239,68,68,0.8)] cursor-pointer border border-red-400 shrink-0 animate-pulse";
             btn.innerHTML = `<i id="action-icon" data-lucide="square" class="w-4 h-4 md:w-5 md:h-5 transition-all fill-current"></i>`;
+            
             refreshIcons();
         }
 
         function resetActionButton() {
             isGenerating = false;
             const btn = document.getElementById('action-btn');
+            
+            // Hard reset back to the send icon
             btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 shadow-[0_0_30px_rgba(34,211,238,0.8)] cursor-pointer border border-cyan-300 shrink-0";
             btn.innerHTML = `<i id="action-icon" data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 relative -ml-1 transition-all"></i>`;
+            
             refreshIcons();
         }
 
         function stopGeneration() {
             if (!isGenerating) return;
             isGenerating = false;
+            
             if (currentAbortController) {
-                currentAbortController.abort(); 
+                currentAbortController.abort(); // Kills the fetch request mid-flight
             }
+            
             resetActionButton();
             showToast("Generation Halted.");
         }
@@ -478,8 +487,13 @@
                 document.getElementById('login-view').classList.remove('hidden-panel');
                 document.getElementById('login-view').classList.remove('opacity-0');
                 document.getElementById('login-card').classList.remove('scale-90', '-translate-y-10', 'opacity-0');
-                document.getElementById('auth-user').value = '';
-                document.getElementById('auth-pass').value = '';
+                
+                // Clear inputs safely
+                const uInput = document.getElementById('auth-user');
+                const pInput = document.getElementById('auth-pass');
+                if (uInput) uInput.value = '';
+                if (pInput) pInput.value = '';
+                
                 closeSidebarOnMobile();
                 showToast("Session Terminated. Neural Link Severed.");
             }
@@ -503,7 +517,8 @@
             } 
             else if (file.type === 'application/pdf') {
                 // 📚 THE PDF EXTRACTION ENGINE
-                document.getElementById('preview-status').innerText = "Extracting Matrix...";
+                const statusEl = document.getElementById('preview-status');
+                if(statusEl) statusEl.innerText = "Extracting Matrix...";
                 currentAttachmentType = 'text';
                 reader.onload = async function() {
                     try {
@@ -518,7 +533,7 @@
                         }
                         currentAttachment = fullText.substring(0, 30000); // Cap tokens to prevent overflow
                         showAttachmentPreview(currentAttachmentName, null);
-                        document.getElementById('preview-status').innerText = "Matrix Secured";
+                        if(statusEl) statusEl.innerText = "Matrix Secured";
                         showToast("PDF Memory Extracted!");
                     } catch (err) {
                         showToast("Failed to read PDF Matrix.");
@@ -554,17 +569,20 @@
             const previewBox = document.getElementById('attachment-preview');
             const thumb = document.getElementById('preview-thumbnail');
             const icon = document.getElementById('preview-icon');
-            document.getElementById('preview-name').innerText = name;
+            const nameEl = document.getElementById('preview-name');
             
-            previewBox.classList.remove('hidden');
+            if(nameEl) nameEl.innerText = name;
+            if(previewBox) previewBox.classList.remove('hidden');
             
             if (base64Image) {
-                thumb.style.backgroundImage = `url(${base64Image})`;
-                thumb.classList.remove('hidden');
-                icon.classList.add('hidden');
+                if(thumb) {
+                    thumb.style.backgroundImage = `url(${base64Image})`;
+                    thumb.classList.remove('hidden');
+                }
+                if(icon) icon.classList.add('hidden');
             } else {
-                thumb.classList.add('hidden');
-                icon.classList.remove('hidden');
+                if(thumb) thumb.classList.add('hidden');
+                if(icon) icon.classList.remove('hidden');
             }
         }
 
@@ -572,8 +590,10 @@
             currentAttachment = null;
             currentAttachmentType = null;
             currentAttachmentName = "";
-            document.getElementById('attachment-preview').classList.add('hidden');
-            document.getElementById('preview-status').innerText = "Ready";
+            const previewBox = document.getElementById('attachment-preview');
+            const statusEl = document.getElementById('preview-status');
+            if (previewBox) previewBox.classList.add('hidden');
+            if (statusEl) statusEl.innerText = "Ready";
         }
 
         // 📋 GLOBAL COPY CODE FUNCTION
@@ -597,23 +617,29 @@
                 const modal = document.getElementById('sandbox-modal');
                 const iframe = document.getElementById('sandbox-frame');
                 
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                
-                const doc = iframe.contentWindow.document;
-                doc.open();
-                doc.write(code);
-                doc.close();
-                showToast("Live Preview Deployed!");
+                if (modal && iframe) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(code);
+                    doc.close();
+                    showToast("Live Preview Deployed!");
+                }
             }
         };
 
         function closeSandbox() {
             const modal = document.getElementById('sandbox-modal');
             const iframe = document.getElementById('sandbox-frame');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            iframe.src = 'about:blank'; // Clear memory
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            if (iframe) {
+                iframe.src = 'about:blank'; // Clear memory
+            }
         }
 
         // 🎤 DYNAMIC SPEECH RECOGNITION CONTROLLER
@@ -636,7 +662,7 @@
 
                 recognition.onstart = () => {
                     isRecording = true;
-                    micBtn.classList.add('text-red-500', 'bg-red-500/20', 'animate-pulse');
+                    if(micBtn) micBtn.classList.add('text-red-500', 'bg-red-500/20', 'animate-pulse');
                     showToast("Listening to voice input...");
                 };
 
@@ -652,8 +678,10 @@
 
                 recognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript;
-                    chatInput.value += (chatInput.value ? ' ' : '') + transcript;
-                    chatInput.focus();
+                    if (chatInput) {
+                        chatInput.value += (chatInput.value ? ' ' : '') + transcript;
+                        chatInput.focus();
+                    }
                     showToast("Voice matched successfully!");
                 };
             }
@@ -675,22 +703,29 @@
 
         // 🔐 OPEN LOGIN SYSTEM
         function handleLogin() {
-            const user = document.getElementById('auth-user').value.trim();
-            const pass = document.getElementById('auth-pass').value.trim();
+            const userEl = document.getElementById('auth-user');
+            const passEl = document.getElementById('auth-pass');
+            const user = userEl ? userEl.value.trim() : '';
+            const pass = passEl ? passEl.value.trim() : '';
+            
             const loginCard = document.getElementById('login-card');
             const loginView = document.getElementById('login-view');
             const loginBtn = document.getElementById('login-btn');
 
             if (!user || !pass) {
-                loginCard.classList.remove('error-shake');
-                void loginCard.offsetWidth; 
-                loginCard.classList.add('error-shake');
+                if(loginCard) {
+                    loginCard.classList.remove('error-shake');
+                    void loginCard.offsetWidth; 
+                    loginCard.classList.add('error-shake');
+                }
                 showToast("Please enter an Identity and Passcode.");
                 return;
             }
 
-            loginBtn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-white"></i>`;
-            refreshIcons();
+            if(loginBtn) {
+                loginBtn.innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-white"></i>`;
+                refreshIcons();
+            }
 
             setTimeout(() => {
                 session = { 
@@ -702,24 +737,28 @@
                     session.role = 'owner'; session.name = user.charAt(0).toUpperCase() + user.slice(1); session.color = 'from-cyan-400 to-blue-600';
                 } 
 
-                const updateAvatars = (id) => {
-                    const el = document.getElementById(id);
-                    if(el) {
-                        el.innerText = session.avatar;
-                        el.className = `stagger-btn stagger-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center text-sm md:text-base font-extrabold text-white shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/20`;
-                    }
+                const avatar = document.getElementById('user-avatar');
+                if (avatar) {
+                    avatar.innerText = session.avatar;
+                    avatar.className = `stagger-btn stagger-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center text-sm md:text-base font-extrabold text-white shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/20`;
                 }
-                updateAvatars('user-avatar');
-                document.getElementById('mobile-indicator').innerText = session.avatar;
 
-                loginCard.classList.add('scale-90', '-translate-y-10', 'opacity-0');
-                loginView.style.backdropFilter = "blur(0px)";
-                loginView.classList.add('opacity-0');
+                const mobInd = document.getElementById('mobile-indicator');
+                if(mobInd) mobInd.innerText = session.avatar;
+
+                if(loginCard) loginCard.classList.add('scale-90', '-translate-y-10', 'opacity-0');
+                if(loginView) {
+                    loginView.style.backdropFilter = "blur(0px)";
+                    loginView.classList.add('opacity-0');
+                }
                 
                 setTimeout(() => {
-                    loginView.classList.add('hidden-panel');
-                    document.getElementById('app-workspace').classList.remove('hidden-panel');
-                    document.getElementById('app-workspace').classList.add('flex');
+                    if(loginView) loginView.classList.add('hidden-panel');
+                    const workspace = document.getElementById('app-workspace');
+                    if(workspace) {
+                        workspace.classList.remove('hidden-panel');
+                        workspace.classList.add('flex');
+                    }
                     
                     setGreeting(); 
                     loadChatHistory(); 
@@ -735,10 +774,14 @@
             if (hour < 12) greeting = "Good morning";
             else if (hour < 18) greeting = "Good afternoon";
             
-            document.getElementById('greeting-text').innerText = `${greeting}, ${session.name}`;
+            const greetingText = document.getElementById('greeting-text');
+            if (greetingText) greetingText.innerText = `${greeting}, ${session.name}`;
+            
             const container = document.getElementById('greeting-container');
-            container.classList.remove('opacity-0');
-            container.classList.add('bounce-in'); 
+            if (container) {
+                container.classList.remove('opacity-0');
+                container.classList.add('bounce-in'); 
+            }
         }
 
         function saveMessage(role, text, styleClass) {
@@ -792,6 +835,7 @@
 
         function appendMessageToDOM(role, text, styleClass) {
             const container = document.getElementById('message-container');
+            if(!container) return;
             const div = document.createElement('div');
             
             if (role === 'user') {
@@ -831,10 +875,12 @@
                 chatHistory = JSON.parse(saved);
                 if(chatHistory.length > 0) {
                     hasConversationStarted = true;
-                    titleBox.classList.add('hidden');
-                    container.classList.remove('hidden');
-                    container.classList.add('flex', 'flex-1', 'flex-col'); 
-                    wrapper.classList.remove('justify-center');
+                    if(titleBox) titleBox.classList.add('hidden');
+                    if(container) {
+                        container.classList.remove('hidden');
+                        container.classList.add('flex', 'flex-1', 'flex-col'); 
+                    }
+                    if(wrapper) wrapper.classList.remove('justify-center');
 
                     chatHistory.forEach(msg => {
                         appendMessageToDOM(msg.role, msg.text, msg.styleClass);
@@ -852,18 +898,23 @@
                 hasConversationStarted = false;
                 
                 const titleBox = document.getElementById('title-anim-box');
-                titleBox.classList.remove('hidden');
+                if(titleBox) titleBox.classList.remove('hidden');
                 
                 const containerBox = document.getElementById('greeting-container');
-                containerBox.classList.remove('bounce-in');
-                void containerBox.offsetWidth;
-                containerBox.classList.add('bounce-in');
+                if(containerBox) {
+                    containerBox.classList.remove('bounce-in');
+                    void containerBox.offsetWidth;
+                    containerBox.classList.add('bounce-in');
+                }
                 
                 const container = document.getElementById('message-container');
-                container.classList.add('hidden');
-                container.classList.remove('flex', 'flex-1', 'flex-col');
-                container.innerHTML = '';
-                document.getElementById('chat-center-wrapper').classList.add('justify-center');
+                if(container) {
+                    container.classList.add('hidden');
+                    container.classList.remove('flex', 'flex-1', 'flex-col');
+                    container.innerHTML = '';
+                }
+                const wrapper = document.getElementById('chat-center-wrapper');
+                if(wrapper) wrapper.classList.add('justify-center');
                 switchView('chat-view');
                 showToast("Chat History Cleared");
             }
@@ -895,24 +946,30 @@
                 showToast("Access Denied. Admin privileges required.");
                 return;
             }
-            document.getElementById('chat-view').classList.add('hidden-panel');
-            document.getElementById('admin-view').classList.add('hidden-panel');
+            const chatView = document.getElementById('chat-view');
+            const adminView = document.getElementById('admin-view');
+            if(chatView) chatView.classList.add('hidden-panel');
+            if(adminView) adminView.classList.add('hidden-panel');
             
             const inactiveClass = "p-3 md:p-4 text-gray-400 hover:bg-white/10 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95";
-            document.getElementById('sidebar-chat-btn').className = inactiveClass;
-            document.getElementById('sidebar-admin-btn').className = inactiveClass;
+            const chatBtn = document.getElementById('sidebar-chat-btn');
+            const adminBtn = document.getElementById('sidebar-admin-btn');
+            if(chatBtn) chatBtn.className = inactiveClass;
+            if(adminBtn) adminBtn.className = inactiveClass;
             
             const targetView = document.getElementById(viewId);
-            targetView.classList.remove('hidden-panel');
-            
-            if (viewId === 'chat-view') {
-                document.getElementById('sidebar-chat-btn').classList.add('text-cyan-400', 'liquid-glass-active', 'shadow-[0_0_20px_rgba(34,211,238,0.4)]');
-            } else {
-                document.getElementById('sidebar-admin-btn').classList.add('text-purple-400', 'liquid-glass-active', 'shadow-[0_0_20px_rgba(168,85,247,0.4)]');
+            if(targetView) {
+                targetView.classList.remove('hidden-panel');
+                
+                if (viewId === 'chat-view' && chatBtn) {
+                    chatBtn.classList.add('text-cyan-400', 'liquid-glass-active', 'shadow-[0_0_20px_rgba(34,211,238,0.4)]');
+                } else if (adminBtn) {
+                    adminBtn.classList.add('text-purple-400', 'liquid-glass-active', 'shadow-[0_0_20px_rgba(168,85,247,0.4)]');
+                }
+                targetView.classList.remove('view-spring-transition');
+                void targetView.offsetWidth; 
+                targetView.classList.add('view-spring-transition');
             }
-            targetView.classList.remove('view-spring-transition');
-            void targetView.offsetWidth; 
-            targetView.classList.add('view-spring-transition');
         }
 
         function showToast(msg) {
@@ -933,6 +990,7 @@
             event.stopPropagation();
             const dropdown = document.getElementById('model-dropdown');
             const arrow = document.getElementById('dropdown-arrow');
+            if(!dropdown) return;
             const isHidden = dropdown.classList.contains('hidden');
             dropdown.classList.toggle('hidden', !isHidden);
             if(arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
@@ -952,31 +1010,36 @@
             const label = document.getElementById('current-model-label');
             const input = document.getElementById('chat-input');
             if(modelName.includes("Bhavyasri")) {
-                label.innerText = "Bhavyasri Agent";
-                input.placeholder = "Ask Bhavyasri...";
+                if(label) label.innerText = "Bhavyasri Agent";
+                if(input) input.placeholder = "Ask Bhavyasri...";
                 showToast("Routed to Bhavyasri");
             } else {
-                label.innerText = "Lura Agent"; 
-                input.placeholder = "Ask Lura...";
+                if(label) label.innerText = "Lura Agent"; 
+                if(input) input.placeholder = "Ask Lura...";
                 showToast("Routed to Lura Core");
             }
         }
 
         function toggleSettingsModal() {
             const modal = document.getElementById('settings-modal');
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
+            if(modal) {
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+            }
         }
 
         function saveSettings() {
-            typingSpeedDelay = parseInt(document.getElementById('setting-speed').value);
-            aiPersonalityTone = document.getElementById('setting-tone').value;
+            const speedEl = document.getElementById('setting-speed');
+            const toneEl = document.getElementById('setting-tone');
+            if(speedEl) typingSpeedDelay = parseInt(speedEl.value);
+            if(toneEl) aiPersonalityTone = toneEl.value;
             toggleSettingsModal();
             showToast("Settings Applied!");
         }
 
         // 🔥 FIRE TO LIVE CLOUD SERVER & TYPEWRITER + CODE BOX ENGINE 🔥
         async function handleSend() {
+            // 🛑 INTERCEPT: If already generating, clicking the button triggers a STOP instead of send
             if (isGenerating) {
                 stopGeneration();
                 return;
@@ -986,19 +1049,23 @@
             const container = document.getElementById('message-container');
             const titleBox = document.getElementById('title-anim-box');
             const wrapper = document.getElementById('chat-center-wrapper');
-            const userText = input.value.trim();
+            const userText = input ? input.value.trim() : '';
             
             if (userText === "" && !currentAttachment) return;
 
             if (!hasConversationStarted) {
                 hasConversationStarted = true;
-                titleBox.style.opacity = '0';
-                titleBox.style.transform = 'scale(0.95)';
+                if(titleBox) {
+                    titleBox.style.opacity = '0';
+                    titleBox.style.transform = 'scale(0.95)';
+                }
                 setTimeout(() => {
-                    titleBox.classList.add('hidden');
-                    container.classList.remove('hidden');
-                    container.classList.add('flex', 'flex-1', 'flex-col'); 
-                    wrapper.classList.remove('justify-center');
+                    if(titleBox) titleBox.classList.add('hidden');
+                    if(container) {
+                        container.classList.remove('hidden');
+                        container.classList.add('flex', 'flex-1', 'flex-col'); 
+                    }
+                    if(wrapper) wrapper.classList.remove('justify-center');
                 }, 300);
             }
 
@@ -1009,7 +1076,7 @@
             // 🤖 HARDWARE IOT WEBHOOK INTERCEPT
             if (userText.toLowerCase() === 'lura, execute protocol alpha') {
                  appendMessageToDOM('user', userText, userGrad);
-                 input.value = '';
+                 if(input) input.value = '';
                  setStopButton();
                  setTimeout(() => {
                      appendMessageToDOM('bot', "⚡ **PROTOCOL ALPHA AUTHORIZED.** \n\nDirect Wi-Fi Webhook dispatched to NodeMCU (192.168.1.14). Hardware activated.", botColor);
@@ -1046,8 +1113,10 @@
             saveMessage('user', displayHistoryText, userGrad);
             appendMessageToDOM('user', displayHistoryText, userGrad);
             
-            input.value = "";
-            input.blur(); 
+            if(input) {
+                input.value = "";
+                input.blur(); 
+            }
             clearAttachment();
 
             // Initialize State and UI for Generation
@@ -1072,9 +1141,11 @@
                     <div class="typing-dot"></div>
                 </div>
             `;
-            container.appendChild(loadingDiv);
-            refreshIcons();
-            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            if(container) {
+                container.appendChild(loadingDiv);
+                refreshIcons();
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }
 
             try {
                 let systemPrompt = isBhavyasri
@@ -1122,8 +1193,10 @@
                             <span class="text-xs text-red-400 font-bold opacity-70">[ Generation Halted by User ]</span>
                         </div>
                     `;
-                    container.appendChild(stoppedDiv);
-                    refreshIcons();
+                    if(container) {
+                        container.appendChild(stoppedDiv);
+                        refreshIcons();
+                    }
                     return; 
                 }
 
@@ -1135,10 +1208,14 @@
                     </div>
                     <div class="${textColor} text-[15px] md:text-base max-w-[85%] leading-relaxed font-medium pt-1 md:pt-2 tracking-wide type-target w-full pr-4 bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner"></div>
                 `;
-                container.appendChild(botDiv);
-                refreshIcons();
+                if(container) {
+                    container.appendChild(botDiv);
+                    refreshIcons();
+                }
                 
                 const textTarget = botDiv.querySelector('.type-target');
+                if(!textTarget) return;
+
                 const parts = aiReply.split(/```/g);
                 
                 for (let i = 0; i < parts.length; i++) {
@@ -1154,7 +1231,7 @@
                         for (let token of tokens) {
                             if (!isGenerating) break; 
                             textTarget.innerHTML += token;
-                            container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
+                            if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
                             await new Promise(r => setTimeout(r, typingSpeedDelay));
                         }
                     } else {
@@ -1188,7 +1265,7 @@
                             </div>
                         `;
                         refreshIcons();
-                        container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
+                        if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
                         await new Promise(r => setTimeout(r, 150)); 
                     }
                 }
@@ -1216,8 +1293,10 @@
                             <span class="text-xs text-red-400 font-bold opacity-70">[ Generation Halted by User ]</span>
                         </div>
                     `;
-                    container.appendChild(stoppedDiv);
-                    refreshIcons();
+                    if(container) {
+                        container.appendChild(stoppedDiv);
+                        refreshIcons();
+                    }
                 } else {
                     console.error("API Error:", error);
                     const errorDiv = document.createElement('div');
@@ -1226,8 +1305,10 @@
                             <i data-lucide="alert-triangle" class="w-6 h-6"></i> Cloud Server Offline. Check your Render logs!
                         </div>
                     `;
-                    container.appendChild(errorDiv);
-                    refreshIcons();
+                    if(container) {
+                        container.appendChild(errorDiv);
+                        refreshIcons();
+                    }
                 }
             } finally {
                 resetActionButton();
