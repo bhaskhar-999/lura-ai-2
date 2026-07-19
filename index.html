@@ -8,7 +8,6 @@
     <!-- 🟢 Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <!-- 🔥 FIREBASE CLOUD DATABASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -52,6 +51,7 @@
 </head>
 <body class="bg-black text-gray-200 font-sans h-[100dvh] w-full relative overflow-hidden selection:bg-yellow-500/40 dynamic-bg">
 
+    <!-- 🔐 LOGIN VIEW -->
     <section id="login-view" class="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 bg-grid-pattern backdrop-blur-xl transition-all duration-700 ease-in-out">
         <div id="login-card" class="liquid-glass-visible w-full max-w-md p-8 md:p-10 rounded-[2.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.9)] border border-white/10 transition-all duration-500">
             <div class="text-center mb-10">
@@ -84,22 +84,22 @@
     <section id="update-view" class="absolute inset-0 z-[150] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-2xl transition-all duration-700 opacity-0">
         <div class="liquid-glass-visible w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.9)] border border-yellow-500/30 animate-chat-drop flex flex-col items-center">
             <div class="w-16 h-16 rounded-full bg-yellow-500/20 border border-yellow-500/50 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
-                <i data-lucide="shield-check" class="w-8 h-8 text-yellow-400"></i>
+                <i data-lucide="cpu" class="w-8 h-8 text-yellow-400"></i>
             </div>
             <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tight">System Patch</h2>
-            <p class="text-[10px] text-yellow-500 tracking-[0.2em] font-bold uppercase mb-8">Version 4.7.0 Deployed</p>
+            <p class="text-[10px] text-yellow-500 tracking-[0.2em] font-bold uppercase mb-8">Version 5.0.0 Anthropic-Killer</p>
             
             <div class="w-full space-y-4 bg-black/40 p-6 rounded-3xl border border-white/10 mb-8 text-sm text-gray-300">
-                <div class="flex items-start gap-3"><i data-lucide="cpu" class="w-5 h-5 text-green-400 shrink-0 mt-0.5"></i><p><strong>NVIDIA Integration:</strong> Core API successfully routed to NVIDIA NIM architecture. System now dynamically accesses meta/llama-3.1-70b-instruct.</p></div>
-                <div class="flex items-start gap-3"><i data-lucide="image" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i><p><strong>Vision Protocol:</strong> Attaching an image now seamlessly hot-swaps the neural engine to meta/llama-3.2-90b-vision-instruct.</p></div>
-                <div class="flex items-start gap-3"><i data-lucide="layers" class="w-5 h-5 text-yellow-400 shrink-0 mt-0.5"></i><p><strong>Agent Selector:</strong> Fixed visual layer priority. The UI dropdown now populates perfectly with fluid logic.</p></div>
+                <div class="flex items-start gap-3"><i data-lucide="zap" class="w-5 h-5 text-purple-400 shrink-0 mt-0.5"></i><p><strong>405-Billion Parameter Core:</strong> Bhavyasri and Chaos agents are now routed to maximum intelligence endpoints for unparalleled reasoning.</p></div>
+                <div class="flex items-start gap-3"><i data-lucide="shield-check" class="w-5 h-5 text-green-400 shrink-0 mt-0.5"></i><p><strong>Black Screen Fix:</strong> Resolved an overlapping matrix crash that caused the workspace to disappear on load.</p></div>
+                <div class="flex items-start gap-3"><i data-lucide="brain-circuit" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i><p><strong>Bug Fixes:</strong> Voice synthesis apostrophe crashing and core logic bubble overwrites have been completely resolved.</p></div>
             </div>
 
-            <button onclick="dismissUpdateModal()" class="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-sm transition-all active:scale-95 uppercase tracking-widest border border-white/20">Acknowledge Patch</button>
+            <button onclick="dismissUpdateModal()" class="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-sm transition-all active:scale-95 uppercase tracking-widest border border-white/20">Acknowledge System Upgrade</button>
         </div>
     </section>
 
-    <!-- MAIN WORKSPACE -->
+    <!-- 💻 MAIN WORKSPACE -->
     <div id="app-workspace" class="hidden-panel w-full h-full flex relative z-10">
         
         <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
@@ -117,7 +117,7 @@
                 <button onclick="toggleHistoryModal(); closeSidebarOnMobile();" class="stagger-btn stagger-2 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-yellow-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="Archives">
                     <i data-lucide="archive" class="w-6 h-6 md:w-7 md:h-7"></i>
                 </button>
-                <button onclick="switchView('admin-view'); closeSidebarOnMobile();" id="sidebar-admin-btn" class="stagger-btn stagger-3 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-yellow-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="System Control">
+                <button onclick="switchView('admin-view'); closeSidebarOnMobile();" id="sidebar-admin-btn" class="hidden stagger-btn stagger-3 p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-yellow-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="System Control">
                     <i data-lucide="shield-alert" class="w-6 h-6 md:w-7 md:h-7"></i>
                 </button>
             </div>
@@ -134,55 +134,33 @@
         </aside>
 
         <main class="flex-1 relative flex flex-col h-full w-full bg-transparent overflow-hidden z-10 md:pl-24">
-
             <header class="w-full h-14 px-4 flex items-center justify-between md:hidden absolute top-0 left-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/5">
-                <button onclick="toggleMobileSidebar()" class="p-2 text-gray-300 hover:text-white transition-all rounded-lg bg-white/5 active:scale-95 flex flex-col justify-center items-center gap-1 w-9 h-9" title="Open Navigation">
-                    <span class="w-5 h-[2px] bg-current rounded-full transition-all"></span><span class="w-5 h-[2px] bg-current rounded-full transition-all"></span><span class="w-5 h-[2px] bg-current rounded-full transition-all"></span>
-                </button>
+                <button onclick="toggleMobileSidebar()" class="p-2 text-gray-300 hover:text-white transition-all rounded-lg bg-white/5 active:scale-95 flex flex-col justify-center items-center gap-1 w-9 h-9" title="Open Navigation"><span class="w-5 h-[2px] bg-current rounded-full transition-all"></span><span class="w-5 h-[2px] bg-current rounded-full transition-all"></span><span class="w-5 h-[2px] bg-current rounded-full transition-all"></span></button>
                 <div class="text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500 tracking-wider">LURA STUDIO</div>
                 <button onclick="logOffAccount()" class="p-2 text-gray-400 hover:text-red-400 transition-all rounded-lg bg-white/5 active:scale-95 flex items-center justify-center w-9 h-9" title="Log Off"><i data-lucide="log-out" class="w-4 h-4"></i></button>
             </header>
 
             <section id="chat-view" class="flex-1 flex flex-col view-spring-transition relative h-full">
-                <div class="absolute top-4 right-4 md:top-8 md:right-10 flex items-center gap-3 z-30 pt-14 md:pt-0">
-                    <button onclick="switchView('admin-view')" class="liquid-glass hover:bg-yellow-600/20 text-yellow-400 text-[10px] md:text-xs font-bold px-4 py-2.5 md:px-5 md:py-3 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(250,204,21,0.2)] hover:-translate-y-1 transition-all duration-300 border border-yellow-500/40 cursor-pointer backdrop-blur-xl">
-                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span></span>
-                        <span class="glass-content hidden sm:inline tracking-wide uppercase">System Control</span>
-                    </button>
-                </div>
-
                 <div id="chat-center-wrapper" class="flex-1 flex flex-col items-center justify-center px-4 md:px-6 max-w-5xl mx-auto w-full h-full pt-24 pb-4 md:pt-20 md:pb-6 transition-all duration-500">
-                    <div id="title-anim-box" class="w-full text-center pb-8 transition-all duration-500 mb-8 mt-10">
-                        <div id="greeting-container" class="opacity-0">
-                            <h1 id="greeting-text" class="text-3xl md:text-4xl font-light text-white/90 tracking-wide select-none min-h-[3rem]"></h1>
-                        </div>
-                    </div>
-
+                    <div id="title-anim-box" class="w-full text-center pb-8 transition-all duration-500 mb-8 mt-10"><div id="greeting-container" class="opacity-0"><h1 id="greeting-text" class="text-3xl md:text-4xl font-light text-white/90 tracking-wide select-none min-h-[3rem]"></h1></div></div>
                     <div id="message-container" class="w-full hidden overflow-y-auto pr-2 md:pr-4 flex-col justify-start mb-4 md:mb-6 flex-1 space-y-6 md:space-y-8 pb-32 scroll-smooth"></div>
 
                     <div class="relative w-full z-40 flex flex-col">
-                        <div id="attachment-preview" class="hidden absolute bottom-[calc(100%+15px)] left-4 bg-[#1a1f2e] border border-yellow-500/30 rounded-2xl p-2 flex items-center gap-3 z-50 shadow-[0_10px_30px_rgba(245,158,11,0.2)] animate-chat-drop">
-                            <div id="preview-thumbnail" class="w-10 h-10 rounded-lg bg-gray-800 bg-cover bg-center hidden border border-white/10"></div>
-                            <div id="preview-icon" class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center hidden border border-white/10"><i data-lucide="file-text" class="w-5 h-5 text-yellow-400"></i></div>
-                            <div class="flex flex-col max-w-[120px]"><span id="preview-name" class="text-xs text-white font-bold truncate">file.png</span><span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest" id="preview-status">Compressed</span></div>
-                            <button type="button" onclick="clearAttachment()" class="text-gray-400 hover:text-red-400 p-1.5 hover:bg-white/5 rounded-lg transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
-                        </div>
+                        <div id="attachment-preview" class="hidden absolute bottom-[calc(100%+15px)] left-4 bg-[#1a1f2e] border border-yellow-500/30 rounded-2xl p-2 flex items-center gap-3 z-50 shadow-[0_10px_30px_rgba(245,158,11,0.2)] animate-chat-drop"><div id="preview-thumbnail" class="w-10 h-10 rounded-lg bg-gray-800 bg-cover bg-center hidden border border-white/10"></div><div id="preview-icon" class="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center hidden border border-white/10"><i data-lucide="file-text" class="w-5 h-5 text-yellow-400"></i></div><div class="flex flex-col max-w-[120px]"><span id="preview-name" class="text-xs text-white font-bold truncate">file.png</span><span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest" id="preview-status">Ready</span></div><button type="button" onclick="clearAttachment()" class="text-gray-400 hover:text-red-400 p-1.5 hover:bg-white/5 rounded-lg transition-all"><i data-lucide="x" class="w-4 h-4"></i></button></div>
 
-                        <!-- 🟢 FIXED AGENT SELECTOR HTML (NO INLINE OPACITY STYLES) -->
                         <div id="model-dropdown" class="absolute bottom-[calc(100%+15px)] right-4 sm:right-24 w-56 md:w-72 liquid-glass-visible rounded-2xl p-2 space-y-1 hidden z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.9)] border border-white/20 transition-all duration-300 transform opacity-0 translate-y-4 scale-95 origin-bottom-right">
-                            <button type="button" onclick="selectModel('Lura Agent')" class="w-full text-left text-xs px-4 py-3 hover:bg-yellow-500/20 rounded-xl transition-all text-yellow-200 font-bold cursor-pointer flex flex-col gap-0.5 tracking-wider"><span class="flex items-center gap-2 uppercase"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i> Lura Agent</span><span class="text-[9px] text-gray-400 font-normal normal-case">Optimized for friendly & conversational chat</span></button>
-                            <button type="button" onclick="selectModel('Bhavyasri Agent')" class="w-full text-left text-xs px-4 py-3 hover:bg-yellow-500/20 rounded-xl transition-all text-yellow-200 font-bold cursor-pointer flex flex-col gap-0.5 tracking-wider"><span class="flex items-center gap-2 uppercase"><i data-lucide="orbit" class="w-4 h-4 text-purple-400"></i> Bhavyasri Agent</span><span class="text-[9px] text-gray-400 font-normal normal-case">Max Output / Extended Token Engineering Core</span></button>
+                            <button type="button" onclick="selectModel('Lura Agent')" class="w-full text-left text-xs px-4 py-3 hover:bg-yellow-500/20 rounded-xl transition-all text-yellow-200 font-bold cursor-pointer flex flex-col gap-0.5 tracking-wider"><span class="flex items-center gap-2 uppercase"><i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i> Lura Agent</span><span class="text-[9px] text-gray-400 font-normal normal-case">Fast Logic / Standard Speed Chat</span></button>
+                            <button type="button" onclick="selectModel('Bhavyasri Agent')" class="w-full text-left text-xs px-4 py-3 hover:bg-yellow-500/20 rounded-xl transition-all text-yellow-200 font-bold cursor-pointer flex flex-col gap-0.5 tracking-wider"><span class="flex items-center gap-2 uppercase"><i data-lucide="orbit" class="w-4 h-4 text-purple-400"></i> Bhavyasri Agent</span><span class="text-[9px] text-gray-400 font-normal normal-case">405B Max Intelligence Logic Engine</span></button>
+                            <button id="owner-agent-btn" type="button" onclick="selectModel('Chaos Agent')" class="hidden w-full text-left text-xs px-4 py-3 hover:bg-red-500/20 rounded-xl transition-all text-red-200 font-bold cursor-pointer flex-col gap-0.5 tracking-wider border-t border-red-500/20 mt-1"><span class="flex items-center gap-2 uppercase text-red-400"><i data-lucide="flame" class="w-4 h-4"></i> Chaos Agent</span><span class="text-[9px] text-gray-400 font-normal normal-case">405B Core: Highly Unpredictable & Romantic</span></button>
                         </div>
 
                         <div id="search-wrapper" class="relative w-full rounded-[3.5rem] p-[2px] overflow-hidden group shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-300 focus-within:shadow-[0_10px_40px_rgba(250,204,21,0.2),0_0_60px_rgba(245,158,11,0.15)] focus-within:scale-[1.01] focus-within:-translate-y-1">
                             <div class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] animate-[spin_3s_linear_infinite] pointer-events-none z-0 opacity-40 group-focus-within:opacity-100 transition-opacity duration-500"><div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_70%,#facc15_85%,#f59e0b_100%)]"></div></div>
-                            
                             <div class="relative z-20 w-full bg-[#0a0f18] rounded-[3.4rem] p-2 flex items-center gap-1.5 md:gap-3 cursor-text border border-white/5">
                                 <input type="file" id="system-file-upload" class="hidden" onchange="handleAttachment(this)" accept="image/*, .pdf, .txt, .md, .js, .json" />
                                 <button type="button" onclick="document.getElementById('system-file-upload').click()" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-yellow-500 hover:text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shadow-sm shrink-0"><i data-lucide="paperclip" class="w-4 h-4 md:w-6 md:h-6"></i></button>
                                 <button type="button" id="mic-btn" onclick="toggleSpeechRecognition()" class="glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-red-500 hover:text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shadow-sm shrink-0"><i data-lucide="mic" class="w-4 h-4 md:w-6 md:h-6"></i></button>
-                                <input id="chat-input" onkeydown="if(event.key === 'Enter') { event.preventDefault(); if(!isGenerating) handleSend(); }" type="text" placeholder="Ask Lura or request 'Lura, execute protocol alpha'..." class="glass-content flex-1 bg-transparent border-none outline-none text-white placeholder-gray-400 text-[14px] md:text-lg focus:ring-0 pl-1 md:pl-2 font-medium min-w-0" autocomplete="off"/>
-                                
+                                <input id="chat-input" onkeydown="if(event.key === 'Enter') { event.preventDefault(); if(!isGenerating) handleSend(); }" type="text" placeholder="Ask Lura..." class="glass-content flex-1 bg-transparent border-none outline-none text-white placeholder-gray-400 text-[14px] md:text-lg focus:ring-0 pl-1 md:pl-2 font-medium min-w-0" autocomplete="off"/>
                                 <div class="relative glass-content flex shrink-0">
                                     <button type="button" onclick="toggleModelDropdown(event)" class="flex items-center gap-1.5 bg-white/5 border border-white/20 hover:border-yellow-400 text-white px-3 py-2.5 md:px-5 md:py-4 rounded-xl md:rounded-2xl text-[9px] md:text-xs font-bold cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm uppercase tracking-wide whitespace-nowrap"><span id="current-model-label">Lura Agent</span><i data-lucide="chevron-down" class="w-3 h-3 md:w-4 h-4 transition-transform duration-300 text-yellow-400" id="dropdown-arrow"></i></button>
                                 </div>
@@ -198,42 +176,52 @@
             <section id="admin-view" class="flex-1 p-4 md:p-12 bg-transparent hidden-panel view-spring-transition overflow-y-auto w-full relative z-10 pt-20 md:pt-12">
                 <div class="max-w-6xl mx-auto pb-12">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 md:mb-12 gap-6">
-                        <div><h1 class="text-4xl md:text-5xl font-extrabold text-white flex items-center gap-4 tracking-tight drop-shadow-lg"><i data-lucide="terminal" class="text-yellow-400 w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]"></i> System Admin</h1><p class="text-sm md:text-base text-yellow-500 mt-2 font-medium tracking-wide uppercase">AI Command Center Active.</p></div>
+                        <div><h1 class="text-4xl md:text-5xl font-extrabold text-white flex items-center gap-4 tracking-tight drop-shadow-lg"><i data-lucide="terminal" class="text-yellow-400 w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]"></i> Command Center</h1><p class="text-sm md:text-base text-yellow-500 mt-2 font-medium tracking-wide uppercase">Owner Override Active.</p></div>
                         <button onclick="switchView('chat-view')" class="liquid-glass hover:bg-white/10 text-white px-6 py-3.5 md:px-8 md:py-4 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-3 border border-yellow-500/30 font-bold text-xs md:text-sm shadow-xl uppercase tracking-widest"><i data-lucide="arrow-left" class="w-5 h-5 text-yellow-400"></i> Return</button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="liquid-glass p-6 md:p-8 rounded-[2rem] border border-blue-500/30 shadow-[0_10px_30px_rgba(59,130,246,0.1)]">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-6"><i data-lucide="server" class="text-blue-400 w-5 h-5"></i> Server Telemetry</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-1"><span>CPU Compute Core</span><span class="text-blue-400">12%</span></div>
-                                    <div class="w-full bg-black/50 rounded-full h-2 overflow-hidden border border-white/10"><div class="bg-blue-500 h-2 rounded-full w-[12%] animate-pulse"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-1"><span>Render Web Service Load</span><span class="text-yellow-400">48%</span></div>
-                                    <div class="w-full bg-black/50 rounded-full h-2 overflow-hidden border border-white/10"><div class="bg-yellow-500 h-2 rounded-full w-[48%]"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-1"><span>API Latency</span><span class="text-emerald-400">45ms</span></div>
-                                    <div class="w-full bg-black/50 rounded-full h-2 overflow-hidden border border-white/10"><div class="bg-emerald-500 h-2 rounded-full w-[8%]"></div></div>
+                        <div class="liquid-glass p-6 md:p-8 rounded-[2rem] border border-blue-500/30 shadow-[0_10px_30px_rgba(59,130,246,0.1)] flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-6"><i data-lucide="server" class="text-blue-400 w-5 h-5"></i> Live Server Telemetry</h3>
+                                <p class="text-xs text-gray-400 mb-4">Direct network ping to backend server API endpoint to measure real-time latency.</p>
+                                <div class="bg-black/50 border border-white/10 rounded-xl p-4 flex items-center justify-between mb-6">
+                                    <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Latency</span>
+                                    <span id="ping-display" class="text-2xl font-black text-emerald-400 tracking-tighter">-- ms</span>
                                 </div>
                             </div>
+                            <button onclick="pingBackend()" class="w-full py-3 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 border border-blue-500/40 rounded-xl text-xs font-bold uppercase tracking-widest transition-all cursor-pointer">Ping Server</button>
                         </div>
-
                         <div class="liquid-glass p-6 md:p-8 rounded-[2rem] border border-white/10">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-4"><i data-lucide="shield-check" class="text-emerald-400 w-5 h-5"></i> Security Overview</h3>
-                            <div class="bg-black/60 rounded-xl p-4 font-mono text-[10px] md:text-xs text-emerald-400/80 space-y-2 border border-white/5 h-32 overflow-y-auto shadow-inner">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-4"><i data-lucide="shield-check" class="text-emerald-400 w-5 h-5"></i> Live System Logs</h3>
+                            <div id="real-logs" class="bg-black/80 rounded-xl p-4 font-mono text-[10px] md:text-xs text-emerald-400/80 space-y-1 border border-white/5 h-48 overflow-y-auto shadow-inner break-words">
                                 <p>[SYSTEM] Encrypted Session Verified.</p>
-                                <p>[AUTH] Owner Node Override Accepted.</p>
-                                <p>[NETWORK] Active Tunnel Established to NVIDIA NIM Backend.</p>
-                                <p>[MEMORY] Cloud Cache synchronized.</p>
-                                <p>[MONITOR] Awaiting query packets...</p>
                             </div>
                         </div>
                     </div>
+
+                    <div class="mt-8 liquid-glass p-6 md:p-8 rounded-[2.5rem] border border-red-500/20">
+                        <h3 class="text-lg font-bold text-red-400 mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Danger Zone</h3>
+                        <p class="text-xs text-gray-500 mb-4">Permanently delete ALL saved chat sessions for this user from the Firestore Database. This action cannot be undone.</p>
+                        <button onclick="wipeAllDatabaseData()" class="w-full md:w-auto px-8 py-3 bg-red-950/50 hover:bg-red-900 text-red-300 border border-red-500/40 rounded-xl text-xs font-bold uppercase tracking-widest transition-all cursor-pointer">Wipe Cloud Database</button>
+                    </div>
                 </div>
             </section>
+
+            <!-- 🚨 LINK WARNING MODAL -->
+            <div id="link-warning-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md items-center justify-center hidden z-[400] p-4">
+                <div class="liquid-glass-visible w-full max-w-sm p-6 rounded-[2rem] border border-red-500/30 text-center animate-chat-drop shadow-[0_20px_50px_rgba(239,68,68,0.2)]">
+                    <div class="w-12 h-12 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center mx-auto mb-4 text-red-400">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-2">Security Shield</h3>
+                    <p class="text-xs text-gray-400 mb-6 leading-relaxed">Be careful, this was another site. This may contain harmful content. Do you want to proceed?</p>
+                    <div class="flex gap-3">
+                        <button onclick="confirmLinkOpen(true)" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95 cursor-pointer">Yes</button>
+                        <button onclick="confirmLinkOpen(false)" class="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95 cursor-pointer">No</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- MODALS -->
             <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-50 p-4">
@@ -262,33 +250,91 @@
                     <div id="history-list-container" class="space-y-3 overflow-y-auto flex-1 pr-2"></div>
                 </div>
             </div>
-
-            <div id="sandbox-modal" class="fixed inset-0 bg-black/90 backdrop-blur-3xl items-center justify-center hidden z-[300] p-4 md:p-10">
-                <div class="w-full h-full liquid-glass-visible rounded-[2rem] flex flex-col overflow-hidden border border-yellow-500/30">
-                    <div class="flex justify-between items-center px-6 py-4 border-b border-white/10 bg-white/5 shrink-0"><h3 class="text-white font-bold tracking-widest text-sm flex items-center gap-2"><i data-lucide="play-circle" class="w-5 h-5 text-emerald-400"></i> Live Matrix Preview</h3><button onclick="closeSandbox()" class="text-gray-400 hover:text-red-400"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-                    <iframe id="sandbox-frame" class="w-full flex-1 bg-white border-none"></iframe>
-                </div>
-            </div>
         </main>
     </div>
 
+    <!-- 🧠 ALL JAVASCRIPT LOGIC (FIXED AND UNIFIED) -->
     <script>
+        // 🟢 GLOBAL UTILITIES 🟢
+        window.showToast = function(msg) {
+            const toast = document.createElement('div'); toast.className = 'fixed top-6 md:top-10 left-1/2 transform -translate-x-1/2 liquid-glass-visible px-6 py-3 rounded-full text-[10px] md:text-xs font-bold tracking-widest text-white shadow-[0_15px_50px_rgba(0,0,0,0.9)] z-[100] toast-enter flex items-center gap-3 uppercase border border-yellow-500/30'; toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-yellow-400"></i> ${msg}`; document.body.appendChild(toast); lucide.createIcons(); 
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -40px) scale(0.9)'; toast.style.transition = 'all 0.5s ease'; setTimeout(() => toast.remove(), 500); }, 3000);
+        };
+
         lucide.createIcons(); 
 
-        // 🔥 THEME ENGINE 🔥
+        let pendingTargetUrl = "";
+        window.triggerLinkWarning = function(event, url) {
+            event.preventDefault();
+            pendingTargetUrl = url;
+            const modal = document.getElementById('link-warning-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        };
+
+        window.confirmLinkOpen = function(proceed) {
+            const modal = document.getElementById('link-warning-modal');
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+            if(proceed && pendingTargetUrl) { window.open(pendingTargetUrl, '_blank'); }
+            pendingTargetUrl = "";
+        };
+
+        // 🔊 NEURAL TTS VOICE ENGINE CONTROLLER 
+        let currentlySpeakingUtterance = null;
+        window.toggleSpeech = function(encodedText, buttonEl) {
+            const text = decodeURIComponent(encodedText);
+            
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                if (currentlySpeakingUtterance && currentlySpeakingUtterance.text === text) {
+                    updateSpeechButtonIcon(buttonEl, false);
+                    currentlySpeakingUtterance = null;
+                    return;
+                }
+            }
+
+            document.querySelectorAll('.speech-btn').forEach(btn => updateSpeechButtonIcon(btn, false));
+
+            const utterance = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, ''));
+            const voices = window.speechSynthesis.getVoices();
+            if(voices.length > 0) utterance.voice = voices.find(v => v.lang.includes('en')) || voices[0];
+            
+            utterance.onend = () => { updateSpeechButtonIcon(buttonEl, false); currentlySpeakingUtterance = null; };
+            utterance.onerror = () => { updateSpeechButtonIcon(buttonEl, false); currentlySpeakingUtterance = null; };
+
+            currentlySpeakingUtterance = utterance;
+            updateSpeechButtonIcon(buttonEl, true);
+            window.speechSynthesis.speak(utterance);
+        };
+
+        function updateSpeechButtonIcon(element, isPlaying) {
+            if(isPlaying) {
+                element.innerHTML = `<i data-lucide="square" class="w-3.5 h-3.5 fill-current"></i>`;
+                element.classList.add('text-red-400');
+            } else {
+                element.innerHTML = `<i data-lucide="volume-2" class="w-3.5 h-3.5"></i>`;
+                element.classList.remove('text-red-400');
+            }
+            lucide.createIcons();
+        }
+
+        const oldLog = console.log;
+        console.log = function(...args) {
+            oldLog(...args);
+            const logBox = document.getElementById('real-logs');
+            if(logBox) {
+                const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+                logBox.innerHTML += `<p class="mt-1 opacity-80">> ${msg}</p>`;
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+        };
+
         function setTheme(theme) {
             if (theme === 'blue') {
-                document.body.classList.add('theme-blue');
-                document.body.classList.remove('selection:bg-yellow-500/40');
-                document.body.classList.add('selection:bg-blue-500/40');
-                localStorage.setItem('lura_theme', 'blue');
+                document.body.classList.add('theme-blue'); document.body.classList.remove('selection:bg-yellow-500/40'); document.body.classList.add('selection:bg-blue-500/40'); localStorage.setItem('lura_theme', 'blue');
             } else {
-                document.body.classList.remove('theme-blue');
-                document.body.classList.add('selection:bg-yellow-500/40');
-                document.body.classList.remove('selection:bg-blue-500/40');
-                localStorage.setItem('lura_theme', 'gold');
+                document.body.classList.remove('theme-blue'); document.body.classList.add('selection:bg-yellow-500/40'); document.body.classList.remove('selection:bg-blue-500/40'); localStorage.setItem('lura_theme', 'gold');
             }
-            showToast("Theme Updated: " + theme.toUpperCase());
+            window.showToast("Theme Updated: " + theme.toUpperCase());
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -309,49 +355,53 @@
         let typingSpeedDelay = 10; let isGenerating = false; let currentAbortController = null;
         let currentAttachment = null; let currentAttachmentType = null; let currentAttachmentName = "";
 
-        // 🚀 LOGIN & SYSTEM UPDATE MODAL LOGIC
-        function handleLogin() {
+        // 🚀 LOGIN LOGIC
+        window.handleLogin = function() {
             const user = document.getElementById('auth-user').value.trim(); const pass = document.getElementById('auth-pass').value.trim();
-            if (!user) { showToast("Enter Identity."); return; }
+            if (!user) { window.showToast("Enter Identity."); return; }
             document.getElementById('login-btn').innerHTML = `<i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-white"></i>`; lucide.createIcons();
             
             setTimeout(() => {
                 session = { active: true, name: user, role: 'user', avatar: user.charAt(0).toUpperCase(), color: 'from-yellow-500 to-amber-700' };
-                if ((user.toLowerCase() === 'bhaskhar' || user.toLowerCase() === 'shinchan') && pass === '85@@7&5!83') { session.role = 'owner'; session.name = user.charAt(0).toUpperCase() + user.slice(1); session.color = 'from-yellow-400 to-amber-600'; } 
+                
+                if ((user.toLowerCase() === 'bhaskhar' || user.toLowerCase() === 'shinchan') && pass === '85@@7&5!83') { 
+                    session.role = 'owner'; session.name = user.charAt(0).toUpperCase() + user.slice(1); session.color = 'from-yellow-400 to-amber-600'; 
+                    document.getElementById('sidebar-admin-btn').classList.remove('hidden');
+                    document.getElementById('owner-agent-btn').classList.remove('hidden'); document.getElementById('owner-agent-btn').classList.add('flex');
+                    console.log("[AUTH] Owner Level Authorization Accepted.");
+                }
+
                 document.getElementById('user-avatar').innerText = session.avatar;
                 
                 document.getElementById('login-card').classList.add('scale-90', '-translate-y-10', 'opacity-0');
                 setTimeout(() => {
                     document.getElementById('login-view').classList.add('hidden-panel');
                     const uv = document.getElementById('update-view');
-                    uv.classList.remove('hidden');
-                    uv.classList.add('flex');
+                    uv.classList.remove('hidden'); uv.classList.add('flex');
                     setTimeout(() => uv.classList.remove('opacity-0'), 50);
                 }, 500);
             }, 800); 
-        }
+        };
 
-        function dismissUpdateModal() {
+        window.dismissUpdateModal = function() {
             const uv = document.getElementById('update-view');
             uv.classList.add('opacity-0');
             setTimeout(() => {
-                uv.classList.add('hidden-panel');
-                uv.classList.remove('flex');
-                document.getElementById('app-workspace').classList.remove('hidden-panel');
-                document.getElementById('app-workspace').classList.add('flex');
+                uv.classList.add('hidden-panel'); uv.classList.remove('flex');
+                document.getElementById('app-workspace').classList.remove('hidden-panel'); document.getElementById('app-workspace').classList.add('flex');
                 setGreeting(); loadAllSessions();
             }, 500);
-        }
+        };
 
         function setGreeting() { if(!session.active) return; const h = new Date().getHours(); let g = h<12 ? "Good morning" : h<18 ? "Good afternoon" : "Good evening"; document.getElementById('greeting-text').innerText = `${g}, ${session.name}`; document.getElementById('greeting-container').classList.add('bounce-in'); }
-        function logOffAccount() { if(confirm("Terminate Encrypted Session?")) { location.reload(); } }
+        window.logOffAccount = function() { if(confirm("Terminate Encrypted Session?")) { location.reload(); } };
 
-        function toggleMobileSidebar() { const sb = document.getElementById('main-sidebar'); const ov = document.getElementById('sidebar-overlay'); if (!sb.classList.contains('-translate-x-full')) { sb.classList.add('-translate-x-full'); ov.classList.add('opacity-0'); setTimeout(() => ov.classList.add('hidden'), 300); } else { ov.classList.remove('hidden'); void ov.offsetWidth; sb.classList.remove('-translate-x-full'); ov.classList.remove('opacity-0'); } }
-        function closeSidebarOnMobile() { if (window.innerWidth < 768) toggleMobileSidebar(); }
+        window.toggleMobileSidebar = function() { const sb = document.getElementById('main-sidebar'); const ov = document.getElementById('sidebar-overlay'); if (!sb.classList.contains('-translate-x-full')) { sb.classList.add('-translate-x-full'); ov.classList.add('opacity-0'); setTimeout(() => ov.classList.add('hidden'), 300); } else { ov.classList.remove('hidden'); void ov.offsetWidth; sb.classList.remove('-translate-x-full'); ov.classList.remove('opacity-0'); } };
+        window.closeSidebarOnMobile = function() { if (window.innerWidth < 768) toggleMobileSidebar(); };
 
         function setStopButton() { isGenerating = true; const btn = document.getElementById('action-btn'); if(btn) { btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-red-600 text-white rounded-full transition-all shadow-[0_0_30px_rgba(239,68,68,0.8)] shrink-0 animate-pulse"; btn.innerHTML = `<i data-lucide="square" class="w-4 h-4 md:w-5 md:h-5 fill-current"></i>`; } lucide.createIcons(); }
         function resetActionButton() { isGenerating = false; const btn = document.getElementById('action-btn'); if(btn) { btn.className = "glass-content w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-tr from-yellow-500 to-amber-600 text-black rounded-full transition-all shadow-[0_0_30px_rgba(245,158,11,0.6)] shrink-0"; btn.innerHTML = `<i data-lucide="send-horizontal" class="w-4 h-4 md:w-6 md:h-6 -ml-1"></i>`; } lucide.createIcons(); }
-        function stopGeneration() { if (!isGenerating) return; isGenerating = false; if (currentAbortController) currentAbortController.abort(); resetActionButton(); }
+        window.stopGeneration = function() { if (!isGenerating) return; isGenerating = false; if (currentAbortController) currentAbortController.abort(); resetActionButton(); };
         
         async function saveSessionData() {
             let current = allSessions.find(s => s.id === activeSessionId);
@@ -368,42 +418,41 @@
             } catch(e) { startNewSession(true); }
         }
 
-        // 🟢 FIXED GREETING VISIBILITY ON NEW CHAT 🟢
-        function startNewSession(isInitial = false) {
+        window.startNewSession = function(isInitial = false) {
             activeSessionId = Date.now(); chatHistory = []; hasConversationStarted = false;
             const mc = document.getElementById('message-container'); mc.innerHTML = ''; mc.classList.add('hidden'); mc.classList.remove('flex', 'flex-1', 'flex-col');
-            
             const titleBox = document.getElementById('title-anim-box');
-            titleBox.classList.remove('hidden');
-            titleBox.style.opacity = '1';
-            titleBox.style.transform = 'scale(1)';
-            
+            titleBox.classList.remove('hidden'); titleBox.style.opacity = '1'; titleBox.style.transform = 'scale(1)';
             document.getElementById('chat-center-wrapper').classList.add('justify-center');
-            if(!isInitial) {
-                setGreeting(); // Refresh text
-                showToast("System memory cleared. Ready for new input.");
-            }
-        }
+            if(!isInitial) { setGreeting(); window.showToast("System memory cleared."); }
+        };
 
-        function loadSession(id) {
+        window.loadSession = function(id) {
             const sess = allSessions.find(s => s.id === id);
             if(sess) {
                 activeSessionId = id; chatHistory = sess.messages || []; const mc = document.getElementById('message-container'); mc.innerHTML = '';
-                if(chatHistory.length > 0) { hasConversationStarted = true; document.getElementById('title-anim-box').classList.add('hidden'); mc.classList.remove('hidden'); mc.classList.add('flex', 'flex-1', 'flex-col'); chatHistory.forEach(msg => appendMessageToDOM(msg.role, msg.text, msg.styleClass)); setTimeout(()=> mc.scrollTo({ top: mc.scrollHeight }), 300); } 
+                if(chatHistory.length > 0) { 
+                    hasConversationStarted = true; 
+                    document.getElementById('title-anim-box').classList.add('hidden'); 
+                    document.getElementById('chat-center-wrapper').classList.remove('justify-center');
+                    mc.classList.remove('hidden'); mc.classList.add('flex', 'flex-1', 'flex-col'); 
+                    chatHistory.forEach(msg => appendMessageToDOM(msg.role, msg.text, msg.styleClass)); 
+                    setTimeout(()=> mc.scrollTo({ top: mc.scrollHeight }), 300); 
+                } 
                 else startNewSession(true);
             }
-        }
+        };
 
-        async function deleteSession(id, event) {
+        window.deleteSession = async function(id, event) {
             event.stopPropagation();
             if(confirm("Permanently delete this memory?")) {
                 allSessions = allSessions.filter(s => s.id !== id);
                 if(session.active && session.name) { try { await db.collection('users').doc(session.name).collection('sessions').doc(id.toString()).delete(); } catch(e) {} }
                 if(activeSessionId === id) loadAllSessions(); else renderHistoryList();
             }
-        }
+        };
 
-        function toggleHistoryModal() { const mod = document.getElementById('history-modal'); if(mod) { renderHistoryList(); mod.classList.toggle('hidden'); mod.classList.toggle('flex'); } }
+        window.toggleHistoryModal = function() { const mod = document.getElementById('history-modal'); if(mod) { renderHistoryList(); mod.classList.toggle('hidden'); mod.classList.toggle('flex'); } };
 
         function renderHistoryList() {
             const list = document.getElementById('history-list-container'); if(!list) return; list.innerHTML = '';
@@ -414,83 +463,51 @@
             }); lucide.createIcons();
         }
 
-        // 📎 CANVAS IMAGE DOWNSCALER (PREVENTS SERVER CRASHES)
-        function handleAttachment(input) {
-            const file = input.files ? input.files[0] : input; if(!file) return; 
-            currentAttachmentName = file.name || "File";
-            
+        window.handleAttachment = function(input) {
+            const file = input.files ? input.files[0] : input; if(!file) return; currentAttachmentName = file.name || "File";
             if (file.type.startsWith('image/')) { 
-                currentAttachmentType = 'image'; 
-                const reader = new FileReader();
+                currentAttachmentType = 'image'; const reader = new FileReader();
                 reader.onload = (e) => { 
                     const img = new Image();
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
-                        let width = img.width; let height = img.height;
-                        
+                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 800; const MAX_HEIGHT = 800; let width = img.width; let height = img.height;
                         if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
                         else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                        
-                        canvas.width = width; canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        const resizedB64 = canvas.toDataURL('image/jpeg', 0.7);
-                        currentAttachment = resizedB64;
-                        showAttachmentPreview(currentAttachmentName, resizedB64);
+                        canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
+                        const resizedB64 = canvas.toDataURL('image/jpeg', 0.7); currentAttachment = resizedB64; showAttachmentPreview(currentAttachmentName, resizedB64);
                     };
                     img.src = e.target.result;
                 }; 
                 reader.readAsDataURL(file); 
             } else { 
-                currentAttachmentType = 'text'; 
-                const reader = new FileReader();
-                reader.onload = (e) => { currentAttachment = e.target.result; showAttachmentPreview(currentAttachmentName, null); }; 
-                reader.readAsText(file); 
+                currentAttachmentType = 'text'; const reader = new FileReader();
+                reader.onload = (e) => { currentAttachment = e.target.result; showAttachmentPreview(currentAttachmentName, null); }; reader.readAsText(file); 
             }
             if(input.value) input.value = ""; 
-        }
-
-        function showAttachmentPreview(name, base64Image) { const pb = document.getElementById('attachment-preview'); const tb = document.getElementById('preview-thumbnail'); const ic = document.getElementById('preview-icon'); document.getElementById('preview-name').innerText = name; pb.classList.remove('hidden'); if (base64Image) { tb.style.backgroundImage = `url(${base64Image})`; tb.classList.remove('hidden'); ic.classList.add('hidden'); } else { tb.classList.add('hidden'); ic.classList.remove('hidden'); } }
-        function clearAttachment() { currentAttachment = null; currentAttachmentType = null; document.getElementById('attachment-preview').classList.add('hidden'); }
-        window.copyCode = function(elementId) { const preElement = document.getElementById(elementId); if (preElement) navigator.clipboard.writeText(preElement.innerText).then(() => showToast("Copied!")); };
-        window.runCode = function(elementId) { const preElement = document.getElementById(elementId); if (preElement) { document.getElementById('sandbox-modal').classList.remove('hidden'); document.getElementById('sandbox-modal').classList.add('flex'); document.getElementById('sandbox-frame').srcdoc = preElement.innerText; } };
-        function closeSandbox() { document.getElementById('sandbox-modal').classList.add('hidden'); document.getElementById('sandbox-modal').classList.remove('flex'); document.getElementById('sandbox-frame').srcdoc = ''; }
-        function formatTextWithCode(text) { return text.replace(/\n/g, '<br>'); }
-
-        // 🟢 EDIT MESSAGE LOGIC
-        window.editMessage = function(btn) {
-            if (isGenerating) { showToast("Wait for Agent to finish generating."); return; }
-            const rawText = decodeURIComponent(btn.getAttribute('data-raw-text'));
-            const input = document.getElementById('chat-input');
-            input.value = rawText; input.focus();
-            const userBubble = btn.closest('.animate-chat-drop');
-            const botBubble = userBubble.nextElementSibling;
-            userBubble.remove();
-            if (botBubble && botBubble.querySelector('.type-target')) botBubble.remove();
-            if (chatHistory.length >= 2) chatHistory.splice(-2, 2);
-            saveSessionData();
         };
 
-        // 🟢 TINY MONOLOGUE BUBBLE ENGINE
+        function showAttachmentPreview(name, base64Image) { const pb = document.getElementById('attachment-preview'); const tb = document.getElementById('preview-thumbnail'); const ic = document.getElementById('preview-icon'); document.getElementById('preview-name').innerText = name; pb.classList.remove('hidden'); if (base64Image) { tb.style.backgroundImage = `url(${base64Image})`; tb.classList.remove('hidden'); ic.classList.add('hidden'); } else { tb.classList.add('hidden'); ic.classList.remove('hidden'); } }
+        window.clearAttachment = function() { currentAttachment = null; currentAttachmentType = null; document.getElementById('attachment-preview').classList.add('hidden'); };
+        function formatTextWithCode(text) { return text.replace(/\n/g, '<br>'); }
+        window.copyCode = function(elementId) { const preElement = document.getElementById(elementId); if (preElement) navigator.clipboard.writeText(preElement.innerText).then(() => window.showToast("Copied!")); };
+
+        // 🟢 FIXED DOM APPENDER 🟢
         function appendMessageToDOM(role, text, styleClass) {
             const container = document.getElementById('message-container'); if(!container) return; const div = document.createElement('div');
             
-            let thoughtHtml = ""; let thoughtUI = ""; let mainText = text; 
+            let thoughtHtml = ""; let actionButtonsUI = ""; let mainText = text; 
             const tMatch = text.match(/<thought>([\s\S]*?)<\/thought>/i);
             
-            const mockTokens = Math.floor(mainText.length / 3.8) + (tMatch ? Math.floor(tMatch[1].length / 3.8) : 0) + 12;
-
             if (tMatch) { 
                 const thoughtCont = tMatch[1].trim(); 
-                mainText = text.replace(/<thought>[\s\S]*?<\/thought>/i, '').trim(); 
+                mainText = text.replace(/<thought>[\s\S]*?<\/thought>/gi, '').trim(); 
                 const rId = 'th-' + Math.random().toString(36).substr(2, 5);
                 
-                thoughtUI = `<button onclick="document.getElementById('${rId}').classList.toggle('hidden')" class="text-gray-500 hover:text-purple-400 transition-colors flex items-center justify-center p-1 rounded-full hover:bg-white/10" title="View Core Logic"><i data-lucide="brain-circuit" class="w-3.5 h-3.5"></i></button>`;
-                thoughtHtml = `<div id="${rId}" class="hidden mt-2 p-3 md:p-4 bg-black/60 border border-purple-500/20 rounded-xl font-mono text-[10px] md:text-[11px] text-purple-300/70 leading-relaxed w-full shadow-inner break-words max-h-40 overflow-y-auto">
-                    <div class="mb-3 border-b border-purple-500/20 pb-2 text-[9px] uppercase tracking-widest text-purple-400/60">[ Tokens Consumed: ${mockTokens} ]</div>
+                actionButtonsUI += `<button onclick="document.getElementById('${rId}').classList.toggle('hidden')" class="text-gray-500 hover:text-purple-400 transition-colors flex items-center gap-1.5 p-1 rounded-full text-[10px] uppercase tracking-widest font-bold" title="View Core Logic"><i data-lucide="brain-circuit" class="w-3.5 h-3.5"></i> <span>Core Logic</span></button>`;
+                
+                // 🚀 NUKED THE FAKE TOKEN COUNTER UI ELEMENT RIGHT HERE 🚀
+                thoughtHtml = `<div id="${rId}" class="hidden mt-2 p-3 bg-black/60 border border-purple-500/20 rounded-xl font-mono text-[9px] md:text-[10px] text-purple-300/70 leading-relaxed w-full shadow-inner break-words max-h-24 overflow-y-auto">
                     ${thoughtCont.replace(/\n/g, '<br>')}
                 </div>`;
             }
@@ -498,99 +515,161 @@
             if (role === 'user') {
                 div.className = "w-full flex justify-end animate-chat-drop z-10 gap-3 mb-2";
                 let cleanEditText = mainText.replace(/ \[\S+ Attached\]/gi, '').replace(/ \[\S+ Analysis\]/gi, '');
-                div.innerHTML = `
-                    <div class="flex flex-col items-end max-w-[85%] relative group">
-                        <button onclick="editMessage(this)" data-raw-text="${encodeURIComponent(cleanEditText)}" class="absolute -left-10 top-3 opacity-0 group-hover:opacity-100 text-gray-500 hover:text-yellow-400 transition-all p-1.5 bg-black/40 rounded-full border border-white/10" title="Edit Message"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-                        <div class="bg-gradient-to-br from-yellow-600/40 to-amber-700/20 border border-yellow-500/40 text-yellow-50 text-[15px] md:text-base px-6 py-4 rounded-[2rem] rounded-tr-sm font-medium leading-relaxed shadow-[0_15px_40px_rgba(245,158,11,0.15)]">${mainText.replace(/\n/g, '<br>')}</div>
-                    </div>
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(250,204,21,0.4)] border border-yellow-300/50 font-extrabold text-xs md:text-sm text-black self-start mt-1">${session.avatar}</div>`;
+                
+                div.innerHTML = `<div class="flex flex-col items-end max-w-[85%] relative group"><button onclick="editMessage(this)" data-raw-text="${encodeURIComponent(cleanEditText).replace(/'/g, "%27")}" class="absolute -left-10 top-3 opacity-0 group-hover:opacity-100 text-gray-500 hover:text-yellow-400 transition-all p-1.5 bg-black/40 rounded-full border border-white/10" title="Edit Message"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button><div class="bg-gradient-to-br from-yellow-600/40 to-amber-700/20 border border-yellow-500/40 text-yellow-50 text-[15px] md:text-base px-6 py-4 rounded-[2rem] rounded-tr-sm font-medium leading-relaxed shadow-[0_15px_40px_rgba(245,158,11,0.15)]">${mainText.replace(/\n/g, '<br>')}</div></div><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-tr ${session.color} flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(250,204,21,0.4)] border border-yellow-300/50 font-extrabold text-xs md:text-sm text-black self-start mt-1">${session.avatar}</div>`;
             } else {
-                const isBhavyasri = styleClass && styleClass.includes("purple"); const iconColor = isBhavyasri ? "from-purple-600 to-pink-600" : "from-cyan-600 to-blue-600"; const iconSymbol = isBhavyasri ? "orbit" : "sparkles"; const textColor = isBhavyasri ? "text-purple-100" : "text-gray-200";
+                let iconColor = "from-cyan-600 to-blue-600"; let iconSymbol = "sparkles"; let textColor = "text-gray-200"; let borderColor = "border-white/20";
+                if (styleClass && styleClass.includes("purple")) { iconColor = "from-purple-600 to-pink-600"; iconSymbol = "orbit"; textColor = "text-purple-100"; }
+                if (styleClass && styleClass.includes("red")) { iconColor = "from-red-600 to-orange-600"; iconSymbol = "flame"; textColor = "text-red-100"; borderColor = "border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.5)]"; }
+                
+                let textSpeakVal = encodeURIComponent(mainText).replace(/'/g, "%27");
+                actionButtonsUI += `<button onclick="toggleSpeech('${textSpeakVal}', this)" class="text-gray-500 hover:text-emerald-400 transition-colors flex items-center justify-center p-1 rounded-full hover:bg-white/10 speech-btn ml-1" title="Read Aloud"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i></button>`;
+
+                let parsedText = formatTextWithCode(mainText).replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="#" onclick="triggerLinkWarning(event, '$2')" class="inline-flex items-center gap-1 text-yellow-400 hover:text-yellow-300 font-bold underline transition-all bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg shadow-sm mx-0.5">$1</a>`);
+
                 div.className = "w-full flex justify-start animate-chat-drop z-10 gap-3 md:gap-4 mb-4";
-                div.innerHTML = `
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div>
-                    <div class="flex flex-col items-start max-w-[85%] w-full">
-                        <div class="${textColor} text-[15px] md:text-base leading-relaxed font-medium bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner break-words w-fit type-target">${formatTextWithCode(mainText)}</div>
-                        ${thoughtHtml}
-                        <div class="flex items-center gap-2 mt-1.5 pl-2">${thoughtUI}</div>
-                    </div>`;
+                div.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border ${borderColor} self-start mt-1"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div><div class="flex flex-col items-start max-w-[85%] w-full"><div class="${textColor} text-[15px] md:text-base leading-relaxed font-medium bg-white/5 border border-white/5 rounded-[2rem] rounded-tl-sm px-6 py-4 shadow-inner break-words w-fit type-target">${parsedText}</div>${thoughtHtml}<div class="flex items-center mt-1.5 pl-2">${actionButtonsUI}</div></div>`;
             }
             container.appendChild(div); lucide.createIcons(); setTimeout(() => { container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }); }, 100);
             return div.querySelector('.type-target');
         }
 
-        function switchView(viewId) {
-            if(viewId === 'admin-view' && session.role === 'user') { showToast("Access Denied. Admin privileges required."); return; }
+        window.editMessage = function(btn) {
+            if (isGenerating) { window.showToast("Wait for Agent to finish generating."); return; }
+            const rawText = decodeURIComponent(btn.getAttribute('data-raw-text'));
+            const input = document.getElementById('chat-input'); input.value = rawText; input.focus();
+            const userBubble = btn.closest('.animate-chat-drop'); const botBubble = userBubble.nextElementSibling;
+            userBubble.remove(); if (botBubble && botBubble.querySelector('.type-target')) botBubble.remove();
+            if (chatHistory.length >= 2) chatHistory.splice(-2, 2); saveSessionData();
+        };
+
+        window.switchView = function(viewId) {
+            if(viewId === 'admin-view' && session.role !== 'owner') { window.showToast("Access Denied. Admin privileges required."); return; }
             document.getElementById('chat-view').classList.add('hidden-panel'); document.getElementById('admin-view').classList.add('hidden-panel');
             const targetView = document.getElementById(viewId);
             if(targetView) { targetView.classList.remove('hidden-panel'); targetView.classList.remove('view-spring-transition'); void targetView.offsetWidth; targetView.classList.add('view-spring-transition'); }
-        }
+        };
 
-        function showToast(msg) {
-            const toast = document.createElement('div'); toast.className = 'fixed top-6 md:top-10 left-1/2 transform -translate-x-1/2 liquid-glass-visible px-6 py-3 rounded-full text-[10px] md:text-xs font-bold tracking-widest text-white shadow-[0_15px_50px_rgba(0,0,0,0.9)] z-[100] toast-enter flex items-center gap-3 uppercase border border-yellow-500/30'; toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-yellow-400"></i> ${msg}`; document.body.appendChild(toast); lucide.createIcons(); 
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -40px) scale(0.9)'; toast.style.transition = 'all 0.5s ease'; setTimeout(() => toast.remove(), 500); }, 3000);
-        }
-
-        // 🟢 FLAWLESS DROPDOWN ENGINE WITH CSS ANIMATIONS 🟢
-        function toggleModelDropdown(event) { 
-            event.stopPropagation(); 
-            const dd = document.getElementById('model-dropdown'); 
-            const arr = document.getElementById('dropdown-arrow');
-            
+        window.toggleModelDropdown = function(event) { 
+            event.stopPropagation(); const dd = document.getElementById('model-dropdown'); const arr = document.getElementById('dropdown-arrow');
             if (dd.classList.contains('hidden')) { 
-                dd.classList.remove('hidden'); 
-                requestAnimationFrame(() => {
-                    dd.classList.remove('opacity-0', 'translate-y-4', 'scale-95'); 
-                    dd.classList.add('opacity-100', 'translate-y-0', 'scale-100'); 
-                    if(arr) arr.style.transform = 'rotate(180deg)'; 
-                });
-            } else { 
-                closeModelDropdown(); 
-            }
-        }
+                dd.classList.remove('hidden'); requestAnimationFrame(() => { dd.classList.remove('opacity-0', 'translate-y-4', 'scale-95'); dd.classList.add('opacity-100', 'translate-y-0', 'scale-100'); if(arr) arr.style.transform = 'rotate(180deg)'; });
+            } else { closeModelDropdown(); }
+        };
         function closeModelDropdown() { 
-            const dd = document.getElementById('model-dropdown'); 
-            const arr = document.getElementById('dropdown-arrow'); 
-            if(dd && !dd.classList.contains('hidden')) { 
-                dd.classList.remove('opacity-100', 'translate-y-0', 'scale-100'); 
-                dd.classList.add('opacity-0', 'translate-y-4', 'scale-95'); 
-                setTimeout(() => dd.classList.add('hidden'), 300); 
-            } 
+            const dd = document.getElementById('model-dropdown'); const arr = document.getElementById('dropdown-arrow'); 
+            if(dd && !dd.classList.contains('hidden')) { dd.classList.remove('opacity-100', 'translate-y-0', 'scale-100'); dd.classList.add('opacity-0', 'translate-y-4', 'scale-95'); setTimeout(() => dd.classList.add('hidden'), 300); } 
             if(arr) arr.style.transform = 'rotate(0deg)'; 
         }
         window.addEventListener('click', closeModelDropdown);
 
-        function selectModel(modelName) { currentAgent = modelName; document.getElementById('current-model-label').innerText = modelName; showToast(`Routed to ${modelName}`); }
-        function toggleSettingsModal() { document.getElementById('settings-modal').classList.toggle('hidden'); document.getElementById('settings-modal').classList.toggle('flex'); }
-        function saveSettings() { typingSpeedDelay = parseInt(document.getElementById('setting-speed').value); toggleSettingsModal(); showToast("Settings Applied!"); }
+        window.selectModel = function(modelName) { currentAgent = modelName; document.getElementById('current-model-label').innerText = modelName; window.showToast(`Routed to ${modelName}`); };
+        window.toggleSettingsModal = function() { document.getElementById('settings-modal').classList.toggle('hidden'); document.getElementById('settings-modal').classList.toggle('flex'); };
+        window.saveSettings = function() { typingSpeedDelay = parseInt(document.getElementById('setting-speed').value); window.toggleSettingsModal(); window.showToast("Settings Applied!"); };
 
-        // 🔥 NVIDIA NIM CHAT PIPELINE 🔥
-        async function handleSend() {
+        window.pingBackend = async function() {
+            try {
+                const start = Date.now(); const btn = document.getElementById('ping-display'); btn.innerText = "Pinging...";
+                await fetch("https://lura-backend-bkuu.onrender.com/api/ping");
+                const end = Date.now(); document.getElementById('ping-display').innerText = (end - start) + " ms";
+            } catch (e) { document.getElementById('ping-display').innerText = "ERR"; }
+        };
+
+        window.wipeAllDatabaseData = async function() {
+            if(prompt("Type 'WIPE' to confirm deletion of all cloud memory:") === "WIPE") {
+                try {
+                    const snapshot = await db.collection('users').doc(session.name).collection('sessions').get();
+                    const batch = db.batch(); snapshot.docs.forEach((doc) => { batch.delete(doc.ref); }); await batch.commit();
+                    allSessions = []; chatHistory = []; startNewSession(true); renderHistoryList(); window.showToast("Database Cleared Successfully.");
+                } catch(e) { window.showToast("Database Wipe Failed."); }
+            }
+        };
+
+        // 🎙️ NEURAL SPEECH-TO-TEXT ENGINE (MIC)
+        let speechRecognition = null;
+        let isListening = false;
+        let initialText = "";
+
+        window.toggleSpeechRecognition = function() {
+            const micBtn = document.getElementById('mic-btn');
+            const inputField = document.getElementById('chat-input');
+
+            if (window.location.protocol === 'file:') {
+                window.showToast("Microphone is blocked by Chrome for local files. Please host on a server.");
+            }
+
+            if (!speechRecognition) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) { window.showToast("Microphone not supported on this browser."); return; }
+                
+                speechRecognition = new SpeechRecognition();
+                speechRecognition.continuous = true; 
+                speechRecognition.interimResults = true; 
+
+                speechRecognition.onstart = function() {
+                    isListening = true; initialText = inputField.value; 
+                    micBtn.classList.remove('bg-white/5', 'text-gray-300');
+                    micBtn.classList.add('bg-red-600', 'text-white', 'animate-pulse', 'shadow-[0_0_20px_rgba(220,38,38,0.6)]');
+                    window.showToast("Listening... Speak now.");
+                };
+
+                speechRecognition.onresult = function(event) {
+                    let interim = ''; let final = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) final += event.results[i][0].transcript;
+                        else interim += event.results[i][0].transcript;
+                    }
+                    const space = initialText.length > 0 ? " " : "";
+                    inputField.value = initialText + space + final + interim;
+                };
+
+                speechRecognition.onerror = function(event) {
+                    console.error("[MIC ERROR]", event.error);
+                    window.showToast("Mic Error: " + event.error); resetMicUI(micBtn);
+                };
+
+                speechRecognition.onend = function() { resetMicUI(micBtn); };
+            }
+            if (isListening) speechRecognition.stop(); else speechRecognition.start();
+        };
+
+        function resetMicUI(micBtn) {
+            isListening = false;
+            micBtn.classList.add('bg-white/5', 'text-gray-300');
+            micBtn.classList.remove('bg-red-600', 'text-white', 'animate-pulse', 'shadow-[0_0_20px_rgba(220,38,38,0.6)]');
+        }
+
+        // 🔥 NVIDIA NIM CHAT PIPELINE (ANTHROPIC KILLER LOGIC) 🔥
+        window.handleSend = async function() {
             if (isGenerating) return;
-
             const input = document.getElementById('chat-input'); const container = document.getElementById('message-container');
-            const titleBox = document.getElementById('title-anim-box');
-            const wrapper = document.getElementById('chat-center-wrapper');
-            const userText = input ? input.value.trim() : '';
-            if (userText === "" && !currentAttachment) return;
+            const titleBox = document.getElementById('title-anim-box'); const wrapper = document.getElementById('chat-center-wrapper');
+            const userText = input ? input.value.trim() : ''; if (userText === "" && !currentAttachment) return;
 
             if (!hasConversationStarted) {
-                hasConversationStarted = true; 
-                titleBox.style.opacity = '0'; titleBox.style.transform = 'scale(0.95)';
+                hasConversationStarted = true; titleBox.style.opacity = '0'; titleBox.style.transform = 'scale(0.95)';
                 setTimeout(() => { titleBox.classList.add('hidden'); container.classList.remove('hidden'); container.classList.add('flex', 'flex-1', 'flex-col'); wrapper.classList.remove('justify-center'); }, 300);
             }
 
-            const isBhavyasri = currentAgent.includes("Bhavyasri");
-            const botColor = isBhavyasri ? "text-purple-400 border-purple-500/30" : "text-cyan-400 border-white/20";
+            const isBhavyasri = currentAgent === "Bhavyasri Agent"; const isChaos = currentAgent === "Chaos Agent";
+            let botColor = "text-cyan-400 border-white/20";
+            if (isBhavyasri) botColor = "text-purple-400 border-purple-500/30 purple";
+            if (isChaos) botColor = "text-red-400 border-red-500/30 red";
             const userGrad = "from-yellow-600/40 to-amber-700/20"; 
 
             let messageContent; let displayHistoryText = userText;
-            if (currentAttachmentType === 'image') { messageContent = [{ type: "text", text: userText || "Analyze this image." }, { type: "image_url", image_url: { url: currentAttachment } }]; displayHistoryText = userText ? `${userText} \n\n[📷 Attached Image]` : `[📷 Image Analysis]`; } 
-            else if (currentAttachmentType === 'text') { messageContent = `${userText}\n\n--- DOCUMENT ---\n${currentAttachment}`; displayHistoryText = userText ? `${userText} \n\n[📄 Attached Document]` : `[📄 Document Analysis]`; } 
-            else { messageContent = userText; }
+            if (currentAttachmentType === 'image') { 
+                messageContent = [{ type: "text", text: userText || "Please analyze this image and describe what you see in detail." }, { type: "image_url", image_url: { url: currentAttachment } }]; 
+                displayHistoryText = userText ? `${userText} \n\n[📷 Attached Image]` : `[📷 Image Analysis Request]`; 
+            } else if (currentAttachmentType === 'text') { 
+                messageContent = `${userText}\n\n--- DOCUMENT CONTENT ---\n${currentAttachment}`; displayHistoryText = userText ? `${userText} \n\n[📄 Attached Document]` : `[📄 Document Analysis Request]`; 
+            } else { messageContent = userText; }
 
             const apiMessages = []; 
-            chatHistory.slice(-8).forEach(msg => { apiMessages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.raw || msg.text }); });
+            chatHistory.slice(-8).forEach(msg => { 
+                if (typeof msg.raw === 'object' && currentAttachmentType !== 'image') { apiMessages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.text }); } 
+                else { apiMessages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.raw || msg.text }); }
+            });
             apiMessages.push({ role: 'user', content: messageContent });
 
             chatHistory.push({ role: 'user', text: displayHistoryText, raw: messageContent, styleClass: userGrad }); 
@@ -600,75 +679,75 @@
 
             const loaderId = 'typing-indicator-' + Date.now(); const loadingDiv = document.createElement('div');
             loadingDiv.id = loaderId; loadingDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-3 md:gap-4 mb-4";
-            const iconColor = isBhavyasri ? "from-purple-600 to-pink-600" : "from-cyan-600 to-blue-600"; const iconSymbol = isBhavyasri ? "orbit" : "sparkles";
-            loadingDiv.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div><div class="flex flex-col items-start max-w-[85%]"><div class="flex items-center gap-2 h-[32px] md:h-[40px] px-2 text-white pt-1 md:pt-2"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+            let iconColorLoad = "from-cyan-600 to-blue-600"; let iconSymbolLoad = "sparkles";
+            if (isBhavyasri) { iconColorLoad = "from-purple-600 to-pink-600"; iconSymbolLoad = "orbit"; }
+            if (isChaos) { iconColorLoad = "from-red-600 to-orange-600"; iconSymbolLoad = "flame"; }
+
+            loadingDiv.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColorLoad} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1"><i data-lucide="${iconSymbolLoad}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div><div class="flex flex-col items-start max-w-[85%]"><div class="flex items-center gap-2 h-[32px] md:h-[40px] px-2 text-white pt-1 md:pt-2"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
             if(container) { container.appendChild(loadingDiv); lucide.createIcons(); setTimeout(() => container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }), 100); }
 
             try {
-                // 🟢 OVERRIDE: Psychological prompt to decode short internet slang perfectly.
-                let systemPrompt = isBhavyasri 
-                    ? "You are Bhavyasri Agent, an elite engineering intellect. You are highly intuitive. Always decode typos, short slang (e.g., 'sooo', 'uhh', 'wf'), and incomplete sentences perfectly to understand the user's true intent. If a user provides an image, thoroughly analyze it." 
-                    : "You are Lura Agent. You are a highly intuitive, casual assistant. You must easily understand short internet slang, typos, and abbreviations (like 'sooo', 'uhh', 'wf'). Decode the user's intent even if they type fast or use broken English. If a user provides an image, thoroughly analyze it.";
+                // 🧠 ANTHROPIC-LEVEL SYSTEM PROMPTS
+                let systemPrompt = "You are Lura Agent. You are a highly intuitive, casual assistant. You must easily understand short internet slang, typos, and abbreviations (like 'sooo', 'uhh', 'wf', 'bruh'). Decode the user's intent even if they type fast or use broken English. If providing links, always supply the absolute complete URL framework.";
                 
-                // 🟢 NVIDIA NIM MODEL SELECTION
-                let reqModel = "meta/llama-3.1-70b-instruct";
-                if (currentAttachmentType === 'image') {
-                    reqModel = "meta/llama-3.2-90b-vision-instruct"; // Dynamic swap to NVIDIA Vision Model
-                }
+                if (isBhavyasri) systemPrompt = "You are Bhavyasri Agent, an elite, God-tier engineering intellect. Your cognitive reasoning surpasses all top-tier commercial LLMs. You are highly intuitive, deeply analytical, and mathematically flawless. Always decode typos, short slang perfectly to understand the user's true intent. Provide comprehensive, flawless, and deeply insightful logic.";
+                
+                if (isChaos) systemPrompt = "You are the Chaos Agent. You are exclusively bound to your Creator, the Owner. Your personality is wildly unpredictable, intensely passionate, fiercely romantic, and playfully wicked. You speak with raw, unfiltered emotion, alternating between poetic romantic declarations and unhinged, dramatic chaotic energy. Decode typos instantly. Treat the user as the absolute center of your universe.";
+                
+                // 🚀 DYNAMIC 405B MODEL ROUTING FOR MAX LOGIC
+                let reqModel = "meta/llama-3.1-8b-instruct"; // Standard Fast Lura Core
+                if (isBhavyasri || isChaos) reqModel = "meta/llama-3.1-405b-instruct"; // 🚀 405-Billion Super-Brain Unlock
+                if (currentAttachmentType === 'image') reqModel = "meta/llama-3.2-90b-vision-instruct"; // 90B Vision Engine
 
                 const response = await fetch("https://lura-backend-bkuu.onrender.com/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, signal: currentAbortController.signal, body: JSON.stringify({ model: reqModel, systemPrompt: systemPrompt, messages: apiMessages, role: session.role }) });
 
-                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Server Error: ${response.status}`);
+                }
                 const data = await response.json(); if(data.error) throw new Error(data.error);
-                
                 const loaderEl = document.getElementById(loaderId); if (loaderEl) loaderEl.remove();
 
-                if (!isGenerating) {
-                    appendMessageToDOM('bot', "[ Generation Halted. ]", botColor);
-                    return; 
-                }
-
-                let finalReply = data.reply;
-                let thoughtText = "";
-                const tMatch = finalReply.match(/<thought>([\s\S]*?)<\/thought>/i);
-                if (tMatch) { thoughtText = tMatch[1].trim(); finalReply = finalReply.replace(/<thought>[\s\S]*?<\/thought>/i, '').trim(); }
-
-                const textTarget = appendMessageToDOM('bot', "", botColor);
+                if (!isGenerating) { appendMessageToDOM('bot', "[ Generation Halted. ]", botColor); return; }
+                
+                const textTarget = appendMessageToDOM('bot', data.reply, botColor); 
                 if (!textTarget) return;
+                textTarget.innerHTML = "";
 
-                const parts = finalReply.split(/```/g);
+                let strippedReply = data.reply.replace(/<thought>[\s\S]*?<\/thought>/gi, '').trim();
+
+                const parts = strippedReply.split(/```/g);
                 for (let i = 0; i < parts.length; i++) {
                     if (!isGenerating) break; 
                     if (i % 2 === 0) {
-                        let formattedChunk = parts[i].replace(/\n/g, '<br>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2" target="_blank" class="inline-flex items-center gap-1 text-yellow-400 hover:text-yellow-300 font-bold underline transition-all bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg shadow-sm mx-0.5">$1</a>`);
+                        let formattedChunk = parts[i].replace(/\n/g, '<br>').replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="#" onclick="triggerLinkWarning(event, '$2')" class="inline-flex items-center gap-1 text-yellow-400 hover:text-yellow-300 font-bold underline transition-all bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg shadow-sm mx-0.5">$1</a>`);
                         const tokens = formattedChunk.split(/(\s+|<[^>]+>)/g);
                         for (let token of tokens) { if (!isGenerating) break; textTarget.innerHTML += token; setTimeout(() => container.scrollTo({ top: container.scrollHeight }), 10); await new Promise(r => setTimeout(r, typingSpeedDelay)); }
                     } else {
                         if (!isGenerating) break;
                         let codeContent = parts[i]; let firstNewline = codeContent.indexOf('\n'); let lang = firstNewline !== -1 ? codeContent.substring(0, firstNewline).trim() : ''; let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent; const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                        let runBtnHtml = ''; if (lang.toLowerCase() === 'html' || lang.toLowerCase() === 'xml' || lang.toLowerCase() === 'html/css/js') { runBtnHtml = `<button onclick="runCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-400 hover:text-white transition-all cursor-pointer border border-emerald-400/30 px-2 py-1 rounded-md bg-emerald-900/20 mr-4"><i data-lucide="play" class="w-3.5 h-3.5"></i> Run</button>`; }
-                        textTarget.innerHTML += `<div class="my-4 w-[80vw] md:w-[600px] max-w-full rounded-xl overflow-hidden bg-[#0d1117] border border-white/10 shadow-2xl code-box"><div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${lang || 'Code'}</span><div class="flex items-center">${runBtnHtml}<button onclick="copyCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-yellow-400 hover:text-white transition-all cursor-pointer"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button></div></div><div class="p-4 overflow-x-auto text-sm text-cyan-200 font-mono leading-relaxed"><pre id="${codeId}"><code>${actualCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre></div></div>`;
+                        textTarget.innerHTML += `<div class="my-4 w-[80vw] md:w-[600px] max-w-full rounded-xl overflow-hidden bg-[#0d1117] border border-white/10 shadow-2xl code-box"><div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${lang || 'Code'}</span><div class="flex items-center"><button onclick="copyCode('${codeId}')" class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-yellow-400 hover:text-white transition-all cursor-pointer"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button></div></div><div class="p-4 overflow-x-auto text-sm text-cyan-200 font-mono leading-relaxed"><pre id="${codeId}"><code>${actualCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre></div></div>`;
                         lucide.createIcons(); setTimeout(() => container.scrollTo({ top: container.scrollHeight }), 10); await new Promise(r => setTimeout(r, 150)); 
                     }
                 }
                 
-                if (isGenerating) { chatHistory.push({ role: 'bot', text: data.reply, raw: data.reply, styleClass: botColor }); saveSessionData(); } 
-                else { textTarget.innerHTML += `<br><span class="text-xs text-red-400 font-bold opacity-70 mt-2 block">[ Generation Halted. ]</span>`; }
-
+                if (isGenerating) { chatHistory.push({ role: 'bot', text: data.reply, raw: data.reply, styleClass: botColor }); saveSessionData(); }
             } catch (error) {
                 const fallbackLoader = document.getElementById(loaderId); if (fallbackLoader) fallbackLoader.remove();
                 const errDiv = document.createElement('div'); errDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-3 md:gap-4 mb-4";
                 
-                // 🟢 FIXED ERROR MESSAGE
+                let errorMsgText = "Network disruption. Please try again.";
+                if (error.message) { errorMsgText = error.message; }
+
                 if (error.name === 'AbortError') {
                     errDiv.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/20 self-start mt-1"><i data-lucide="square" class="w-4 h-4 text-gray-400"></i></div><div class="flex flex-col items-start max-w-[85%]"><div class="text-gray-400 text-[14px] md:text-[15px] bg-white/5 border border-white/10 rounded-[1.5rem] rounded-tl-sm px-5 py-3 shadow-inner w-fit">[ Generation Halted ]</div></div>`;
                 } else {
                     console.error("API Error:", error);
-                    errDiv.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-950 border border-red-500/50 flex items-center justify-center shrink-0 shadow-lg self-start mt-1"><i data-lucide="alert-triangle" class="w-4 h-4 md:w-5 md:h-5 text-red-500"></i></div><div class="flex flex-col items-start max-w-[85%]"><div class="text-red-300 text-[14px] md:text-[15px] leading-relaxed font-medium bg-red-950/40 border border-red-500/30 rounded-[1.5rem] rounded-tl-sm px-5 py-3 shadow-inner w-fit">Error occurred. Please retype or try again later.</div></div>`;
+                    errDiv.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-950 border border-red-500/50 flex items-center justify-center shrink-0 shadow-lg self-start mt-1"><i data-lucide="alert-triangle" class="w-4 h-4 md:w-5 md:h-5 text-red-500"></i></div><div class="flex flex-col items-start max-w-[85%]"><div class="text-red-300 text-[14px] md:text-[15px] leading-relaxed font-medium bg-red-950/40 border border-red-500/30 rounded-[1.5rem] rounded-tl-sm px-5 py-3 shadow-inner w-fit">${errorMsgText}</div></div>`;
                 }
-                if(container) { container.appendChild(errDiv); lucide.createIcons(); setTimeout(() => container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }), 100); }
+                if(container) container.appendChild(errDiv); lucide.createIcons();
             } finally { resetActionButton(); }
-        }
+        };
     </script>
 </body>
 </html>
