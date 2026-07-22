@@ -61,13 +61,17 @@
         .th-conic { background-image: conic-gradient(from 0deg, transparent 50%, var(--th-primary) 80%, var(--th-grad-to) 100%); }
         .th-radial { background-image: radial-gradient(circle, var(--th-glow-strong) 0%, transparent 60%); }
 
+        /* GLASSMORPHISM */
         .liquid-glass { background: rgba(20, 20, 28, 0.55); backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1); }
         .liquid-glass-visible { background: rgba(20, 20, 28, 0.75); backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.15); }
-
         .glass-content { position: relative; z-index: 10; }
         .bg-grid-pattern { background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
 
-        /* 🚀 NEW HYPER-ANIMATIONS */
+        /* REDUCED MOTION SUPPORT */
+        body.reduced-motion *, body.reduced-motion { animation: none !important; transition: none !important; backdrop-filter: none !important; box-shadow: none !important; }
+        body.reduced-motion .liquid-glass, body.reduced-motion .liquid-glass-visible { background: #111827 !important; border-color: #374151 !important; }
+
+        /* 🚀 HYPER-ANIMATIONS */
         @keyframes revealText { from { opacity: 0; transform: translateY(15px); filter: blur(8px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
         .anim-reveal { display: inline-block; animation: revealText 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
         .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.4s; }
@@ -115,8 +119,13 @@
 
         .oauth-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
         .oauth-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
-        .msg-actions { opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
-        .msg-container:hover .msg-actions { opacity: 1; transform: translateY(0); }
+        .msg-actions { opacity: 0; transition: all 0.3s ease; }
+        .msg-container:hover .msg-actions { opacity: 1; transform: translateX(0); }
+        .user-actions { transform: translateX(10px); }
+        .bot-actions { transform: translateY(10px); }
+        .msg-container:hover .user-actions { transform: translateX(0); }
+        .msg-container:hover .bot-actions { transform: translateY(0); }
+
         @keyframes scanLaser { 0% { transform: translateY(-100%); } 50% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
         .animate-scanner { animation: scanLaser 3s ease-in-out infinite; }
 
@@ -134,6 +143,14 @@
         #matrix-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; pointer-events: none; }
         .packet-tracer-line { animation: slideInRight 0.3s ease-out forwards; }
         @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* TERMINAL BLINK */
+        .terminal-cursor { display: inline-block; width: 8px; height: 12px; background-color: #10b981; animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* TOGGLE SWITCH STYLES */
+        .setting-toggle-input:checked + .toggle-bg { background-color: var(--th-primary); }
+        .setting-toggle-input:checked + .toggle-bg .toggle-dot { transform: translateX(1.25rem); background-color: #fff; }
     </style>
 </head>
 <body class="bg-black text-gray-200 font-sans h-[100dvh] w-full relative overflow-hidden dynamic-bg" data-theme="cyan">
@@ -219,6 +236,7 @@
 
                 <!-- 💎 PREMIUM GLASS CAPTCHA -->
                 <div id="captcha-module" class="relative mt-6 bg-[#0d1117] p-5 rounded-2xl border border-emerald-500/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] overflow-hidden group transition-all">
+                    <!-- Scanner Laser -->
                     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/10 to-transparent animate-scanner pointer-events-none z-0"></div>
                     
                     <div class="flex justify-between items-center mb-4 relative z-10">
@@ -249,11 +267,12 @@
     <!-- 💻 MAIN WORKSPACE -->
     <div id="app-workspace" class="hidden-panel w-full h-full flex-col-reverse md:flex-row relative z-10">
         
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR (Animated) -->
         <aside id="main-sidebar" class="w-full h-[70px] md:w-24 md:h-full overflow-x-auto md:overflow-visible flex flex-row md:flex-col justify-between items-center px-4 md:px-0 py-2 md:py-8 bg-black/60 backdrop-blur-2xl border-t md:border-t-0 md:border-r border-white/10 z-40 shrink-0 shadow-[0_0_40px_rgba(0,0,0,0.8)] transition-all duration-500 -translate-x-full md:translate-x-0">
             <div class="flex flex-row md:flex-col items-center gap-2 sm:gap-4 md:gap-8 w-auto">
                 <button onclick="switchView('chat-view')" id="sidebar-chat-btn" class="p-3 md:p-4 th-text liquid-glass-visible rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 th-glow"><i data-lucide="sparkles" class="w-6 h-6 md:w-7 md:h-7"></i></button>
-                <button onclick="toggleHistory()" class="p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-white rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="Cloud Vault / History"><i data-lucide="history" class="w-6 h-6 md:w-7 md:h-7"></i></button>
+                <button onclick="startNewChat()" class="p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-white rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="New Chat"><i data-lucide="edit" class="w-6 h-6 md:w-7 md:h-7"></i></button>
+                <button onclick="toggleHistory()" class="p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-cyan-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="Cloud Vault / History"><i data-lucide="history" class="w-6 h-6 md:w-7 md:h-7"></i></button>
                 <button onclick="switchView('admin-view')" id="sidebar-admin-btn" class="hidden p-3 md:p-4 text-gray-400 hover:bg-white/10 hover:text-purple-400 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95" title="Admin Portal"><i data-lucide="shield-alert" class="w-6 h-6 md:w-7 md:h-7"></i></button>
             </div>
             <div class="flex flex-row md:flex-col items-center gap-2 sm:gap-4 md:gap-8 w-auto">
@@ -263,14 +282,14 @@
             </div>
         </aside>
 
-        <!-- ☁️ CLOUD VAULT HISTORY PANEL -->
-        <div id="history-panel" class="absolute top-0 bottom-0 left-0 md:left-24 w-[280px] bg-[#0a0f18]/95 backdrop-blur-3xl border-r border-white/10 z-30 transition-transform duration-500 -translate-x-full shadow-[30px_0_50px_rgba(0,0,0,0.5)] pt-6 flex flex-col">
+        <!-- ☁️ REAL CLOUD VAULT HISTORY PANEL -->
+        <div id="history-panel" class="absolute top-0 bottom-0 left-0 md:left-24 w-[300px] bg-[#0a0f18]/95 backdrop-blur-3xl border-r border-white/10 z-30 transition-transform duration-500 -translate-x-full shadow-[30px_0_50px_rgba(0,0,0,0.8)] pt-6 flex flex-col">
             <div class="px-6 pb-4 border-b border-white/10 flex justify-between items-center">
                 <h3 class="text-xs font-bold text-gray-300 tracking-widest uppercase flex items-center gap-2"><i data-lucide="cloud" class="w-4 h-4 text-emerald-400"></i> Cloud Vault</h3>
                 <button onclick="toggleHistory()" class="text-gray-500 hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-2 scroll-smooth">
-                <!-- History items populated via JS -->
+                <!-- Real History items populated via JS -->
             </div>
         </div>
 
@@ -281,14 +300,18 @@
                 
                 <!-- TOP HEADER BAR -->
                 <div class="absolute top-4 right-4 md:top-8 md:right-10 flex items-center gap-3 z-30">
+                    
+                    <!-- 🔍 FOCUS MODE TOGGLE -->
                     <button onclick="toggleFocusMode()" id="focus-btn" class="liquid-glass hover:bg-white/10 text-gray-400 hover:text-white px-3 py-2.5 md:py-3 rounded-full flex items-center gap-2 border border-white/10 backdrop-blur-xl transition-all outline-none hover:-translate-y-1" title="Toggle Focus Mode">
                         <i data-lucide="maximize" class="w-4 h-4" id="focus-icon"></i>
                     </button>
 
+                    <!-- 🗑️ CLEAR CHAT ACTION -->
                     <button onclick="resetChatLayout()" class="liquid-glass hover:bg-red-500/20 text-gray-400 hover:text-red-400 px-3 py-2.5 md:py-3 rounded-full flex items-center gap-2 border border-white/10 backdrop-blur-xl transition-all outline-none hover:-translate-y-1" title="Clear Chat">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
 
+                    <!-- CLOUD SYNC INDICATOR -->
                     <div id="cloud-sync-status" class="liquid-glass px-4 py-2.5 md:py-3 rounded-full flex items-center gap-2 border border-white/10 backdrop-blur-xl transition-all duration-300">
                         <i data-lucide="cloud" class="w-4 h-4 text-emerald-400" id="cloud-icon"></i>
                         <span class="text-[10px] font-bold text-gray-300 tracking-wider uppercase hidden sm:inline" id="cloud-text">Vault Synced</span>
@@ -331,19 +354,25 @@
                     <div id="message-container" class="w-full hidden overflow-y-auto pr-2 flex-col justify-start mb-6 flex-1 space-y-8 scroll-smooth pb-10"></div>
 
                     <!-- SEARCH BAR -->
-                    <div class="w-full shrink-0 relative flex flex-col px-1 md:px-0">
+                    <div class="w-full shrink-0 relative flex flex-col px-1 md:px-0 mt-4">
                         
+                        <!-- ⌨️ LIVE WORD COUNTER -->
                         <div class="absolute -top-7 right-4 flex items-center gap-4">
                             <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest" id="typing-counter">0 Words</span>
                         </div>
 
-                        <div id="attachment-preview" class="hidden absolute bottom-[calc(100%+20px)] left-4 bg-[#1a1f2e] border th-border rounded-2xl p-2 flex items-center gap-3 animate-chat-drop shadow-2xl">
-                            <div id="preview-thumbnail" class="w-10 h-10 rounded-lg bg-gray-800 bg-cover bg-center hidden border border-white/10"></div>
-                            <div id="preview-icon" class="w-10 h-10 rounded-lg flex items-center justify-center hidden"><i data-lucide="file-text" class="w-5 h-5 th-text"></i></div>
-                            <div class="flex flex-col pr-2"><span id="preview-name" class="text-xs text-white font-bold truncate max-w-[150px]">file</span><span class="text-[9px] text-emerald-400 uppercase">Ready</span></div>
-                            <button onclick="clearAttachment()" class="text-gray-400 hover:text-red-400 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        <!-- 📎 FILE ATTACHMENT PREVIEW (Fixed Overlap Issue) -->
+                        <div id="attachment-preview" class="hidden w-max max-w-full mb-3 ml-2 md:ml-4 bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-2 flex items-center gap-3 animate-chat-drop shadow-[0_10px_30px_rgba(0,0,0,0.8)] z-50 transition-all">
+                            <div id="preview-thumbnail" class="w-10 h-10 rounded-lg bg-gray-800 bg-cover bg-center hidden border border-white/10 shrink-0"></div>
+                            <div id="preview-icon" class="w-10 h-10 rounded-lg flex items-center justify-center hidden bg-white/5 shrink-0"><i data-lucide="file-text" class="w-5 h-5 th-text"></i></div>
+                            <div class="flex flex-col pr-2 overflow-hidden">
+                                <span id="preview-name" class="text-xs text-white font-bold truncate max-w-[150px] md:max-w-[250px]">file</span>
+                                <span class="text-[9px] text-emerald-400 uppercase tracking-widest font-bold">Attached</span>
+                            </div>
+                            <button onclick="clearAttachment()" class="text-gray-400 hover:text-red-400 p-1.5 hover:bg-red-500/20 rounded-lg transition-all shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
                         </div>
 
+                        <!-- 💡 NEON BAR CONTAINER -->
                         <div id="search-wrapper" class="relative w-full rounded-[3.5rem] p-[2px] overflow-hidden group shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-300 focus-within:scale-[1.01] focus-within:shadow-[0_0_40px_var(--th-glow)]">
                             
                             <div id="search-neon-ring" class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] animate-[spin_3s_linear_infinite] pointer-events-none z-0 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500">
@@ -356,7 +385,7 @@
 
                             <form onsubmit="event.preventDefault(); if(isGenerating){ stopGeneration(); } else { handleSend(); }" id="search-bar-box" class="relative z-20 w-full bg-[#0a0f18] rounded-[3.4rem] p-2 md:p-3 flex items-center gap-2 md:gap-4 cursor-text border border-white/5">
                                 <input type="file" id="system-file-upload" class="hidden" onchange="handleAttachment(this)" accept="image/*, .pdf, .txt, .md, .js, .json, .html" />
-                                <button type="button" onclick="document.getElementById('system-file-upload').click()" class="glass-content w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shrink-0">
+                                <button type="button" onclick="document.getElementById('system-file-upload').click()" class="glass-content w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-gray-300 bg-white/5 hover:bg-white/10 hover:text-emerald-400 rounded-full transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer border border-white/10 shrink-0">
                                     <i data-lucide="paperclip" class="w-5 h-5 md:w-6 md:h-6"></i>
                                 </button>
                                 
@@ -407,7 +436,6 @@
                         <button onclick="switchView('chat-view')" class="liquid-glass hover:bg-white/10 text-white px-6 py-3.5 rounded-2xl transition-all duration-300 border border-white/20 font-bold text-xs shadow-xl uppercase tracking-widest flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Return</button>
                     </div>
 
-                    <!-- CPU / NET LOAD METRICS -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         <div class="liquid-glass p-6 rounded-[2rem] border border-white/5 relative overflow-hidden group hover:border-emerald-500/50 transition-all col-span-1 md:col-span-2">
                             <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase flex items-center justify-between mb-4">
@@ -434,7 +462,7 @@
                         <div class="lg:col-span-2 liquid-glass p-6 rounded-[2.5rem] border border-white/10 flex flex-col h-[350px]">
                             <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
                                 <h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase flex items-center gap-2"><i data-lucide="terminal" class="w-4 h-4 text-white"></i> Master Root Terminal</h3>
-                                <span class="text-[9px] text-emerald-400 border border-emerald-400/30 px-2 py-1 rounded-full animate-pulse flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> LIVE</span>
+                                <span class="text-[9px] text-emerald-400 border border-emerald-400/30 px-2 py-1 rounded-full flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> ONLINE</span>
                             </div>
                             <div id="admin-terminal-output" class="flex-1 overflow-y-auto font-mono text-[11px] text-emerald-400 space-y-1.5 pr-2 mb-2 transition-all">
                                 <div><span class="text-emerald-700">[SYS]</span> Root terminal initialized. Type /help for commands.</div>
@@ -442,6 +470,7 @@
                             <form onsubmit="event.preventDefault(); handleTerminalCommand();" class="relative flex items-center mt-2 border-t border-white/10 pt-3">
                                 <span class="text-emerald-500 font-mono text-xs mr-2">root@lura:~#</span>
                                 <input type="text" id="admin-term-input" class="w-full bg-transparent text-emerald-400 font-mono text-xs outline-none" autocomplete="off" spellcheck="false" placeholder="Enter command..."/>
+                                <div class="terminal-cursor absolute right-2"></div>
                             </form>
                         </div>
 
@@ -454,12 +483,13 @@
                                 </div>
                             </div>
                             
-                            <div class="liquid-glass p-6 rounded-[2.5rem] border border-white/10 flex flex-col relative overflow-hidden min-h-[160px] group hover:border-yellow-500/50 transition-all">
-                                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-yellow-500/10 rounded-full blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
-                                <h3 class="text-[10px] font-bold text-gray-400 tracking-widest uppercase flex items-center gap-2 mb-2"><i data-lucide="database" class="w-3 h-3 text-yellow-400"></i> Local Storage DB</h3>
+                            <!-- LOCAL STORAGE MONITOR -->
+                            <div class="liquid-glass p-6 rounded-[2.5rem] border border-white/10 flex flex-col relative overflow-hidden min-h-[160px] group hover:border-blue-500/50 transition-all">
+                                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+                                <h3 class="text-[10px] font-bold text-gray-400 tracking-widest uppercase flex items-center gap-2 mb-2"><i data-lucide="database" class="w-3 h-3 text-blue-400"></i> System Integrity</h3>
                                 <div class="text-3xl font-extrabold text-white tracking-tight mt-1" id="admin-storage-size">0 KB</div>
-                                <div class="text-[10px] text-yellow-400 mt-1 font-mono tracking-widest uppercase flex justify-between items-end flex-1">
-                                    <span>Used Memory</span>
+                                <div class="w-full h-1.5 bg-black/50 rounded-full mt-auto border border-white/5 overflow-hidden">
+                                    <div id="storage-bar" class="h-full bg-blue-500 w-[1%] shadow-[0_0_10px_#3b82f6] transition-all duration-1000"></div>
                                 </div>
                             </div>
                         </div>
@@ -496,24 +526,66 @@
 
             <!-- ⚙️ SETTINGS MODAL -->
             <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-2xl items-center justify-center hidden z-50 p-4">
-                <div class="liquid-glass-visible w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] animate-chat-drop border border-white/20 shadow-2xl">
-                    <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
-                        <h3 class="text-2xl font-extrabold text-white flex items-center gap-4"><i data-lucide="palette" class="th-text"></i> System Theme</h3>
+                <div class="liquid-glass-visible w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] animate-chat-drop border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-6">
+                        <h3 class="text-2xl font-extrabold text-white flex items-center gap-4"><i data-lucide="settings" class="th-text"></i> System Config</h3>
                         <button type="button" onclick="toggleSettingsModal()" class="text-gray-400 hover:text-white cursor-pointer bg-white/10 p-3 rounded-full hover:rotate-90 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
                     
                     <div class="space-y-6">
-                        <label class="text-xs font-bold text-gray-400 tracking-widest uppercase">Select Visual Interface</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <button onclick="setTheme('cyan')" id="btn-theme-cyan" class="theme-btn py-4 rounded-2xl border border-[#22d3ee] bg-[#22d3ee]/10 text-[#22d3ee] font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2"><div class="w-4 h-4 rounded-full bg-[#22d3ee] shadow-[0_0_10px_#22d3ee]"></div>Cyan</button>
-                            <button onclick="setTheme('gold')" id="btn-theme-gold" class="theme-btn py-4 rounded-2xl border border-transparent bg-white/5 text-[#fbbf24] font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2 opacity-50 hover:opacity-100"><div class="w-4 h-4 rounded-full bg-[#fbbf24] shadow-[0_0_10px_#fbbf24]"></div>Gold</button>
-                            <button onclick="setTheme('blue')" id="btn-theme-blue" class="theme-btn py-4 rounded-2xl border border-transparent bg-white/5 text-[#60a5fa] font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2 opacity-50 hover:opacity-100"><div class="w-4 h-4 rounded-full bg-[#60a5fa] shadow-[0_0_10px_#60a5fa]"></div>Blue</button>
-                            <button onclick="setTheme('white')" id="btn-theme-white" class="theme-btn py-4 rounded-2xl border border-transparent bg-white/5 text-white font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2 opacity-50 hover:opacity-100"><div class="w-4 h-4 rounded-full bg-white shadow-[0_0_10px_white]"></div>White</button>
+                        <!-- THEMES -->
+                        <div>
+                            <label class="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3 block">Visual Interface</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <button onclick="setTheme('cyan')" id="btn-theme-cyan" class="theme-btn py-4 rounded-2xl border border-[#22d3ee] bg-[#22d3ee]/10 text-[#22d3ee] font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2"><div class="w-4 h-4 rounded-full bg-[#22d3ee] shadow-[0_0_10px_#22d3ee]"></div>Cyan</button>
+                                <button onclick="setTheme('gold')" id="btn-theme-gold" class="theme-btn py-4 rounded-2xl border border-transparent bg-white/5 text-[#fbbf24] font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2 opacity-50 hover:opacity-100"><div class="w-4 h-4 rounded-full bg-[#fbbf24] shadow-[0_0_10px_#fbbf24]"></div>Gold</button>
+                                <button onclick="setTheme('blue')" id="btn-theme-blue" class="theme-btn py-4 rounded-2xl border border-transparent bg-white/5 text-[#60a5fa] font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2 opacity-50 hover:opacity-100"><div class="w-4 h-4 rounded-full bg-[#60a5fa] shadow-[0_0_10px_#60a5fa]"></div>Blue</button>
+                                <button onclick="setTheme('white')" id="btn-theme-white" class="theme-btn py-4 rounded-2xl border border-transparent bg-white/5 text-white font-bold text-[10px] tracking-widest uppercase transition-all hover:scale-105 active:scale-95 cursor-pointer flex flex-col items-center gap-2 opacity-50 hover:opacity-100"><div class="w-4 h-4 rounded-full bg-white shadow-[0_0_10px_white]"></div>White</button>
+                            </div>
+                        </div>
+
+                        <!-- ⚙️ ADVANCED SETTINGS -->
+                        <div class="pt-6 border-t border-white/10 space-y-4">
+                            <h4 class="text-xs font-bold text-gray-400 tracking-widest uppercase">System Preferences</h4>
+                            
+                            <label class="flex items-center justify-between cursor-pointer group bg-white/5 hover:bg-white/10 p-3 rounded-xl transition-colors border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="binary" class="w-4 h-4 text-emerald-400"></i>
+                                    <span class="text-sm font-medium text-gray-300">Matrix Hacker Background</span>
+                                </div>
+                                <input type="checkbox" id="toggle-matrix" class="hidden setting-toggle-input" onchange="toggleSetting('matrix')">
+                                <div class="w-10 h-5 bg-white/10 rounded-full relative transition-colors toggle-bg"><div class="w-4 h-4 bg-gray-400 absolute left-0.5 top-0.5 rounded-full transition-transform toggle-dot"></div></div>
+                            </label>
+
+                            <label class="flex items-center justify-between cursor-pointer group bg-white/5 hover:bg-white/10 p-3 rounded-xl transition-colors border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="volume-2" class="w-4 h-4 text-purple-400"></i>
+                                    <span class="text-sm font-medium text-gray-300">Auto-Read AI Voice (TTS)</span>
+                                </div>
+                                <input type="checkbox" id="toggle-tts" class="hidden setting-toggle-input" onchange="toggleSetting('tts')">
+                                <div class="w-10 h-5 bg-white/10 rounded-full relative transition-colors toggle-bg"><div class="w-4 h-4 bg-gray-400 absolute left-0.5 top-0.5 rounded-full transition-transform toggle-dot"></div></div>
+                            </label>
+
+                            <label class="flex items-center justify-between cursor-pointer group bg-white/5 hover:bg-white/10 p-3 rounded-xl transition-colors border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="wind" class="w-4 h-4 th-text"></i>
+                                    <span class="text-sm font-medium text-gray-300">Immersive Animations</span>
+                                </div>
+                                <input type="checkbox" id="toggle-motion" class="hidden setting-toggle-input" onchange="toggleSetting('motion')">
+                                <div class="w-10 h-5 bg-white/10 rounded-full relative transition-colors toggle-bg"><div class="w-4 h-4 bg-gray-400 absolute left-0.5 top-0.5 rounded-full transition-transform toggle-dot"></div></div>
+                            </label>
+                        </div>
+                        
+                        <!-- ⚠️ FACTORY RESET -->
+                        <div class="pt-6 border-t border-white/10">
+                            <button onclick="factoryReset()" class="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl text-xs font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="alert-triangle" class="w-4 h-4"></i> Factory Reset System
+                            </button>
                         </div>
                     </div>
 
-                    <button type="button" onclick="toggleSettingsModal()" class="w-full mt-10 py-4 th-grad text-white font-extrabold rounded-2xl text-sm transition-all active:scale-95 cursor-pointer uppercase tracking-widest border border-white/20 th-glow">
-                        Confirm & Close
+                    <button type="button" onclick="toggleSettingsModal()" class="w-full mt-6 py-4 th-grad text-white font-extrabold rounded-2xl text-sm transition-all active:scale-95 cursor-pointer uppercase tracking-widest border border-white/20 th-glow">
+                        Close
                     </button>
                 </div>
             </div>
@@ -531,14 +603,42 @@
         let isGenerating = false; let currentAbortController = null;
         let currentAttachment = null; let currentAttachmentType = null; let currentAttachmentName = "";
         let speechRec = null; let lastUserMessage = ""; let isFocusMode = false; let isHistoryOpen = false;
+        let currentSessionId = Date.now().toString(); 
         let spamFilter = { count: 0, firstMsgTime: 0, blockedUntil: 0 };
+
+        // ⚙️ SYSTEM SETTINGS LOGIC
+        let sysSettings = JSON.parse(localStorage.getItem('lura_sys_settings')) || { matrix: true, tts: false, motion: true };
+        
+        function applySettings() {
+            document.getElementById('toggle-matrix').checked = sysSettings.matrix;
+            document.getElementById('toggle-tts').checked = sysSettings.tts;
+            document.getElementById('toggle-motion').checked = sysSettings.motion;
+
+            const matrixCanvas = document.getElementById('matrix-canvas');
+            if(matrixCanvas) matrixCanvas.style.display = sysSettings.matrix ? 'block' : 'none';
+
+            if(!sysSettings.motion) document.body.classList.add('reduced-motion');
+            else document.body.classList.remove('reduced-motion');
+        }
+
+        function toggleSetting(key) {
+            sysSettings[key] = !sysSettings[key];
+            localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings));
+            applySettings();
+            showToast("Preferences Updated");
+        }
+
+        function factoryReset() {
+            if(confirm("CRITICAL WARNING: This will delete ALL users, vaults, and settings permanently. Proceed?")) {
+                localStorage.clear(); location.reload();
+            }
+        }
 
         function escapeHTML(str) {
             if (!str) return "";
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        // 💻 MATRIX CANVAS RAIN EFFECT
         function initMatrixCanvas() {
             const canvas = document.getElementById('matrix-canvas');
             if(!canvas) return;
@@ -560,7 +660,6 @@
             setInterval(draw, 33);
         }
 
-        // 🎙️ VOICE TO TEXT ENGINE
         function toggleVoice() {
             if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { return showToast("Speech recognition not supported in this browser."); }
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -611,11 +710,10 @@
         }
         
         window.addEventListener('DOMContentLoaded', () => { 
-            initMatrixCanvas(); generateCaptcha(); setupCaptchaBoxes(); loadIcons(); setTimeout(loadIcons, 1000); startPacketTracer();
+            applySettings(); initMatrixCanvas(); generateCaptcha(); setupCaptchaBoxes(); loadIcons(); setTimeout(loadIcons, 1000); startPacketTracer();
             const sb = document.getElementById('main-sidebar'); if(sb) sb.classList.remove('-translate-x-full');
         });
 
-        // 🔥 LIVE PACKET TRACER
         function startPacketTracer() {
             setInterval(() => {
                 if(session.role !== 'owner') return;
@@ -633,7 +731,7 @@
         function loadIcons(rootElement) {
             try {
                 if (typeof lucide !== 'undefined') { if (rootElement) { lucide.createIcons({ root: rootElement }); } else { lucide.createIcons(); } }
-            } catch (e) { console.warn("Icon load skipped."); }
+            } catch (e) {}
         }
 
         function showToast(msg) {
@@ -676,7 +774,6 @@
             if (preElement) { navigator.clipboard.writeText(preElement.innerText).then(() => { showToast("Code Copied to Clipboard!"); adminLog("User copied generated code."); }); }
         };
 
-        // 🛡️ SECURE OAUTH LOGIN (POPUP SIMULATION)
         window.initiateOAuth = function(provider, btnElement) {
             const captchaInput = Array.from(document.querySelectorAll('.captcha-box')).map(b => b.value).join('').toUpperCase();
             const captchaModule = document.getElementById('captcha-module');
@@ -713,7 +810,7 @@
                     if(loginView) loginView.classList.add('hidden-panel'); 
                     const workspace = document.getElementById('app-workspace');
                     if(workspace) { workspace.classList.remove('hidden-panel'); workspace.classList.add('flex'); }
-                    setGreeting(); loadChatHistory(); showToast(`Authenticated. Welcome, ${session.name}.`);
+                    setGreeting(); loadLatestSession(); showToast(`Authenticated. Welcome, ${session.name}.`);
                 }, 500);
             }, 1200);
         }
@@ -754,7 +851,7 @@
                     if(loginView) loginView.classList.add('hidden-panel'); 
                     const workspace = document.getElementById('app-workspace');
                     if(workspace) { workspace.classList.remove('hidden-panel'); workspace.classList.add('flex'); }
-                    setGreeting(); loadChatHistory(); showToast(`Auth Success. Welcome, ${session.name}.`); startAdminLiveTelemetry(); 
+                    setGreeting(); loadLatestSession(); showToast(`Auth Success. Welcome, ${session.name}.`); startAdminLiveTelemetry(); 
                 }, 500);
             }, 800); 
         }
@@ -774,30 +871,32 @@
             }
         }
 
-        // ☁️ CLOUD VAULT HISTORY TOGGLE
         function toggleHistory() {
             isHistoryOpen = !isHistoryOpen;
             const panel = document.getElementById('history-panel');
             if(panel) {
-                if (isHistoryOpen) {
-                    panel.classList.remove('-translate-x-full');
-                    renderHistoryList();
-                } else {
-                    panel.classList.add('-translate-x-full');
-                }
+                if (isHistoryOpen) { panel.classList.remove('-translate-x-full'); renderHistoryList(); } 
+                else { panel.classList.add('-translate-x-full'); }
             }
         }
+
+        function getVault() { return JSON.parse(localStorage.getItem(`lura_vault_${session.name}`) || '[]'); }
+        function saveVault(vault) { localStorage.setItem(`lura_vault_${session.name}`, JSON.stringify(vault)); }
 
         function renderHistoryList() {
             const list = document.getElementById('history-list');
             if(!list) return;
             list.innerHTML = '';
+            const vault = getVault();
             
-            // Render active session if exists
+            if(vault.length === 0 && chatHistory.length === 0) { 
+                list.innerHTML = '<div class="text-[10px] text-gray-500 text-center mt-10 font-bold uppercase tracking-widest">Vault is empty</div>'; return; 
+            }
+            
             if (chatHistory.length > 0) {
-                const currentTitle = chatHistory[0].text ? chatHistory[0].text.substring(0, 25) + "..." : "New Conversation";
-                list.innerHTML += `<div class="w-full text-left p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all flex items-center gap-3 group mb-2">
-                    <i data-lucide="message-square" class="w-4 h-4 text-cyan-400 group-hover:animate-pulse"></i>
+                const currentTitle = chatHistory[0].text ? chatHistory[0].text.substring(0, 25) + "..." : "Active Connection";
+                list.innerHTML += `<div class="w-full text-left p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 group mb-4 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                    <i data-lucide="message-square" class="w-4 h-4 text-cyan-400"></i>
                     <div class="flex flex-col overflow-hidden">
                         <span class="text-[11px] font-bold text-gray-200 truncate">${escapeHTML(currentTitle)}</span>
                         <span class="text-[9px] text-emerald-400 uppercase tracking-widest mt-0.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Sync</span>
@@ -805,42 +904,116 @@
                 </div>`;
             }
 
-            // Simulated past cloud sessions
-            const sessions = [
-                { title: "Roblox Lua Interface Logic", date: "Today, 10:45 AM", icon: "code" },
-                { title: "NodeMCU WiFi Controller", date: "Yesterday", icon: "cpu" },
-                { title: "Video Script Generation", date: "Jul 20, 2026", icon: "pen-tool" },
-                { title: "Security Firewall Check", date: "Jul 18, 2026", icon: "shield" }
-            ];
-
-            sessions.forEach(s => {
-                list.innerHTML += `<div class="w-full text-left p-3 rounded-xl border border-transparent cursor-pointer hover:bg-white/5 transition-all flex items-center gap-3 opacity-60 hover:opacity-100">
-                    <i data-lucide="${s.icon}" class="w-4 h-4 text-gray-400"></i>
-                    <div class="flex flex-col overflow-hidden">
-                        <span class="text-[11px] font-bold text-gray-300 truncate">${s.title}</span>
-                        <span class="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">${s.date}</span>
+            vault.sort((a,b) => b.id - a.id).forEach(chat => {
+                if(chat.id === currentSessionId && chatHistory.length > 0) return;
+                const t = chat.title || "Archived Chat";
+                list.innerHTML += `<div class="w-full text-left p-3 rounded-xl border border-transparent cursor-pointer hover:bg-white/5 transition-all flex items-center justify-between group mb-1 opacity-70 hover:opacity-100">
+                    <div class="flex items-center gap-3 overflow-hidden flex-1" onclick="loadSession('${chat.id}')">
+                        <i data-lucide="cloud" class="w-4 h-4 text-gray-400"></i>
+                        <div class="flex flex-col overflow-hidden">
+                            <span class="text-[11px] font-bold text-gray-300 truncate">${escapeHTML(t)}</span>
+                            <span class="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">${chat.date}</span>
+                        </div>
                     </div>
+                    <button onclick="deleteSession('${chat.id}', event)" class="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Delete Archive"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                 </div>`;
             });
             loadIcons(list);
         }
+
+        window.loadSession = function(id) {
+            const vault = getVault();
+            const chat = vault.find(c => c.id === id);
+            if(chat) {
+                if(chatHistory.length > 0) { saveCurrentToVault(); }
+                currentSessionId = id; chatHistory = chat.messages || [];
+                
+                const welcomeScreen = document.getElementById('welcome-screen');
+                const container = document.getElementById('message-container');
+                if(welcomeScreen) welcomeScreen.classList.add('hidden');
+                if(container) { container.classList.remove('hidden'); container.classList.add('flex', 'flex-1'); container.innerHTML = ''; }
+                
+                hasConversationStarted = true;
+                chatHistory.forEach(msg => { 
+                    try { 
+                        if(msg.text) appendMessageToDOM(msg.role, msg.text, msg.styleClass, false); 
+                        if(msg.role === 'user') lastUserMessage = msg.text;
+                    } catch(err) {}
+                });
+                
+                toggleHistory(); showToast("Archive Restored");
+                if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }
+        };
+
+        window.deleteSession = function(id, e) {
+            e.stopPropagation();
+            if(confirm("Permanently delete this archived chat?")) {
+                let vault = getVault(); vault = vault.filter(c => c.id !== id); saveVault(vault);
+                if(id === currentSessionId) {
+                    chatHistory = []; currentSessionId = Date.now().toString();
+                    document.getElementById('message-container').innerHTML = '';
+                    const welcomeScreen = document.getElementById('welcome-screen');
+                    if(welcomeScreen) { welcomeScreen.classList.remove('hidden'); welcomeScreen.style.opacity = '1'; }
+                }
+                renderHistoryList(); showToast("Archive Deleted"); updateStorageMonitor();
+            }
+        };
+
+        function saveCurrentToVault() {
+            if(chatHistory.length === 0) return;
+            let vault = getVault();
+            const existingIndex = vault.findIndex(c => c.id === currentSessionId);
+            const sessionData = {
+                id: currentSessionId,
+                title: chatHistory[0].text ? chatHistory[0].text.substring(0, 30) + "..." : "Archived Chat",
+                date: new Date().toLocaleString(),
+                messages: chatHistory
+            };
+            if(existingIndex >= 0) { vault[existingIndex] = sessionData; } else { vault.push(sessionData); }
+            saveVault(vault); updateStorageMonitor();
+        }
+
+        function startNewChat() {
+            if(chatHistory.length > 0) { saveCurrentToVault(); showToast("Chat Archived to Vault"); }
+            chatHistory = []; currentSessionId = Date.now().toString(); lastUserMessage = ""; hasConversationStarted = false;
+            
+            const welcomeScreen = document.getElementById('welcome-screen');
+            if(welcomeScreen) { welcomeScreen.classList.remove('hidden'); welcomeScreen.style.opacity = '1'; }
+            
+            const container = document.getElementById('message-container'); 
+            if(container) { container.classList.add('hidden'); container.classList.remove('flex', 'flex-1'); container.innerHTML = ''; }
+            
+            const qp = document.getElementById('quick-prompts');
+            if(qp) { qp.classList.remove('hidden'); setTimeout(() => { qp.classList.remove('opacity-0', 'translate-y-4'); qp.classList.add('opacity-100', 'translate-y-0'); }, 100); }
+
+            switchView('chat-view'); if(isHistoryOpen) renderHistoryList();
+        }
+        window.startNewChat = startNewChat;
+
+        function loadLatestSession() {
+            const vault = getVault();
+            if(vault.length > 0) { const latest = vault.sort((a,b) => b.id - a.id)[0]; loadSession(latest.id); }
+        }
+
+        window.resetChatLayout = function() {
+            if(confirm("Clear this screen and start a new chat?")) { startNewChat(); }
+        };
 
         function setGreeting() {
             if(!session.active) return; const hour = new Date().getHours(); let greeting = hour < 12 ? "Good morning" : (hour < 18 ? "Good afternoon" : "Good evening");
             const welcomeScreen = document.getElementById('welcome-screen');
             if(welcomeScreen) { welcomeScreen.classList.remove('hidden'); welcomeScreen.style.opacity = '1'; }
             
-            // 🐛 FIXED GREETING HTML BUG
             const gText = document.getElementById('greeting-text');
             if(gText) {
-                gText.innerHTML = `<span class="anim-reveal delay-1">${greeting},</span> <span class="anim-reveal delay-2 th-text-bright">${session.name}</span>`;
+                // 🐛 BUG FIXED: Properly formatted HTML for text reveal without breaking span
+                const textStr = `<span class="anim-reveal delay-1">${greeting},</span> <span class="anim-reveal delay-2 th-text-bright">${escapeHTML(session.name)}</span>`;
+                gText.innerHTML = textStr;
             }
             
             const qp = document.getElementById('quick-prompts');
-            if(qp && chatHistory.length === 0) {
-                qp.classList.remove('hidden'); 
-                setTimeout(() => { qp.classList.remove('opacity-0', 'translate-y-4'); qp.classList.add('opacity-100', 'translate-y-0'); }, 100);
-            }
+            if(qp && chatHistory.length === 0) { qp.classList.remove('hidden'); setTimeout(() => { qp.classList.remove('opacity-0', 'translate-y-4'); qp.classList.add('opacity-100', 'translate-y-0'); }, 100); }
         }
 
         function injectPrompt(text) {
@@ -848,40 +1021,33 @@
             if(input) { input.value = text; updateWordCount(text); handleSend(); }
         }
 
-        // ☁️ REAL CLOUD API SYNC HOOK
-        async function syncToCloud() {
+        function syncToCloudUI() {
             const cloudIcon = document.getElementById('cloud-icon'); const cloudText = document.getElementById('cloud-text');
             if(cloudIcon && cloudText) {
                 cloudIcon.setAttribute('data-lucide', 'refresh-cw'); cloudIcon.classList.add('animate-spin'); cloudText.innerText = "Syncing..."; loadIcons();
-                
-                try {
-                    // This pushes your chat history to your Render backend asynchronously!
-                    // Note: If you don't have this route configured in server.js, it will just fail silently and fallback to local.
-                    await fetch(`${BACKEND_URL}/api/history/save`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user: session.name, history: chatHistory })
-                    });
-                } catch(e) { 
-                    // Fails silently if backend DB route isn't set up yet
-                }
-
+                fetch(`${BACKEND_URL}/api/history/save`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: session.name, id: currentSessionId, history: chatHistory })
+                }).catch(()=>{});
                 setTimeout(() => { cloudIcon.setAttribute('data-lucide', 'cloud'); cloudIcon.classList.remove('animate-spin'); cloudText.innerText = "Vault Synced"; loadIcons(); }, 1500);
             }
         }
 
         function saveMessage(role, text, styleClass) { 
             chatHistory.push({ role, text, styleClass, raw: text }); 
-            try { 
-                localStorage.setItem(`lura_chat_${session.name}`, JSON.stringify(chatHistory)); 
-                updateStorageMonitor(); 
-                syncToCloud(); // Calls the real API hook
-            } catch(e) {} 
+            try { localStorage.setItem(`lura_chat_${session.name}`, JSON.stringify(chatHistory)); updateStorageMonitor(); saveCurrentToVault(); syncToCloudUI(); } catch(e) {} 
         }
 
         function updateStorageMonitor() {
-            const el = document.getElementById('admin-storage-size');
-            if(el) { const totalKB = (JSON.stringify(localStorage).length / 1024).toFixed(2); el.innerText = `${totalKB} KB`; }
+            const el = document.getElementById('admin-storage-size'); const bar = document.getElementById('storage-bar');
+            if(el) { 
+                const totalKB = (JSON.stringify(localStorage).length / 1024).toFixed(2); el.innerText = `${totalKB} KB`; 
+                if(bar) {
+                    let percent = Math.min((totalKB / 5000) * 100, 100); bar.style.width = `${percent}%`;
+                    if(percent > 80) bar.className = "h-full bg-red-500 shadow-[0_0_10px_#ef4444] transition-all duration-1000";
+                }
+            }
+            if(isHistoryOpen) renderHistoryList(); 
         }
 
         function parseAndFormatBotText(rawText) {
@@ -924,19 +1090,29 @@
             return { displayHtml: finalHtml, thoughtHtml: thoughtHtml };
         }
 
-        function appendMessageToDOM(role, text, styleClass) {
+        // 🌟 INSTANT RENDER
+        function appendMessageToDOM(role, text, styleClass, animate = true) {
             const container = document.getElementById('message-container'); const div = document.createElement('div');
-            
             const msgId = 'msg-' + Math.random().toString(36).substr(2, 9);
             const safeCleanText = escapeHTML(text).replace(/"/g, '&quot;').replace(/'/g, "\\'");
             const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const dropClass = animate ? "animate-chat-drop" : "";
 
             if (role === 'user') {
-                div.className = "w-full flex justify-end animate-chat-drop z-10 gap-3 mb-2";
+                // 🐛 FIXED PENCIL ICON ALIGNMENT
+                div.className = `w-full flex justify-end ${dropClass} z-10 gap-3 mb-2 group`;
                 div.innerHTML = `
-                    <div class="flex flex-col items-end w-full max-w-[95%] md:max-w-[85%]">
-                        <div class="th-grad text-white text-[15px] md:text-base px-5 py-3 md:px-6 md:py-4 rounded-[1.5rem] md:rounded-[2rem] rounded-tr-sm border border-white/20 font-medium leading-relaxed th-glow shadow-2xl">${escapeHTML(text).replace(/\n/g, '<br>')}</div>
-                        <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1 mr-2">${timeString}</span>
+                    <div class="flex items-center gap-2 max-w-[95%] md:max-w-[85%] justify-end w-full relative">
+                        <div class="msg-actions flex items-center opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                            <button onclick="document.getElementById('chat-input').value = '${safeCleanText}'; document.getElementById('chat-input').focus(); updateWordCount('${safeCleanText}'); showToast('Prompt Loaded for Editing');" class="bg-white/5 hover:bg-white/10 p-2 rounded-full border border-white/10 text-gray-400 hover:text-th-primary transition-all outline-none shadow-xl" title="Edit Prompt">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <div class="th-grad text-white text-[15px] md:text-base px-5 py-3 md:px-6 md:py-4 rounded-[1.5rem] md:rounded-[2rem] rounded-tr-sm border border-white/20 font-medium leading-relaxed th-glow shadow-2xl">${escapeHTML(text).replace(/\n/g, '<br>')}</div>
+                            <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1 mr-2">${timeString}</span>
+                        </div>
                     </div>
                     <div class="w-8 h-8 md:w-10 md:h-10 rounded-full ${session.color} flex items-center justify-center shrink-0 shadow-lg border border-white/20 font-extrabold text-xs md:text-sm text-white self-start mt-1 select-none">${session.avatar}</div>`;
             } else {
@@ -946,76 +1122,23 @@
                 const textColor = isBhavyasri ? "text-purple-100" : (isChaos ? "text-red-100" : "text-gray-200");
                 const parsed = parseAndFormatBotText(text);
                 
-                div.className = "w-full flex justify-start animate-chat-drop z-10 gap-3 md:gap-4 mb-4 msg-container";
+                div.className = `w-full flex justify-start ${dropClass} z-10 gap-3 md:gap-4 mb-4 msg-container group`;
                 div.innerHTML = `
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div>
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1 scale-95 group-hover:scale-105 transition-transform"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div>
                     <div class="flex flex-col w-full max-w-[95%] md:max-w-[85%]">
                         <div class="${textColor} text-[15px] md:text-base leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-2 md:pr-4" id="${msgId}">${parsed.displayHtml}</div>
                         ${parsed.thoughtHtml}
                         <div class="flex items-center gap-4 mt-2">
                             <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest ml-1">${timeString}</span>
                             <div class="msg-actions flex gap-2">
-                                <button onclick="navigator.clipboard.writeText(document.getElementById('${msgId}').innerText); showToast('Message Copied');" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none" title="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                <button onclick="regenerateMessage()" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none" title="Regenerate Output"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="navigator.clipboard.writeText(document.getElementById('${msgId}').innerText); showToast('Message Copied');" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none shadow-md" title="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="window.speakLuraText('${safeCleanText}')" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none shadow-md" title="Read Aloud"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="regenerateMessage()" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none shadow-md" title="Regenerate Output"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </div>
                     </div>`;
             }
-            if(container) { container.appendChild(div); loadIcons(div); container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }); }
-        }
-
-        window.regenerateMessage = function() {
-            if(isGenerating || !lastUserMessage) return;
-            injectPrompt(lastUserMessage);
-            showToast("Regenerating...");
-        };
-
-        function loadChatHistory() {
-            try {
-                const saved = localStorage.getItem(`lura_chat_${session.name}`); 
-                const container = document.getElementById('message-container'); 
-                const welcomeScreen = document.getElementById('welcome-screen');
-                
-                if(saved) { 
-                    chatHistory = JSON.parse(saved); 
-                    if(chatHistory.length > 0) { 
-                        hasConversationStarted = true; 
-                        if(welcomeScreen) welcomeScreen.classList.add('hidden'); 
-                        if(container) { container.classList.remove('hidden'); container.classList.add('flex', 'flex-1'); } 
-
-                        chatHistory.forEach(msg => { 
-                            try { 
-                                if(msg.text) appendMessageToDOM(msg.role, msg.text, msg.styleClass); 
-                                if(msg.role === 'user') lastUserMessage = msg.text;
-                            } catch(err) {}
-                        }); 
-                    } 
-                } else { chatHistory = []; }
-            } catch (e) {
-                console.error("Memory corrupted. Healing..."); localStorage.removeItem(`lura_chat_${session.name}`); chatHistory = [];
-            }
-            updateStorageMonitor();
-        }
-
-        function resetChatLayout() {
-            if(confirm("Clear local memory session?")) {
-                localStorage.removeItem(`lura_chat_${session.name}`); chatHistory = []; hasConversationStarted = false; lastUserMessage = "";
-                
-                const welcomeScreen = document.getElementById('welcome-screen');
-                if(welcomeScreen) { welcomeScreen.classList.remove('hidden'); welcomeScreen.style.opacity = '1'; }
-                
-                const container = document.getElementById('message-container'); 
-                if(container) { container.classList.add('hidden'); container.classList.remove('flex', 'flex-1'); container.innerHTML = ''; }
-                
-                switchView('chat-view'); setGreeting(); showToast("Chat Memory Cleared"); adminLog("User wiped session memory."); updateStorageMonitor();
-            }
-        }
-
-        function exportChat() {
-            if (chatHistory.length === 0) { showToast("No history to export."); return; }
-            let text = `--- Studio X Chat Log ---\nUser: ${session.name}\nDate: ${new Date().toLocaleString()}\n\n`;
-            chatHistory.forEach(msg => { const speaker = msg.role === 'user' ? session.name : "AI Agent"; text += `[${speaker}]: ${msg.text}\n\n`; });
-            const blob = new Blob([text], {type: "text/plain"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `LuraStudio_Log_${new Date().getTime()}.txt`; a.click(); URL.revokeObjectURL(url); showToast("Chat Log Exported"); adminLog("User exported chat transcripts.");
+            if(container) { container.appendChild(div); loadIcons(div); if(animate) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }); }
         }
 
         function switchView(viewId) {
@@ -1041,7 +1164,6 @@
         function selectModel(modelName) { currentAgent = modelName; const lbl = document.getElementById('current-model-label'); if(lbl) lbl.innerText = modelName; const input = document.getElementById('chat-input'); if(input) input.placeholder = `Ask ${modelName.split(' ')[0]}...`; showToast(`Routed to ${modelName}`); adminLog(`Route switched to Engine: ${modelName}`); }
         function toggleSettingsModal() { const modal = document.getElementById('settings-modal'); if(modal) { modal.classList.toggle('hidden'); modal.classList.toggle('flex'); } }
 
-        // 👨‍💻 INTERACTIVE ADMIN TERMINAL LOGIC
         let adminPingInterval;
         function adminLog(msg) {
             if(!session || session.role !== 'owner') return;
@@ -1065,10 +1187,15 @@
             
             switch(args[0]) {
                 case '/help':
-                    outputEl.innerHTML += `<div class="text-gray-300 ml-4">Available Commands:<br>- /ping : Check server latency<br>- /clear : Clear terminal output<br>- /users : Show active local session data<br>- /theme [cyan|gold|blue|white] : Force change system theme<br>- /sysinfo : Display browser specs<br>- /matrix : Initiate visual datastream<br>- /reboot : Restart local UI<br>- /status : Scan system health<br>- /lockdown : Trigger kill switch</div>`; break;
+                    outputEl.innerHTML += `<div class="text-gray-300 ml-4">Available Commands:<br>- /ping : Check server latency<br>- /clear : Clear terminal output<br>- /users : Show active local session data<br>- /wipeuser [name] : Delete specific user vault<br>- /theme [color] : Force change system theme<br>- /sysinfo : Display browser specs<br>- /matrix : Initiate visual datastream<br>- /reboot : Restart local UI<br>- /status : Scan system health<br>- /lockdown : Trigger kill switch</div>`; break;
                 case '/clear': outputEl.innerHTML = `<div><span class="text-emerald-700">[SYS]</span> Terminal cleared.</div>`; break;
                 case '/ping': outputEl.innerHTML += `<div class="text-yellow-400 ml-4">Pinging Render Core...</div>`; fetchServerHealth(true); break;
-                case '/users': outputEl.innerHTML += `<div class="text-gray-300 ml-4">Active Identity: ${session.name} [${session.role}]<br>Saved Chats: ${chatHistory.length} messages</div>`; break;
+                case '/users': outputEl.innerHTML += `<div class="text-gray-300 ml-4">Active Identity: ${session.name} [${session.role}]<br>Total Sessions: ${getVault().length}</div>`; break;
+                case '/wipeuser': 
+                    if(args[1]) {
+                        localStorage.removeItem(`lura_vault_${args[1]}`); localStorage.removeItem(`lura_chat_${args[1]}`);
+                        outputEl.innerHTML += `<div class="text-red-400 ml-4">System Vault purged for user: ${escapeHTML(args[1])}</div>`; updateStorageMonitor();
+                    } else { outputEl.innerHTML += `<div class="text-red-400 ml-4">Usage: /wipeuser [name]</div>`; } break;
                 case '/theme':
                     if(args[1] && ['cyan','gold','blue','white'].includes(args[1])) { setTheme(args[1]); outputEl.innerHTML += `<div class="text-cyan-400 ml-4">Theme overridden to: ${args[1]}</div>`; } 
                     else { outputEl.innerHTML += `<div class="text-red-400 ml-4">Usage: /theme [cyan|gold|blue|white]</div>`; } break;
@@ -1080,7 +1207,7 @@
                 case '/reboot':
                     outputEl.innerHTML += `<div class="text-yellow-400 ml-4">Initiating UI reboot sequence...</div>`; setTimeout(() => location.reload(), 1500); break;
                 case '/status':
-                    outputEl.innerHTML += `<div class="text-gray-300 ml-4">System Status:<br>> UI Engine: ONLINE<br>> Neural Parser: ACTIVE<br>> Local DB: ${chatHistory.length} nodes<br>> Uplink: ${BACKEND_URL}</div>`; break;
+                    outputEl.innerHTML += `<div class="text-gray-300 ml-4">System Status:<br>> UI Engine: ONLINE<br>> Neural Parser: ACTIVE<br>> Local DB: ${getVault().length} vaults<br>> Uplink: ${BACKEND_URL}</div>`; break;
                 case '/lockdown':
                     outputEl.innerHTML += `<div class="text-red-500 font-bold ml-4">LOCKDOWN INITIATED...</div>`; 
                     setTimeout(() => flushSystemCore(), 3000); break;
@@ -1115,13 +1242,7 @@
             fetchServerHealth(); if(!adminPingInterval) adminPingInterval = setInterval(() => fetchServerHealth(false), 10000); 
         }
 
-        function flushSystemCore() {
-            if(confirm("CRITICAL WARNING: This will permanently wipe all local memory, user settings, and cache. Proceed?")) {
-                adminLog("WARNING: FLUSH COMMAND INITIATED."); localStorage.clear(); setTimeout(() => { location.reload(); }, 1500);
-            }
-        }
-
-        // 🛑 GENERATION & WAVE CONTROLS
+        // 🛑 GENERATION CONTROLS
         function setStopButton() { 
             isGenerating = true; 
             const wrapper = document.getElementById('search-wrapper');
@@ -1156,6 +1277,10 @@
 
         window.handleAttachment = function(input) {
             const file = input.files ? input.files[0] : null; if(!file) return; currentAttachmentName = file.name;
+            
+            const btn = document.querySelector('button[onclick*="system-file-upload"]');
+            if(btn) { btn.classList.add('shadow-[0_0_20px_#10b981]', 'border-emerald-500'); setTimeout(()=>btn.classList.remove('shadow-[0_0_20px_#10b981]', 'border-emerald-500'), 1000); }
+
             if (file.type.includes('pdf')) { showToast("PDFs not supported in visual engine."); input.value = ""; return; }
             if (file.type.startsWith('image/')) { 
                 currentAttachmentType = 'image'; const reader = new FileReader();
@@ -1185,12 +1310,11 @@
         };
         window.clearAttachment = function() { currentAttachment = null; currentAttachmentType = null; const preview = document.getElementById('attachment-preview'); if(preview) preview.classList.add('hidden'); };
 
-        // 🔥 LIVE CLOUD API ENGINE (WITH REAL CLOUD SYNC POST) 🔥
+        // 🔥 LIVE CLOUD API ENGINE 
         async function handleSend() {
             const input = document.getElementById('chat-input'); const container = document.getElementById('message-container'); const welcomeScreen = document.getElementById('welcome-screen');
             const userText = input?.value.trim(); if (userText === "" && !currentAttachment) return;
             
-            // 🚨 SPAM FIREWALL CHECK
             if (session.role !== 'owner') {
                 const now = Date.now();
                 if (now < spamFilter.blockedUntil) { showToast("🚨 SPAM FIREWALL: IP is temporarily locked."); return; }
@@ -1239,7 +1363,7 @@
             if(container) { container.appendChild(loadingDiv); loadIcons(loadingDiv); container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }); }
 
             try {
-                let systemPrompt = `You are Lura, a highly advanced, sweet, and expressive AI companion talking to ${session.name}. Use real emojis (😊, ✨, 🚀). Put internal deductions in <thought> tags at the very beginning.`;
+                let systemPrompt = `You are Lura, a highly advanced, sweet, and AI companion talking to ${session.name}. Use emojis naturally. Put all internal deductions in <thought> tags at the very beginning.`;
 
                 if (isBhavyasri) { systemPrompt = `You are Bhavyasri Beta, an incredibly brilliant engineering AI built by Shinchan (Bhaskhar). You are a master at Roblox Lua scripting, Arduino IDE, NodeMCU hardware, and DIY robotics. Use emojis (⚙️, 💻, ✨). Put complex logic in <thought> tags.`; }
                 if (isChaos) { systemPrompt = `You are Chaos Agent. You are fiercely loyal to your creator, Shinchan. You are completely unhinged and creative. Use intense emojis (🔥, 😈, 🖤). Put erratic inner thoughts inside <thought> tags.`; }
@@ -1251,10 +1375,9 @@
                     try {
                         if(attempt > 0) {
                             adminLog(`Render sleep detected. Awaiting boot cycle ${attempt}/${maxRetries}...`);
+                            const wakeText = document.getElementById(`wake-text-${loaderId}`);
+                            if(wakeText) { wakeText.classList.remove('hidden'); wakeText.innerText = `WAKING CLOUD ENGINE (Takes ~50s)...`; }
                         }
-                        
-                        const wakeText = document.getElementById(`wake-text-${loaderId}`);
-                        if(wakeText) { wakeText.classList.remove('hidden'); wakeText.innerText = `WAKING CLOUD ENGINE (Takes ~50s)...`; }
                         
                         response = await fetch(`${BACKEND_URL}/api/chat`, { 
                             method: "POST", headers: { "Content-Type": "application/json" }, 
@@ -1284,17 +1407,18 @@
                 const safeCleanText = escapeHTML(rawReply.replace(/<thought>[\s\S]*?<\/thought>/gi, '')).replace(/"/g, '&quot;').replace(/'/g, "\\'");
                 const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                const botDiv = document.createElement('div'); botDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-3 md:gap-4 mb-4 msg-container";
+                const botDiv = document.createElement('div'); botDiv.className = "w-full flex justify-start animate-chat-drop z-10 gap-3 md:gap-4 mb-4 msg-container group";
                 botDiv.innerHTML = `
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div>
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${iconColor} flex items-center justify-center shrink-0 shadow-lg border border-white/20 self-start mt-1 scale-95 group-hover:scale-105 transition-transform"><i data-lucide="${iconSymbol}" class="w-4 h-4 md:w-5 md:h-5 text-white"></i></div>
                     <div class="flex flex-col w-full max-w-[95%] md:max-w-[85%]">
-                        <div class="${textColor} text-[15px] md:text-base leading-relaxed font-medium pt-1 md:pt-2 tracking-wide w-full pr-2 md:pr-4" id="${msgId}"></div>
+                        <div class="${textColor} text-[15px] md:text-base leading-relaxed font-medium pt-1 md:pt-2 tracking-wide type-target w-full pr-2 md:pr-4" id="${msgId}"></div>
                         ${parsed.thoughtHtml}
                         <div class="flex items-center gap-4 mt-2">
                             <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest ml-1">${timeString}</span>
                             <div class="msg-actions flex gap-2">
-                                <button onclick="navigator.clipboard.writeText(document.getElementById('${msgId}').innerText); showToast('Message Copied');" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none" title="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                <button onclick="regenerateMessage()" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none" title="Regenerate Output"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="navigator.clipboard.writeText(document.getElementById('${msgId}').innerText); showToast('Message Copied');" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none shadow-md" title="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="window.speakLuraText('${safeCleanText}')" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none shadow-md" title="Read Aloud"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="regenerateMessage()" class="bg-white/5 hover:bg-white/10 p-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-all outline-none shadow-md" title="Regenerate Output"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -1329,9 +1453,11 @@
                 }
                 
                 if (isGenerating) saveMessage('bot', rawReply, botColor); 
+                
+                if(sysSettings.tts && !isGenerating) { window.speakLuraText(safeCleanText); }
 
             } catch (error) {
-                if (error.name === 'AbortError' && error.message !== 'RenderTimeout') return;
+                if (error.name === 'AbortError') return;
                 
                 let errorMsg = `Connection Failed: ${error.message}`;
                 if (error.message.includes('Failed to fetch')) {
