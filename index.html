@@ -3,426 +3,835 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lura OS | Obsidian Galaxy Pro</title>
+    <title>Lura AI | Titan V16</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
+        /* =========================================
+           ✨ LURA OS: THEME ENGINE & VARIABLES
+           ========================================= */
         :root {
-            --bg-deep: #020202;
-            --surface-1: rgba(18, 18, 22, 0.85);
-            --border-light: rgba(255, 255, 255, 0.08);
-            --text-main: #f5f5f5;
-            --text-muted: #888888;
-            --accent-cyan: #00e5ff;
-            --accent-purple: #b026ff;
+            --bg-base: #131314; --surface: #1e1f20; --surface-hover: #2a2b2f;
+            --text-primary: #e3e3e3; --text-secondary: #c4c7c5;
+            --accent: #a8c7fa; --accent-glow: rgba(168, 199, 250, 0.4);
+            --sidebar-w: 68px; --sidebar-exp: 240px;
+        }
+
+        body.theme-matrix { --bg-base: #050a07; --surface: #0a120c; --surface-hover: #121c16; --text-primary: #e0ffe8; --text-secondary: #8abf9d; --accent: #00ff41; --accent-glow: rgba(0, 255, 65, 0.4); }
+        body.theme-cyber { --bg-base: #120408; --surface: #1c0a10; --surface-hover: #2d121c; --text-primary: #ffe6ee; --text-secondary: #c78d9f; --accent: #ff0055; --accent-glow: rgba(255, 0, 85, 0.4); }
+        body.theme-dracula { --bg-base: #282a36; --surface: #383a59; --surface-hover: #44475a; --text-primary: #f8f8f2; --text-secondary: #6272a4; --accent: #bd93f9; --accent-glow: rgba(189, 147, 249, 0.4); }
+        
+        body.theme-gpt { 
+            --bg-base: #000000; --surface: #212121; --surface-hover: #2f2f2f; 
+            --text-primary: #f9f9f9; --text-secondary: #9b9b9b; 
+            --accent: #ffffff; --accent-glow: rgba(255,255,255,0.2); 
         }
 
         body { 
             font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; 
-            background-color: var(--bg-deep); color: var(--text-main); 
-            -webkit-font-smoothing: antialiased;
+            background-color: var(--bg-base); color: var(--text-primary); 
+            -webkit-font-smoothing: antialiased; transition: background-color 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
+
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* 🔥 SPACE DRIFTING CANVAS */
-        #space-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6; }
-
-        /* 🧊 GLASS PANELS */
-        .glass-island {
-            background: var(--surface-1); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--border-light); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .glass-panel {
-            background: rgba(12, 12, 15, 0.9); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--border-light); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
-        }
-
-        /* ✨ TEXTAREA PHYSICS */
-        #chat-input { 
-            resize: none; overflow-y: auto; max-height: 250px; 
-            transition: height 0.2s cubic-bezier(0.23, 1, 0.32, 1); 
-            line-height: 1.6; padding: 12px 16px; color: var(--text-main); width: 100%; box-sizing: border-box;
-            caret-color: var(--accent-cyan); background: transparent; border: none; outline: none; font-size: 15px;
-        }
-        #chat-input::placeholder { color: #555; font-weight: 400; }
-
         ::-webkit-scrollbar { width: 4px; height: 4px; } 
+        ::-webkit-scrollbar-track { background: transparent; } 
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; } 
 
-        /* ✨ CHAT BUBBLES */
-        .user-bubble { background: #1a1a1c; border: 1px solid var(--border-light); border-radius: 1.5rem; border-top-right-radius: 0.3rem; padding: 14px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
-
-        /* 🔘 BUTTONS & ICONS */
-        .icon-btn { color: var(--text-muted); transition: all 0.2s ease; outline: none; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        .icon-btn:hover { color: #fff; background: rgba(255,255,255,0.08); transform: scale(1.1); }
-        .icon-btn.active { color: var(--accent-cyan); background: rgba(0, 229, 255, 0.15); }
-
-        .btn-solid-white { background: #ffffff; color: #000000; font-weight: 700; transition: all 0.2s; border-radius: 1rem; }
-        .btn-solid-white:hover { background: #e0e0e0; transform: scale(1.02); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
-
-        /* ✨ AGENT SELECTOR DROPDOWN (Matches image_63291b perfectly) */
-        .dropdown-anim { opacity: 0; transform: scale(0.95) translateY(-10px); pointer-events: none; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: top center; }
-        .dropdown-anim.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+        /* 🔥 DYNAMIC MESH BACKGROUND */
+        .mesh-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background-color: var(--bg-base); transition: opacity 0.5s ease; pointer-events: none; }
+        .mesh-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.35; animation: float 25s infinite ease-in-out alternate; mix-blend-mode: screen; transition: opacity 0.5s; }
         
-        .agent-card { background: #121215; border: 1px solid rgba(255,255,255,0.06); transition: all 0.2s ease; }
-        .agent-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateX(2px); }
+        .ambient-disabled .mesh-orb, body.theme-gpt .mesh-orb { opacity: 0 !important; }
+        body.theme-gpt .mesh-bg { background-color: #000000; }
+        
+        .orb-1 { width: 70vw; height: 70vw; background: #004d2b; top: -20%; left: -10%; animation: colorShift1 20s infinite alternate, float 25s infinite ease-in-out alternate; }
+        .orb-2 { width: 60vw; height: 60vw; background: #002b6b; bottom: -20%; right: -10%; animation: colorShift2 25s infinite alternate, float 20s infinite ease-in-out alternate-reverse; }
 
-        /* ✨ COMMANDER TOOLBAR */
-        .format-toolbar { display: flex; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--border-light); background: rgba(0,0,0,0.4); border-top-left-radius: 2rem; border-top-right-radius: 2rem; }
-        .format-btn { color: #666; font-size: 11px; font-weight: 600; text-transform: uppercase; transition: all 0.2s; outline: none; }
-        .format-btn:hover { color: var(--accent-cyan); }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(5%, 10%) scale(1.05); } 100% { transform: translate(-5%, -5%) scale(0.95); } }
+        @keyframes colorShift1 { 0% { background: #004d2b; } 33% { background: #6b5200; } 66% { background: #4a006b; } 100% { background: #002b6b; } }
+        @keyframes colorShift2 { 0% { background: #002b6b; } 33% { background: #004d2b; } 66% { background: #6b5200; } 100% { background: #4a006b; } }
 
-        /* ✨ ANIMATIONS */
-        @keyframes slideUpFade { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-        .anim-slide-up { animation: slideUpFade 0.4s ease forwards; }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); cursor: pointer; border: none; outline: none; background: transparent; }
+        .icon-btn:hover { background: var(--surface-hover); color: var(--text-primary); transform: scale(1.05); }
 
-        @keyframes popIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .anim-pop { animation: popIn 0.3s ease forwards; }
+        /* ✨ SIDEBAR LOGIC */
+        #main-sidebar { width: var(--sidebar-w); transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow: hidden; background: transparent; border-right: 1px solid rgba(255,255,255,0.05); z-index: 900; }
+        #main-sidebar.expanded { width: var(--sidebar-exp); background: rgba(19, 19, 20, 0.98); backdrop-filter: blur(20px); }
+        body.theme-gpt #main-sidebar.expanded { background: #000000; }
+        
+        .sidebar-item { display: flex; align-items: center; height: 44px; border-radius: 22px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); white-space: nowrap; margin: 4px 12px; padding: 0 12px; width: 44px; position: relative; z-index: 901; pointer-events: auto; }
+        #main-sidebar.expanded .sidebar-item { width: calc(100% - 24px); }
+        .sidebar-item:hover { background: var(--surface-hover); color: var(--text-primary); }
+        .sidebar-icon { min-width: 20px; display: flex; align-items: center; justify-content: center; margin-right: 16px; position: relative; }
+        .sidebar-text { font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #main-sidebar.expanded .sidebar-text { opacity: 1; transition-delay: 0.1s; }
 
-        .typing-dot { width: 5px; height: 5px; background-color: var(--accent-cyan); border-radius: 50%; opacity: 0.4; animation: typingBounce 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); opacity: 0.3; } 40% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 8px var(--accent-cyan); } }
+        #main-workspace { transition: margin-left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 100; scroll-behavior: smooth; }
+        body.sidebar-open #main-workspace { margin-left: var(--sidebar-exp); }
 
-        /* ✨ CODE BLOCKS */
-        .code-box { border: 1px solid var(--border-light); border-radius: 0.75rem; overflow: hidden; margin: 12px 0; }
-        .mac-dots { display: flex; gap: 6px; } .mac-dots span { width: 10px; height: 10px; border-radius: 50%; }
-        .mac-dot-r { background: #FF5F56; } .mac-dot-y { background: #FFBD2E; } .mac-dot-g { background: #27C93F; }
-
-        /* ✨ KINETIC SEARCH BAR LOGIC (Fixed alignment) */
-        #search-container {
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            position: absolute; left: 50%; width: 95%; max-width: 44rem;
+        @media (max-width: 768px) {
+            #main-sidebar { position: fixed; transform: translateX(-100%); background: var(--bg-base); }
+            body.sidebar-open #main-sidebar { transform: translateX(0); width: 280px; }
+            body.sidebar-open #main-workspace { margin-left: 0 !important; filter: blur(5px); pointer-events: none; }
+            #history-panel { width: 100%; left: 0; }
         }
-        .input-mode-center { top: 62%; transform: translate(-50%, -50%); }
-        .input-mode-bottom { top: calc(100% - 32px); transform: translate(-50%, -100%); width: 100%; max-width: 48rem; }
 
-        #welcome-screen { transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        .welcome-center { transform: translateY(-30px); opacity: 1; pointer-events: auto; }
-        .welcome-hidden { transform: translateY(-80px); opacity: 0; pointer-events: none; }
+        .status-dot { position: absolute; top: -2px; right: -4px; width: 8px; height: 8px; background: #00ff41; border-radius: 50%; border: 2px solid var(--bg-base); display: none; }
+        .status-dot.active { display: block; animation: pulseDot 2s infinite; }
+        @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(0,255,65,0.7); } 70% { box-shadow: 0 0 0 6px rgba(0,255,65,0); } 100% { box-shadow: 0 0 0 0 rgba(0,255,65,0); } }
+
+        /* 🔥 LIQUID GLASS INPUT BAR ANIMATION */
+        @keyframes liquidMorph {
+            0% { border-radius: 32px; }
+            33% { border-radius: 36px 28px 34px 30px; }
+            66% { border-radius: 28px 36px 30px 34px; }
+            100% { border-radius: 32px; }
+        }
+        .input-bar-bg {
+            background: rgba(30, 31, 32, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-radius: 32px; transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 300;
+        }
+        body.theme-gpt .input-bar-bg { background: #212121; box-shadow: none; border-color: transparent; backdrop-filter: none; }
+        
+        body.search-active .input-bar-bg {
+            background: rgba(42, 43, 47, 0.8); border-color: var(--accent);
+            animation: liquidMorph 4s infinite ease-in-out;
+            box-shadow: 0 0 30px var(--accent-glow), 0 10px 30px rgba(0,0,0,0.6); transform: scale(1.01);
+        }
+        
+        /* 🎨 IMAGE CREATION MODE (/imagine) */
+        body.image-mode .input-bar-bg {
+            border-color: #b026ff !important;
+            box-shadow: 0 0 40px rgba(176, 38, 255, 0.4) !important;
+            animation: liquidMorph 2s infinite ease-in-out alternate;
+        }
+        body.image-mode #action-btn.active-send { background: #b026ff; color: white; }
+        
+        @keyframes rgbBorder { 0% { border-color: #ff0000; box-shadow: 0 0 20px rgba(255,0,0,0.3); } 33% { border-color: #00ff00; box-shadow: 0 0 20px rgba(0,255,0,0.3); } 66% { border-color: #0000ff; box-shadow: 0 0 20px rgba(0,0,255,0.3); } 100% { border-color: #ff00ff; box-shadow: 0 0 20px rgba(255,0,255,0.3); } }
+        body.is-generating:not(.theme-gpt):not(.image-mode) .input-bar-bg { animation: rgbBorder 3s infinite alternate, liquidMorph 2s infinite ease-in-out; }
+        
+        #chat-input { resize: none; overflow-y: auto; max-height: 200px; line-height: 1.5; padding: 16px 8px; color: var(--text-primary); width: 100%; box-sizing: border-box; background: transparent; border: none; outline: none; font-size: 15px; }
+        #chat-input::placeholder { color: var(--text-secondary); font-weight: 400; opacity: 0.6; transition: opacity 0.3s; }
+
+        .dropdown-pill { background: transparent; color: var(--text-secondary); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .dropdown-pill:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        #dropdown-arrow { transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #dropdown-arrow.rotate-180 { transform: rotate(180deg); }
+
+        #action-btn { transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); background: transparent; color: var(--text-secondary); }
+        #action-btn.active-send { background: white; color: black; box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
+        body.theme-gpt #action-btn.active-send { background: var(--accent); color: #000; box-shadow: none; }
+        #action-btn.active-send:hover { transform: scale(1.1) rotate(10deg); }
+
+        /* ✨ KINETIC SEARCH BAR ANIMATION */
+        #search-wrapper { position: absolute; left: 50%; transform: translateX(-50%); transition: top 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), max-width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.6s; width: 92%; z-index: 300; }
+        .pos-center { top: 52%; max-width: 780px; }
+        .pos-bottom { top: calc(100% - 85px); max-width: 850px; }
+        @media (max-width: 768px) { 
+            .pos-center { top: 45%; width: 95%; } 
+            .pos-bottom { top: calc(100% - 75px); width: 98%; max-width: 100%; } 
+            .dropdown-pill span { display: none; }
+        }
+
+        #greeting-container { transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .greeting-visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .greeting-hidden { opacity: 0; transform: translateY(-30px) scale(0.95); pointer-events: none; position: absolute; }
+
+        /* ✨ 3D AGENT SELECTOR */
+        .dropdown-menu-fixed {
+            position: absolute; bottom: calc(100% + 15px); right: 0;
+            background: var(--surface); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+            padding: 8px; width: 250px; box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            opacity: 0; pointer-events: none; transform: translateY(15px) scale(0.95) rotateX(10deg); 
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); transform-origin: bottom right; perspective: 1000px; z-index: 450;
+        }
+        .dropdown-menu-fixed.active { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1) rotateX(0); }
+        .agent-item { opacity: 0; transform: translateX(15px); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .dropdown-menu-fixed.active .agent-item { opacity: 1; transform: translateX(0); }
+
+        /* ✨ CHAT BUBBLES */
+        .msg-group { display: flex; flex-direction: column; width: 100%; margin-bottom: 24px; position: relative; }
+        .user-bubble-container { display: flex; justify-content: flex-end; width: 100%; position: relative; }
+        .user-bubble { background: var(--surface-hover); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 12px 20px; font-size: 15px; line-height: 1.6; color: var(--text-primary); margin-left: auto; max-width: 85%; box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: relative; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        body.theme-gpt .user-bubble { border-color: transparent; box-shadow: none; background: #2f2f2f; }
+        .user-bubble:hover { max-height: 1000px; }
+        
+        .user-edit-btn { position: absolute; left: -40px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); cursor: pointer; }
+        .user-bubble-container:hover .user-edit-btn { opacity: 1; }
+        .user-edit-btn:hover { background: var(--surface-hover); color: white; transform: translateY(-50%) scale(1.1); }
+        @media (max-width: 768px) { .user-edit-btn { display: none; } }
+
+        .bot-bubble { background: transparent; font-size: 15px; line-height: 1.7; padding: 4px 0; width: 100%; }
+        
+        .bot-action-icons { display: flex; gap: 12px; margin-top: 8px; opacity: 0; transition: opacity 0.3s ease; color: var(--text-secondary); align-items: center; }
+        .msg-group:hover .bot-action-icons { opacity: 1; }
+        .bot-action-icons button { background: transparent; border: none; outline: none; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 6px; }
+        .bot-action-icons button:hover { color: var(--text-primary); background: rgba(255,255,255,0.1); transform: scale(1.1); }
+
+        /* 🔥 PURE BLACK CODE BOX */
+        .code-box { background: #000000; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; margin: 12px 0; font-family: 'JetBrains Mono', monospace; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .code-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: #111111; font-size: 11px; font-weight: bold; color: #aaa; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* FLOATING SCROLL BUTTON */
+        #scroll-bottom-btn {
+            position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(20px);
+            width: 42px; height: 42px; background-color: #212121; border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); opacity: 0; pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 250;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer;
+        }
+        #scroll-bottom-btn.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        #scroll-bottom-btn:hover { background-color: var(--surface-hover); color: var(--text-primary); transform: translateX(-50%) scale(1.05); }
+
+        #history-panel { position: absolute; top: 0; bottom: 0; left: 0; width: 340px; background: rgba(19,19,20,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); z-index: 500; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(-100%); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+        body.theme-gpt #history-panel { background: #000000; border-color: #333; }
+        #history-panel.active { transform: translateX(0); }
+        #attachments-container { position: absolute; bottom: 100%; left: 0; width: 100%; margin-bottom: 12px; z-index: 10; }
+
+        /* 🔐 MAXIMUM SECURITY LOGIN */
+        .login-input { background: var(--surface); border: 1px solid transparent; color: var(--text-primary); border-radius: 12px; padding: 14px 16px; font-size: 14px; outline: none; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .login-input:focus { background: var(--surface-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
+        .captcha-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
+        .captcha-box:hover { background: var(--surface-hover); }
+        .captcha-check { width: 24px; height: 24px; border: 2px solid #555; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: #111; }
+        .captcha-box.verified .captcha-check { border-color: #00ff41; background: rgba(0,255,65,0.1); }
+        .captcha-box.verified .captcha-svg { display: block; }
+        .captcha-svg { display: none; color: #00ff41; }
+
+        .custom-swipe-container { width: 100%; height: 56px; background: var(--surface); border-radius: 16px; position: relative; display: flex; align-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); user-select: none; touch-action: none; }
+        .custom-swipe-text { position: absolute; width: 100%; text-align: center; color: var(--text-secondary); font-size: 14px; font-weight: 500; pointer-events: none; z-index: 1; transition: opacity 0.2s; }
+        .custom-swipe-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent-glow); z-index: 0; width: 0%; border-radius: 16px; pointer-events: none; }
+        .custom-swipe-thumb { width: 48px; height: 48px; border-radius: 50%; background: white; cursor: grab; position: absolute; left: 4px; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 15px rgba(0,0,0,0.4); transition: transform 0.1s; }
+        .custom-swipe-thumb:active { cursor: grabbing; transform: scale(0.95); }
+
+        #boot-overlay { position: fixed; inset: 0; z-index: 999999; background: #000; transition: opacity 0.5s ease; display: none; flex-direction: column; justify-content: flex-end; padding: 4rem; overflow: hidden; }
+        .hacker-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--accent); text-shadow: 0 0 8px var(--accent-glow); }
+        .term-cursor { display: inline-block; width: 10px; height: 18px; background: var(--accent); animation: blink 1s step-end infinite; vertical-align: bottom; margin-left: 4px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* 🎤 VOICE MODE OVERLAY */
+        #voice-overlay { position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(30px); z-index: 999999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #voice-overlay.active { display: flex; opacity: 1; }
+        .voice-orb { width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a8c7fa 40%, #82aaff 70%, #4b0082 100%); box-shadow: 0 0 80px rgba(168, 199, 250, 0.5), inset -15px -15px 40px rgba(0,0,0,0.3); animation: orbBreath 4s infinite ease-in-out alternate; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .voice-orb.listening { animation: orbListen 1.2s infinite ease-in-out alternate; box-shadow: 0 0 100px rgba(0, 255, 65, 0.6); }
+        .voice-orb.speaking { animation: orbSpeak 0.8s infinite ease-in-out alternate; box-shadow: 0 0 120px rgba(176, 38, 255, 0.7); }
+        @keyframes orbBreath { 0% { transform: scale(1); filter: hue-rotate(0deg); } 100% { transform: scale(1.08); filter: hue-rotate(20deg); } }
+        @keyframes orbListen { 0% { transform: scale(1.05); } 100% { transform: scale(1.2) rotate(5deg); } }
+        @keyframes orbSpeak { 0% { transform: scale(0.98); } 100% { transform: scale(1.25) rotate(-5deg); } }
+
+        /* 🌐 LINK WARNING MODAL */
+        #link-warning-modal { position: fixed; inset: 0; z-index: 999999; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #link-warning-modal.active { display: flex; opacity: 1; }
+
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(25px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        .anim-fade-up { animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+        /* 🔥 PERFECT DRAG & DROP ZONE */
+        #drag-drop-zone {
+            position: absolute; inset: -14px; z-index: 100;
+            background: rgba(30, 31, 32, 0.95); backdrop-filter: blur(8px);
+            border: 2.5px dashed #8ab4f8; border-radius: 36px;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            pointer-events: none; transition: all 0.2s ease;
+        }
+        body.theme-gpt #drag-drop-zone { background: rgba(33, 33, 33, 0.95); }
+        #drag-drop-zone.active { display: flex; animation: pulseDrop 1.5s infinite alternate; }
+        @keyframes pulseDrop { 0% { border-color: rgba(138, 180, 248, 0.5); } 100% { border-color: #8ab4f8; } }
     </style>
 </head>
 <body id="master-body">
 
-    <!-- 🌌 SPACE CANVAS -->
-    <canvas id="space-canvas"></canvas>
+    <!-- 🌌 AMBIENT MESH BACKGROUND -->
+    <div id="ambient-bg" class="mesh-bg">
+        <div class="mesh-orb orb-1"></div>
+        <div class="mesh-orb orb-2"></div>
+    </div>
+    
+    <!-- 🎤 CHATGPT / GEMINI LIVE VOICE OVERLAY -->
+    <div id="voice-overlay">
+        <div class="flex-1 flex flex-col items-center justify-center relative w-full">
+            <div class="voice-orb mb-8" id="voice-orb"></div>
+            <p id="voice-status-text" class="text-sm font-mono text-gray-300 tracking-widest uppercase">Tap Orb to Start Speaking</p>
+            <p id="voice-transcript" class="text-xs text-gray-400 mt-2 max-w-md text-center px-4 min-h-[20px] font-mono"></p>
+        </div>
+        <div class="pb-12 flex items-center gap-6">
+            <button onclick="window.toggleVoiceListening()" class="w-14 h-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></button>
+            <button onclick="window.closeVoiceMode()" class="w-14 h-14 rounded-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 flex items-center justify-center text-red-400 transition-all"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+    </div>
 
-    <!-- 🌐 EXTERNAL LINK WARNING MODAL -->
-    <div id="link-warning-modal" class="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-all duration-300">
-        <div class="glass-panel p-8 rounded-3xl w-[90%] max-w-sm text-center border border-red-500/30">
-            <h3 class="text-white text-lg font-semibold mb-2">External Uplink</h3>
-            <p class="text-gray-400 text-xs mb-6 leading-relaxed">Proceed to this external site at your own risk:<br><span id="warning-url" class="block mt-2 font-mono text-red-400 break-all bg-black/50 p-2 rounded-lg border border-red-500/20"></span></p>
-            <div class="flex gap-3 w-full">
-                <button onclick="window.closeLinkWarning()" class="flex-1 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-semibold text-white transition-all">Cancel</button>
-                <button id="confirm-link-btn" class="flex-1 py-2.5 bg-red-500 hover:bg-red-400 text-white rounded-xl text-xs font-semibold transition-all">Proceed</button>
+    <!-- 📰 ABOUT V16 MODAL -->
+    <div id="about-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md items-center justify-center hidden z-[99999] p-4">
+        <div class="w-full max-w-[480px] p-8 rounded-3xl shadow-2xl flex flex-col anim-fade-up border border-white/10 bg-[var(--surface)]">
+            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                <h3 class="text-md font-bold text-white flex items-center gap-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> About Titan V16</h3>
+                <button onclick="document.getElementById('about-modal').classList.add('hidden'); document.getElementById('about-modal').classList.remove('flex');" class="icon-btn w-8 h-8"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="space-y-4 text-sm text-gray-300">
+                <p>Welcome to <strong>Lura Titan V16</strong>. This is the most advanced, fluid, and powerful iteration of the Lura Engine.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-400">
+                    <li><strong>Fully Unlocked Agents:</strong> All academic, coding, and pro modules are now 100% free for all users.</li>
+                    <li><strong>Liquid Glass UI:</strong> The entire interface has been upgraded to a hardware-accelerated, frictionless design.</li>
+                    <li><strong>Image Creation Engine:</strong> Type <code class="text-[var(--accent)]">/imagine</code> before your prompt to initiate the Visual Matrix.</li>
+                    <li><strong>Omni-Admin Tools:</strong> Advanced terminal commands for complete system control.</li>
+                </ul>
+                <p class="text-xs text-gray-500 mt-4 border-t border-white/5 pt-4">Developed by Bhaskhar (Shinchan). Authorized Access Only.</p>
             </div>
         </div>
     </div>
 
-    <!-- 🔐 EXACT MATCH LOGIN VIEW (From image_63291b) -->
-    <section id="login-view" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black transition-all duration-700 ease-in-out opacity-100">
-        <div class="glass-panel w-full max-w-[400px] p-10 rounded-[2.5rem] flex flex-col items-center relative z-10 anim-pop border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,1)]">
-            <div class="text-center mb-8 w-full">
-                <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-black mb-5 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    <!-- 🌐 EXTERNAL LINK WARNING -->
+    <div id="link-warning-modal">
+        <div class="bg-[var(--surface)] border border-[#ff4444]/40 p-8 rounded-3xl max-w-md w-full shadow-2xl text-center anim-fade-up">
+            <h3 class="text-white text-lg font-bold mb-2 flex items-center justify-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> External Uplink Warning
+            </h3>
+            <p class="text-sm text-gray-400 mb-4">Are you sure you want to navigate to this external address?</p>
+            <div class="bg-black/60 border border-white/5 rounded-xl p-3 mb-6 overflow-x-auto">
+                <code id="warning-url" class="text-xs text-[var(--accent)] font-mono"></code>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="window.closeLinkWarning()" class="flex-1 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-sm font-semibold transition-colors">Cancel</button>
+                <button id="confirm-link-btn" class="flex-1 py-3 bg-[#ff4444]/20 border border-[#ff4444]/40 text-[#ff4444] rounded-xl text-sm font-semibold transition-colors">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔐 MAXIMUM SECURITY LOGIN VIEW -->
+    <section id="login-view" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0a0a0c] transition-all duration-700 ease-in-out opacity-100">
+        <div class="w-full max-w-[360px] flex flex-col items-center relative z-10 anim-fade-up">
+            <div class="text-center mb-8 w-full relative">
+                <div class="relative w-14 h-14 mx-auto mb-4 flex items-center justify-center bg-white rounded-full shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-transform duration-500 hover:scale-110">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 </div>
-                <h2 class="text-2xl font-bold text-white tracking-tight mb-1">Lura Intelligence</h2>
-                <p class="text-xs text-gray-400 font-medium">Verify Identity to Proceed</p>
+                <h2 class="text-[24px] font-bold text-white tracking-tight mb-1">Lura Intelligence</h2>
+                <p class="text-[12px] text-gray-500 font-medium uppercase tracking-widest">Authorized Access Only</p>
             </div>
 
-            <div class="w-full space-y-3.5">
-                <input id="auth-user" type="text" placeholder="Identity" class="w-full bg-[#141414] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-white/30 transition-all placeholder-gray-600" autocomplete="off" onkeydown="if(event.key === 'Enter') document.getElementById('auth-pass').focus();"/>
+            <div class="w-full space-y-3">
+                <input id="auth-user" type="text" placeholder="Identity Node" class="login-input w-full text-center" autocomplete="off" value="Bhaskhar" onkeydown="if(event.key === 'Enter') document.getElementById('auth-pass').focus();"/>
                 
-                <input id="auth-pass" type="password" placeholder="Passcode (Opt)" class="w-full bg-[#141414] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-white/30 transition-all placeholder-gray-600" onkeydown="if(event.key === 'Enter') window.handleLogin();"/>
+                <div class="relative w-full">
+                    <input id="auth-pass" type="password" placeholder="Passcode (Required)" class="login-input w-full text-center px-10" onkeydown="if(event.key === 'Enter') window.verifyAndLogin();"/>
+                    <button type="button" onclick="window.togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white transition-colors outline-none" title="Show/Hide Password">
+                        <svg id="eye-icon-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        <svg id="eye-icon-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+                
+                <div class="captcha-box" id="captcha-btn" onclick="this.classList.toggle('verified')">
+                    <div class="captcha-check">
+                        <svg class="captcha-svg w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="text-sm text-gray-300 font-medium">I am human</span>
+                    <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" width="24" class="ml-auto opacity-60">
+                </div>
 
-                <button type="button" onclick="window.handleLogin()" class="w-full mt-4 py-3.5 btn-solid-white text-sm flex justify-center items-center">
-                    Initialize Session
-                </button>
-                
-                <!-- Real Google Auth Integration -->
-                <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" data-callback="handleGoogleCredentialResponse"></div>
-                <div class="g_id_signin w-full flex justify-center mt-2" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+                <div class="custom-swipe-container" id="custom-swipe-box">
+                    <div class="custom-swipe-fill" id="custom-swipe-fill"></div>
+                    <span class="custom-swipe-text" id="custom-swipe-text">Swipe to Continue</span>
+                    <div class="custom-swipe-thumb" id="custom-swipe-thumb">
+                        <svg id="swipe-arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
+    <!-- ✨ EXTENDED CINEMATIC DECODING BOOT SEQUENCE -->
+    <div id="boot-overlay">
+        <div id="terminal-log-output" class="hacker-text space-y-1 w-full text-left max-w-4xl mx-auto flex flex-col justify-end h-full pb-10"></div>
+        <div class="mt-2 hacker-text text-left max-w-4xl mx-auto w-full absolute bottom-10 left-1/2 transform -translate-x-1/2" id="terminal-cursor-line"><span class="text-white font-bold">LURA_CORE@SYS:~#</span><span class="term-cursor"></span></div>
+    </div>
+
     <!-- 💻 MAIN WORKSPACE -->
-    <div id="app-workspace" class="hidden w-screen h-[100dvh] relative z-10 flex-col overflow-hidden">
+    <div id="app-workspace" class="hidden w-screen h-[100dvh] flex relative z-10 overflow-hidden">
         
-        <!-- 🔥 FLOATING HEADER -->
-        <header id="main-header" class="absolute top-4 left-0 right-0 flex justify-between items-center px-4 md:px-6 z-40 pointer-events-none">
+        <!-- 🔥 EXPANDING LEFT SIDEBAR -->
+        <aside id="main-sidebar" class="hidden md:flex flex-col py-4 z-[900] shrink-0 h-full absolute left-0 top-0 bottom-0 shadow-2xl">
+            <div class="sidebar-item mt-2" onclick="window.toggleSidebar()" title="Menu">
+                <div class="sidebar-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+                <span class="sidebar-text font-bold uppercase tracking-widest text-[11px]">Collapse Menu</span>
+            </div>
             
-            <div class="flex items-center gap-3 pointer-events-auto">
-                <div class="flex items-center gap-2 glass-panel rounded-full px-4 py-2 border border-white/5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
-                    <span class="text-[10px] font-bold text-gray-300 tracking-widest uppercase">Uplink: Secure</span>
+            <div class="sidebar-item mt-4 bg-[var(--surface)] shadow-md border border-white/5" onclick="window.startNewChat()" title="New Chat">
+                <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                <span class="sidebar-text text-white font-semibold">New Chat</span>
+            </div>
+            
+            <div class="sidebar-item mt-2" title="Search Matrix" onclick="window.toggleSearchMatrix()">
+                <div class="sidebar-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <div class="status-dot" id="matrix-status"></div>
                 </div>
+                <span class="sidebar-text" id="matrix-label">Search Matrix</span>
+            </div>
+            
+            <div class="sidebar-item mt-2" title="Cloud Vault" onclick="window.toggleHistory()">
+                <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <span class="sidebar-text">Cloud Vault</span>
             </div>
 
-            <!-- Center Model Pill -->
-            <div class="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2 cursor-pointer glass-panel px-5 py-2 rounded-full hover:bg-white/10 transition-all z-50 border border-white/10 shadow-lg pointer-events-auto group" onclick="window.toggleModelDropdown(event)">
-                <span id="current-model-label" class="text-xs font-semibold text-white">Lura Core</span>
-                <svg id="dropdown-arrow" class="w-3.5 h-3.5 text-gray-400 group-hover:text-white transition-all duration-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+            <div class="sidebar-item mt-2" title="Code Studio" onclick="window.openCodeStudio()">
+                <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                <span class="sidebar-text">Luau Code Studio</span>
             </div>
 
-            <!-- Right Controls -->
-            <div class="flex items-center gap-2 pointer-events-auto">
-                <button onclick="window.startNewChat()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all outline-none border border-white/5 text-gray-400 hover:text-white" title="Clear Context">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                </button>
-                <button onclick="window.toggleFocusMode()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all outline-none border border-white/5 text-gray-400 hover:text-[var(--accent-cyan)]" title="Focus Mode">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-                </button>
-                <button onclick="window.toggleSettingsModal()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all outline-none border border-white/5 text-gray-400 hover:text-white" title="Settings">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                </button>
-                <button onclick="window.logOut()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all outline-none border border-white/5 text-gray-400 hover:text-red-400" title="Sign Out">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                </button>
-            </div>
-        </header>
-
-        <!-- ✨ UPGRADED AGENT SELECTOR (Matches image_63291b perfectly) -->
-        <div id="model-dropdown" class="dropdown-anim absolute top-[70px] left-1/2 transform -translate-x-1/2 w-[320px] glass-panel rounded-2xl p-3 z-[100] border border-white/10 shadow-2xl space-y-2">
-            <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest px-3 pt-1">Models</div>
-            
-            <div onclick="window.selectModel('Lura Core')" class="agent-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
-                <span class="text-sm font-semibold text-white">Lura Core</span>
-                <span class="text-[10px] font-mono text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">Fast</span>
-            </div>
-            
-            <div onclick="window.selectModel('Lura Pro')" class="agent-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
-                <span class="text-sm font-semibold text-white">Lura Pro</span>
-                <span class="text-[10px] font-mono text-white bg-white/10 px-2 py-0.5 rounded border border-white/10">Deep</span>
-            </div>
-            
-            <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest px-3 pt-2">Agents</div>
-            
-            <div onclick="window.selectModel('Roblox Engine')" class="agent-card p-3 rounded-xl flex items-center gap-3 cursor-pointer">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="14.31" x2="20.05" y1="8" y2="17.94"/><line x1="9.69" x2="21.17" y1="8" y2="8"/><line x1="7.38" x2="12" y1="12" y2="4"/><line x1="9.69" x2="3.95" y1="16" y2="6.06"/><line x1="14.31" x2="2.83" y1="16" y2="16"/><line x1="16.62" x2="12" y1="12" y2="20"/></svg>
-                <span class="text-sm font-medium text-gray-200">Roblox Engine</span>
-            </div>
-            
-            <div onclick="window.selectModel('Telugu Matrix')" class="agent-card p-3 rounded-xl flex items-center gap-3 cursor-pointer">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/></svg>
-                <span class="text-sm font-medium text-gray-200">Telugu Matrix</span>
-            </div>
-            
-            <div onclick="window.selectModel('Chaos Agent')" class="agent-card p-3 rounded-xl flex items-center gap-3 cursor-pointer">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-                <span class="text-sm font-medium text-gray-200">Chaos Agent</span>
+            <div class="sidebar-item mt-2" title="Preset Matrix" onclick="window.openPresetMatrix()">
+                <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+                <span class="sidebar-text">Preset Directives</span>
             </div>
 
-            <div class="border-t border-white/10 mt-2 pt-2 px-1">
-                <label class="flex items-center justify-between cursor-pointer p-2 hover:bg-white/5 rounded-lg transition-all">
-                    <span class="text-xs font-medium text-gray-300">Reasoning</span>
-                    <div class="relative inline-flex items-center">
-                        <input type="checkbox" id="extended-thinking-toggle" class="sr-only peer">
-                        <div class="w-9 h-5 bg-[#262626] rounded-full peer peer-focus:outline-none peer-checked:bg-white transition-colors border border-[#333]">
-                            <div class="absolute top-[2px] left-[2px] w-[16px] h-[16px] rounded-full bg-[#a3a3a3] peer-checked:bg-black transition-transform peer-checked:translate-x-[16px] shadow-sm"></div>
-                        </div>
-                    </div>
-                </label>
+            <div class="sidebar-item mt-2" title="Export Vault Data" onclick="window.exportVaultData()">
+                <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                <span class="sidebar-text">Export Session</span>
             </div>
+
+            <div class="sidebar-item mt-auto mb-2" title="What's New" onclick="document.getElementById('about-modal').classList.remove('hidden'); document.getElementById('about-modal').classList.add('flex');">
+                <div class="sidebar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+                <span class="sidebar-text">About V16</span>
+            </div>
+
+            <div class="sidebar-item mb-2" title="Settings" onclick="window.toggleSettingsModal()">
+                <div class="sidebar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+                <span class="sidebar-text">Configuration</span>
+            </div>
+        </aside>
+
+        <!-- ☁️ CLOUD VAULT HISTORY PANEL -->
+        <div id="history-panel" class="absolute top-0 bottom-0 left-[var(--sidebar-w)] w-[340px] bg-[var(--surface)] border-r border-white/5 z-[500] transition-transform duration-500 -translate-x-[150%] shadow-[20px_0_50px_rgba(0,0,0,0.8)] pt-6 flex flex-col pointer-events-none opacity-0">
+            <div class="px-6 pb-4 border-b border-white/5 flex justify-between items-center">
+                <h3 class="text-[11px] font-bold text-[var(--text-secondary)] tracking-[0.2em] uppercase flex items-center gap-2">Database Vault</h3>
+                <button onclick="window.toggleHistory()" class="icon-btn w-8 h-8 pointer-events-auto bg-white/5 hover:bg-white/10"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto px-4 py-4 space-y-1.5 scroll-smooth pointer-events-auto font-mono text-xs text-[var(--text-secondary)]">No recent activity.</div>
+        </div>
+
+        <!-- 🔥 TOP RIGHT CONTROLS -->
+        <div class="absolute top-5 right-6 z-40 flex items-center gap-3">
+            <button class="w-10 h-10 rounded-full bg-[#2a2b2f] flex items-center justify-center text-[14px] font-bold text-white hover:bg-white/10 transition-colors shadow-md border border-white/5 transform hover:scale-105" onclick="window.logOut()" title="Logout" id="user-avatar-btn">B</button>
         </div>
 
         <!-- 💬 MAIN CHAT AREA -->
-        <main class="flex-1 flex flex-col h-full w-full relative z-10 pt-20 pb-[160px]">
-            <div id="scroll-area" class="flex-1 overflow-y-auto w-full px-4 sm:px-6 relative flex flex-col items-center">
-                <div class="w-full max-w-3xl flex flex-col relative min-h-full">
-                    
-                    <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center m-auto transition-opacity duration-500 pb-10 welcome-center">
-                        <!-- Centered Logo exactly matching image_63293e -->
-                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] mb-4">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                        </div>
-                        <h1 id="greeting-text" class="text-3xl md:text-4xl text-center font-semibold text-white tracking-tight">Good evening.</h1>
-                    </div>
+        <main class="flex-1 overflow-y-auto w-full px-4 md:px-12 relative flex flex-col md:ml-[var(--sidebar-w)] transition-all duration-300 h-full" id="main-workspace">
+            
+            <div class="w-full max-w-[850px] mx-auto flex flex-col relative min-h-full pb-[180px] pt-8" id="scroll-area">
+                
+                <div id="greeting-container" class="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full text-center greeting-visible">
+                    <h1 id="greeting-text" class="text-[34px] md:text-[40px] font-medium text-white tracking-tight">What's next, Bhaskhar?</h1>
+                </div>
 
-                    <div id="message-container" class="w-full hidden flex-col justify-start z-10 space-y-6 pt-4 pb-4"></div>
-                    <div id="thinking-indicator" class="hidden anim-pop mt-4 w-full shrink-0"></div>
+                <div id="message-container" class="w-full hidden flex-col justify-start z-10 pt-10 pb-4 space-y-6" onclick="window.handleMessageClick(event)"></div>
+
+                <div id="thinking-indicator" class="hidden anim-fade-up mt-2 w-full flex items-start gap-3 pl-2">
+                    <svg class="w-5 h-5 text-[var(--accent)] mt-0.5 animate-pulse" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1 0-1h6.5V.5a.5.5 0 0 1 .5-.5z" transform="rotate(45 11.5 11.5)"/><path d="M11.5 24a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-6.5v6.5a.5.5 0 0 1-.5.5z" transform="rotate(45 11.5 11.5)"/></svg>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[14px] text-gray-300">Processing Request</span>
+                        <div class="thinking-dots"><span></span><span></span></div>
+                    </div>
                 </div>
             </div>
         </main>
 
-        <!-- 🔥 KINETIC SEARCH BAR (Glides smoothly from center to bottom on enter) -->
-        <footer id="search-container" class="absolute z-40 flex flex-col items-center px-4 md:px-0 pointer-events-none input-mode-center">
-            
-            <div id="attachments-container" class="hidden w-full max-w-3xl flex flex-wrap items-end gap-3 pb-3 pointer-events-auto anim-slide-up px-2"></div>
+        <!-- 🔥 SCROLL TO BOTTOM BUTTON -->
+        <button id="scroll-bottom-btn" onclick="window.scrollToBottom()" class="hidden md:flex fixed bottom-[120px] left-1/2 transform -translate-x-1/2 w-10 h-10 bg-[#212121] border border-white/5 rounded-full items-center justify-center text-[var(--text-secondary)] shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-[250]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </button>
 
-            <div class="glass-island w-full rounded-[1.8rem] flex flex-col shadow-2xl pointer-events-auto relative overflow-hidden bg-[#0d0d0f]/95 border border-white/10">
+        <!-- 🔥 EXACT KINETIC INPUT DOCK -->
+        <footer id="search-wrapper" class="pos-center flex flex-col justify-end">
+            
+            <div id="attachments-container" class="w-full flex-wrap items-end gap-2 pb-2 pointer-events-auto anim-fade-up px-2 hidden"></div>
+
+            <div class="input-bar-bg w-full flex items-center relative z-20 px-2 py-1.5" id="input-bar-container">
                 
-                <div class="format-toolbar w-full justify-between items-center px-4 py-2 border-b border-white/5">
-                    <div class="flex gap-4">
-                        <button type="button" onclick="window.formatText('**', '**')" class="format-btn" title="Bold">B</button>
-                        <button type="button" onclick="window.formatText('*', '*')" class="format-btn italic" title="Italic">I</button>
-                        <button type="button" onclick="window.formatText('```\n', '\n```')" class="format-btn flex items-center gap-1" title="Code Block"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> CODE</button>
-                    </div>
-                    <div class="flex gap-3">
-                        <span class="text-[9px] font-mono text-[var(--accent)] font-bold tracking-widest" id="token-counter">0 TOKENS</span>
-                        <span class="text-[9px] font-mono text-gray-500 font-bold tracking-widest" id="typing-counter">0 WORDS</span>
-                    </div>
+                <!-- LOCALIZED DRAG ZONE OVER INPUT -->
+                <div id="drag-drop-zone">
+                    <svg class="w-7 h-7 text-[#8ab4f8] mb-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <span class="text-[#8ab4f8] text-[14px] font-medium tracking-wide">Drop files here</span>
                 </div>
 
-                <form onsubmit="event.preventDefault(); if(isGenerating){ window.stopGeneration(); } else { window.handleSend(); } return false;" class="flex w-full items-end gap-2 relative z-20 p-2">
+                <form onsubmit="event.preventDefault(); window.handleSend();" class="flex w-full items-center gap-1 relative z-20">
                     
                     <input type="file" id="system-file-upload" class="hidden" multiple onchange="window.handleAttachmentClick(this)" accept="*" />
-                    
-                    <div class="flex items-center shrink-0 mb-1 ml-1 gap-1">
-                        <button type="button" onclick="document.getElementById('system-file-upload').click()" class="icon-btn w-9 h-9" title="Attach">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                        </button>
-                        <button type="button" id="web-search-btn" onclick="window.toggleWebSearch()" class="icon-btn w-9 h-9" title="Live Web Access">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                        </button>
-                    </div>
+                    <button type="button" onclick="document.getElementById('system-file-upload').click()" class="icon-btn shrink-0" title="Attach Data">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
 
                     <div class="flex-1 relative flex flex-col justify-center min-w-0 px-2">
-                        <textarea id="chat-input" rows="1" oninput="window.updateWordCount(this.value); window.autoResize(this)" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); window.handleSend(); }" autocomplete="off" placeholder="Message Lura..."></textarea>
+                        <textarea id="chat-input" rows="1" oninput="window.autoResize(this)" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); window.handleSend(); }" autocomplete="off" placeholder="Message Lura..."></textarea>
                     </div>
                     
-                    <button type="submit" id="action-btn" class="icon-btn w-9 h-9 mb-1 mr-1 shrink-0 bg-transparent text-gray-400 hover:text-white" title="Send">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                    </button>
+                    <div class="flex items-center shrink-0 gap-1 pr-1 relative">
+                        
+                        <!-- Dropdown Trigger -->
+                        <div class="dropdown-pill md:flex" onclick="window.toggleModelDropdown(event)">
+                            <span id="current-model-label">Lura Pro</span>
+                            <svg id="dropdown-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+
+                        <!-- 3D ANIMATED DROPDOWN MENU (NO LOCKS) -->
+                        <div id="model-dropdown" class="dropdown-menu-fixed">
+                            <button type="button" onclick="window.selectModel('Lura Core', null)" class="agent-item w-full text-left text-[13px] px-3 py-2.5 hover:bg-white/5 rounded-lg text-white font-medium flex justify-between outline-none">Lura Core <span class="text-[10px] text-gray-400 font-mono">Fast</span></button>
+                            <button type="button" onclick="window.selectModel('Lura Pro', null)" class="agent-item w-full text-left text-[13px] px-3 py-2.5 hover:bg-white/5 rounded-lg text-white font-medium flex justify-between outline-none">Lura Pro <span class="text-[10px] font-mono text-[var(--text-secondary)] bg-white/10 px-1.5 py-0.5 rounded border border-white/10">Deep</span></button>
+                            <div class="h-px bg-white/10 my-1 mx-2 agent-item"></div>
+                            
+                            <!-- 🔥 FULLY UNLOCKED AGENTS -->
+                            <button type="button" onclick="window.selectModel('Academic Scholar', 'M.Sc Level')" class="agent-item w-full text-left text-[13px] px-3 py-2.5 hover:bg-purple-500/10 rounded-lg text-purple-400 font-medium outline-none transition-colors">Academic Scholar</button>
+                            <button type="button" onclick="window.selectModel('Roblox Engine', null)" class="agent-item w-full text-left text-[13px] px-3 py-2.5 hover:bg-blue-500/10 rounded-lg text-blue-400 font-medium outline-none transition-colors">Roblox Engine</button>
+                            <button type="button" onclick="window.selectModel('Telugu Matrix', null)" class="agent-item w-full text-left text-[13px] px-3 py-2.5 hover:bg-emerald-500/10 rounded-lg text-emerald-400 font-medium outline-none transition-colors">Telugu Matrix</button>
+                            
+                            <div class="h-px bg-white/10 my-1 mx-2 agent-item"></div>
+                            
+                            <!-- 🔥 FIXED Extended Thinking Toggle -->
+                            <div class="agent-item flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-all cursor-pointer">
+                                <span class="text-[12px] font-medium text-[var(--accent)]" onclick="document.getElementById('ext-think-toggle-btn').click()">Extended Thinking</span>
+                                <div class="relative inline-flex items-center">
+                                    <input type="checkbox" id="ext-think-toggle-btn" class="sr-only peer" onchange="window.toggleExtendedThinking(event)">
+                                    <div class="w-9 h-5 bg-[#333] rounded-full peer peer-focus:outline-none peer-checked:bg-[var(--accent)] transition-colors border border-white/10">
+                                        <div class="absolute top-[2px] left-[2px] w-[14px] h-[14px] rounded-full bg-gray-400 peer-checked:bg-[#000] transition-transform peer-checked:translate-x-[16px] shadow-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="mic-btn" class="icon-btn" title="Voice Input" onclick="window.openVoiceMode()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                        </button>
+
+                        <button type="submit" id="action-btn" class="icon-btn hidden transition-all duration-300 transform" title="Send">
+                            <svg id="send-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ml-0.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                            <svg id="stop-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" class="hidden"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"/></svg>
+                        </button>
+                    </div>
                 </form>
             </div>
         </footer>
+
     </div>
 
-    <!-- ⚙️ SETTINGS MODAL (Theme Engine Included) -->
+    <!-- 🛠️ LUAU CODE STUDIO MODAL -->
+    <div id="code-studio-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md items-center justify-center hidden z-[999999] p-6">
+        <div class="w-full max-w-3xl p-6 rounded-3xl border border-white/10 bg-[var(--surface)] shadow-2xl flex flex-col h-[80vh] anim-fade-up">
+            <div class="flex justify-between items-center pb-4 border-b border-white/5">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Luau & Code Studio</h3>
+                <button onclick="document.getElementById('code-studio-modal').classList.add('hidden'); document.getElementById('code-studio-modal').classList.remove('flex');" class="icon-btn w-8 h-8"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <textarea id="studio-editor" class="flex-1 my-4 bg-black/80 border border-white/5 rounded-xl p-4 font-mono text-xs text-gray-200 outline-none focus:border-[var(--accent)] resize-none" placeholder="-- Enter Luau or JS code here for quick formatting..."></textarea>
+            <div class="flex justify-between items-center">
+                <button onclick="document.getElementById('studio-editor').value='';" class="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-semibold transition-colors">Clear</button>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('studio-editor').value); window.showToast('Copied Code Studio Buffer');" class="px-6 py-2.5 bg-white text-black hover:bg-gray-200 rounded-xl text-xs font-bold transition-transform hover:scale-105">Copy Buffer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚙️ SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md items-center justify-center hidden z-[99999] p-4">
-        <div class="glass-panel w-full max-w-md p-6 rounded-2xl shadow-2xl flex flex-col anim-pop border border-white/10 bg-[#0d0d0d]">
-            <div class="flex justify-between items-center mb-6 pb-3 border-b border-white/5">
-                <h3 class="text-sm font-semibold text-white flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> System Configuration</h3>
-                <button onclick="window.toggleSettingsModal()" class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all outline-none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <div class="w-full max-w-[480px] p-8 rounded-3xl shadow-2xl flex flex-col anim-pop border border-white/10 bg-[var(--surface)]">
+            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                <h3 class="text-sm font-semibold text-white flex items-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> System Configuration</h3>
+                <button onclick="window.toggleSettingsModal()" class="icon-btn w-8 h-8"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             </div>
             
-            <div class="space-y-3">
-                <div class="flex items-center justify-between p-3 rounded-lg bg-[#141414] border border-white/5">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-base)] border border-white/5">
                     <span class="text-xs font-semibold text-gray-300">Terminal Theme</span>
-                    <select id="theme-selector" onchange="window.changeTheme(this.value)" class="bg-[#222] border border-white/10 text-white text-xs rounded px-2 py-1 outline-none">
+                    <select id="theme-selector" onchange="window.changeTheme(this.value)" class="bg-[var(--surface-hover)] border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none cursor-pointer transition-all">
                         <option value="default">Obsidian (Cyan)</option>
+                        <option value="gpt">GPT Minimal (Pitch Black)</option>
                         <option value="matrix">Matrix (Green)</option>
                         <option value="cyber">Cyberpunk (Pink)</option>
+                        <option value="dracula">Dracula (Purple)</option>
                     </select>
                 </div>
 
-                <label class="flex items-center justify-between p-3 rounded-lg bg-[#141414] border border-white/5 cursor-pointer">
-                    <span class="text-xs font-semibold text-gray-300">Interface Audio (SFX)</span>
-                    <div class="relative inline-flex items-center">
-                        <input type="checkbox" id="toggle-sfx" class="sr-only peer" checked onchange="window.toggleSetting('sfx')">
-                        <div class="w-11 h-6 bg-[#222] rounded-full peer peer-focus:outline-none peer-checked:bg-[var(--accent)] transition-colors border border-white/10">
-                            <div class="absolute top-[2px] left-[2px] w-[20px] h-[20px] rounded-full bg-[#aaa] peer-checked:bg-black transition-transform peer-checked:translate-x-[20px] shadow-sm"></div>
-                        </div>
+                <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-base)] border border-white/5 cursor-pointer" onclick="document.getElementById('toggle-ambient').click()">
+                    <span class="text-xs font-semibold text-gray-300">Enable Ambient Background</span>
+                    <input type="checkbox" id="toggle-ambient" class="hidden" onchange="window.toggleSetting('ambient')">
+                    <div class="w-10 h-5 bg-[#333] rounded-full relative transition-colors duration-300" id="ambient-track">
+                        <div class="w-3.5 h-3.5 bg-gray-400 rounded-full absolute top-[3px] left-[3px] transition-transform duration-300" id="ambient-thumb"></div>
                     </div>
-                </label>
+                </div>
 
-                <div class="mt-4 pt-3 border-t border-white/5">
+                <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-base)] border border-white/5 cursor-pointer" onclick="document.getElementById('toggle-sfx').click()">
+                    <span class="text-xs font-semibold text-gray-300">Interface Audio (SFX)</span>
+                    <input type="checkbox" id="toggle-sfx" class="hidden" onchange="window.toggleSetting('sfx')">
+                    <div class="w-10 h-5 bg-[#333] rounded-full relative transition-colors duration-300" id="sfx-track">
+                        <div class="w-3.5 h-3.5 bg-gray-400 rounded-full absolute top-[3px] left-[3px] transition-transform duration-300" id="sfx-thumb"></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-white/5">
                     <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">System Directive Override</label>
-                    <textarea id="setting-prompt" rows="2" placeholder="Override Lura's base instructions..." class="w-full bg-[#0a0a0c] border border-white/5 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[var(--accent)] transition-all resize-none" onblur="window.toggleSetting('prompt')"></textarea>
+                    <textarea id="setting-prompt" rows="3" placeholder="Override Lura's base instructions..." class="w-full bg-[var(--bg-base)] border border-white/5 rounded-xl p-4 text-xs text-white outline-none focus:border-[var(--accent)] transition-all resize-none"></textarea>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 🛡️ OMNI-ADMIN MODAL -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl items-center justify-center hidden z-[999999] p-4">
+        <div class="w-full max-w-2xl p-8 rounded-[2rem] border border-[#ff4444]/50 bg-[#0a0000] flex flex-col h-[80vh] shadow-[0_0_100px_rgba(255,0,0,0.2)] anim-fade-up">
+            <h2 class="text-[#ff4444] font-mono text-xl font-bold mb-4 tracking-widest uppercase border-b border-[#ff4444]/30 pb-4 flex items-center justify-between">
+                <span>root@lura-omni-admin:~#</span>
+                <span class="text-xs animate-pulse">STATUS: SECURE</span>
+            </h2>
+            
+            <div id="admin-terminal-output" class="flex-1 overflow-y-auto font-mono text-xs text-[#ff4444] space-y-2 mb-4 p-4 bg-black/50 border border-[#ff4444]/20 rounded-xl scroll-smooth">
+                <div>[SYSTEM] Omni-Admin Access Granted.</div>
+                <div>[SYSTEM] Awaiting root directive...</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-sm">
+                <button onclick="window.adminCmd('purge_vault')" class="py-3 bg-[#ff4444]/10 hover:bg-[#ff4444]/30 border border-[#ff4444]/30 rounded-lg text-left px-4 transition-all text-[#ff4444]">> PURGE_VAULT_DATA</button>
+                <button onclick="window.adminCmd('diagnostics')" class="py-3 bg-[#ff4444]/10 hover:bg-[#ff4444]/30 border border-[#ff4444]/30 rounded-lg text-left px-4 transition-all text-[#ff4444]">> RUN_DIAGNOSTICS</button>
+                <button onclick="window.adminCmd('view_users')" class="py-3 bg-[#ff4444]/10 hover:bg-[#ff4444]/30 border border-[#ff4444]/30 rounded-lg text-left px-4 transition-all text-[#ff4444]">> VIEW_ACTIVE_USERS</button>
+                <button onclick="window.adminCmd('system_logs')" class="py-3 bg-[#ff4444]/10 hover:bg-[#ff4444]/30 border border-[#ff4444]/30 rounded-lg text-left px-4 transition-all text-[#ff4444]">> FETCH_SYSTEM_LOGS</button>
+                <button onclick="window.adminCmd('force_reboot')" class="py-3 bg-[#ff4444]/10 hover:bg-[#ff4444]/30 border border-[#ff4444]/30 rounded-lg text-left px-4 transition-all text-[#ff4444] md:col-span-2">> FORCE_REBOOT</button>
+                <button onclick="document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('admin-modal').classList.remove('flex');" class="py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-center text-white transition-all md:col-span-2">> EXIT_TERMINAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM TOAST -->
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-[var(--surface-hover)] border border-white/10 text-white px-5 py-2.5 rounded-full text-xs font-semibold opacity-0 transition-all duration-400 pointer-events-none z-[999999] shadow-2xl tracking-wide"></div>
+
     <!-- SCRIPTS -->
     <script>
+        // =====================================================================
+        // 🚀 PASTE YOUR BACKEND URL RIGHT HERE BETWEEN THE QUOTES
+        // Example: const BACKEND_URL = "https://your-app-name.onrender.com";
+        // =====================================================================
         const BACKEND_URL = "https://lura-backend-bkuu.onrender.com"; 
+        // =====================================================================
 
-        let session = { active: false, name: "", token: null };
+        let session = { active: false, name: "Bhaskhar" };
         let isGenerating = false;
-        let sessionAttachments = []; 
-        let currentModel = "Lura Core";
+        let currentModel = "Lura Pro";
+        let isExtendedThinking = false;
         let hasConversationStarted = false;
         let chatHistory = [];
-        let currentSessionId = 'sess_' + Date.now();
         let currentAbortController = null;
-        let webSearchActive = true;
+        let sessionAttachments = [];
+        let pendingUrl = null;
+        let speechRecognition = null;
+        let isVoiceActive = false;
 
-        let sysSettings = JSON.parse(localStorage.getItem('lura_sys_settings')) || { sfx: true, web: true, prompt: "", theme: "default" };
+        let sysSettings = JSON.parse(localStorage.getItem('lura_sys_settings')) || { sfx: true, web: false, ambient: true, math: false, prompt: "", theme: "default" };
+        let isAdmin = localStorage.getItem('lura_is_admin') === 'true';
 
         document.addEventListener('DOMContentLoaded', () => {
             if(sysSettings.theme) window.changeTheme(sysSettings.theme, false);
-            initCanvas();
-            if(document.getElementById('toggle-sfx')) document.getElementById('toggle-sfx').checked = sysSettings.sfx;
-            if(document.getElementById('toggle-web')) document.getElementById('toggle-web').checked = sysSettings.web;
+            if(document.getElementById('toggle-sfx')) { document.getElementById('toggle-sfx').checked = sysSettings.sfx; window.updateToggleUI('sfx', sysSettings.sfx); }
+            if(document.getElementById('toggle-ambient')) { document.getElementById('toggle-ambient').checked = sysSettings.ambient; window.updateToggleUI('ambient', sysSettings.ambient); window.applyAmbientState(); }
             if(document.getElementById('setting-prompt')) document.getElementById('setting-prompt').value = sysSettings.prompt || "";
-            webSearchActive = sysSettings.web !== false;
-            window.updateWebSearchUI();
+            
+            document.getElementById('message-container').addEventListener('click', window.handleMessageClick);
+            window.initSpeechEngine();
+
+            const mainWorkspace = document.getElementById('main-workspace');
+            if (mainWorkspace) {
+                mainWorkspace.addEventListener('scroll', function() {
+                    const btn = document.getElementById('scroll-bottom-btn');
+                    if(!btn) return;
+                    if (this.scrollHeight - this.scrollTop - this.clientHeight > 150) btn.classList.add('visible');
+                    else btn.classList.remove('visible');
+                });
+            }
         });
 
-        function initCanvas() {
-            const canvas = document.getElementById('space-canvas');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            let particles = [];
-            
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-                    this.vx = (Math.random() - 0.5) * 0.2; this.vy = (Math.random() - 0.5) * 0.2;
-                    this.radius = Math.random() * 1.2 + 0.3;
-                }
-                update() {
-                    this.x += this.vx; this.y += this.vy;
-                    if(this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
-                    if(this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
-                }
-                draw() {
-                    ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--node-color');
-                    ctx.fill();
-                }
-            }
-            
-            for(let i=0; i<60; i++) particles.push(new Particle());
-            
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const lineColor = getComputedStyle(document.body).getPropertyValue('--line-color').trim();
-                
-                for(let i=0; i<particles.length; i++) {
-                    particles[i].update(); particles[i].draw();
-                    for(let j=i; j<particles.length; j++) {
-                        let dx = particles[i].x - particles[j].x; let dy = particles[i].y - particles[j].y;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist < 120) {
-                            ctx.beginPath(); 
-                            const rgbMatch = lineColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-                            if(rgbMatch) { ctx.strokeStyle = `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${0.12 - dist/900})`; }
-                            else { ctx.strokeStyle = lineColor; }
-                            ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animate);
-            }
-            animate();
-            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-        }
-
-        window.changeTheme = function(themeName, playSound = true) {
-            if(playSound) playSFX('click');
-            document.body.className = '';
-            if(themeName !== 'default') document.body.classList.add(`theme-${themeName}`);
-            sysSettings.theme = themeName;
-            localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings));
-            const selector = document.getElementById('theme-selector');
-            if(selector) selector.value = themeName;
+        window.scrollToBottom = function() {
+            window.playSFX('click');
+            const mw = document.getElementById('main-workspace');
+            if (mw) mw.scrollTo({ top: mw.scrollHeight, behavior: 'smooth' });
         };
 
+        // 🔥 OMNI-ADMIN TERMINAL LOGIC
+        window.adminCmd = function(cmd) {
+            window.playSFX('click');
+            const out = document.getElementById('admin-terminal-output');
+            const log = (msg) => { out.innerHTML += `<div>> ${msg}</div>`; out.scrollTo(0, out.scrollHeight); };
+
+            if(cmd === 'purge_vault') {
+                log('Executing mass deletion of all user vaults...');
+                setTimeout(() => { 
+                    Object.keys(localStorage).forEach(k => { if(k.startsWith('lura_vault')) localStorage.removeItem(k); });
+                    chatHistory = []; document.getElementById('message-container').innerHTML = '';
+                    log('[SUCCESS] Vaults wiped. Context reset.'); window.renderHistoryList();
+                }, 800);
+            } else if(cmd === 'diagnostics') {
+                log('Running system diagnostics...');
+                setTimeout(() => {
+                    log(`[MEM] Vault Allocation: ${(JSON.stringify(localStorage).length / 1024).toFixed(2)} KB`);
+                    log(`[NET] Backend Uplink: ${BACKEND_URL ? 'CONFIGURED' : 'NULL'}`);
+                    log(`[MOD] Active Core: ${currentModel}`);
+                }, 600);
+            } else if(cmd === 'bypass_limits') {
+                log('Attempting to override safety limits...');
+                setTimeout(() => log('[OVERRIDE] Rate limiters bypassed. Temp locked to 1.0.'), 500);
+            } else if(cmd === 'ping_backend') {
+                log(`Pinging ${BACKEND_URL || 'UNDEFINED'}...`);
+                setTimeout(() => {
+                    if(!BACKEND_URL) log('[ERROR] Backend URL is missing.');
+                    else log(`[RESPONSE] 200 OK from server. Connection stable.`);
+                }, 1000);
+            } else if(cmd === 'view_users') {
+                log('Fetching active session sockets...');
+                setTimeout(() => log('[DATA] 1 Active connection detected (Local User).'), 700);
+            } else if(cmd === 'system_logs') {
+                log('Pulling last 5 event hooks...');
+                setTimeout(() => {
+                    log('[LOG] Theme updated successfully.');
+                    log('[LOG] Vault index synchronized.');
+                    log('[LOG] WebSocket handshake established.');
+                }, 600);
+            } else if(cmd === 'force_reboot') {
+                log('Initiating hard refresh...');
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        };
+
+        // 🔥 VOICE ENGINE
+        window.initSpeechEngine = function() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                speechRecognition = new SpeechRecognition();
+                speechRecognition.continuous = false; speechRecognition.interimResults = true;
+                speechRecognition.onstart = () => { document.getElementById('voice-orb').className = "voice-orb listening mb-8"; document.getElementById('voice-status-text').innerText = "Listening..."; };
+                speechRecognition.onresult = (e) => {
+                    let transcript = "";
+                    for (let i = e.resultIndex; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+                    document.getElementById('voice-transcript').innerText = transcript;
+                    if(e.results[0].isFinal) window.processVoiceCommand(transcript);
+                };
+                speechRecognition.onerror = () => { document.getElementById('voice-status-text').innerText = "Tap Orb to Try Again"; document.getElementById('voice-orb').className = "voice-orb mb-8"; };
+                speechRecognition.onend = () => { if(isVoiceActive && !isGenerating) { document.getElementById('voice-orb').className = "voice-orb mb-8"; document.getElementById('voice-status-text').innerText = "Tap Orb to Speak"; } };
+            }
+        };
+
+        window.openVoiceMode = function() { window.playSFX('click'); isVoiceActive = true; document.getElementById('voice-overlay').classList.add('active'); window.toggleVoiceListening(); };
+        window.closeVoiceMode = function() { isVoiceActive = false; if(speechRecognition) speechRecognition.stop(); window.speechSynthesis.cancel(); document.getElementById('voice-overlay').classList.remove('active'); };
+        window.toggleVoiceListening = function() { if(!speechRecognition) { window.showToast("Speech Recognition not supported in this browser."); return; } window.speechSynthesis.cancel(); speechRecognition.start(); };
+        window.processVoiceCommand = async function(text) {
+            if(!text.trim()) return;
+            document.getElementById('voice-orb').className = "voice-orb speaking mb-8"; document.getElementById('voice-status-text').innerText = "Processing...";
+            document.getElementById('chat-input').value = text;
+            await window.handleSend();
+            const lastReply = chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].text : "";
+            if(lastReply) {
+                document.getElementById('voice-status-text').innerText = "Lura Speaking...";
+                const utterance = new SpeechSynthesisUtterance(lastReply.replace(/[*#`]/g, ''));
+                utterance.onend = () => { if(isVoiceActive) { document.getElementById('voice-status-text').innerText = "Listening..."; speechRecognition.start(); } };
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        window.openCodeStudio = function() { window.playSFX('click'); document.getElementById('code-studio-modal').classList.remove('hidden'); document.getElementById('code-studio-modal').classList.add('flex'); };
+        window.openPresetMatrix = function() {
+            window.playSFX('click');
+            const choices = ["1: Roblox Lua Master", "2: Academic Chemistry Scholar", "3: Telugu Matrix Assistant", "4: Minimal Technical Expert"];
+            const choice = prompt("Select Preset Directive:\n" + choices.join("\n"));
+            if(choice === "1") { sysSettings.prompt = "You are an elite Roblox Studio Lua/Luau scripting assistant. Write modular, high-performance Roblox scripts."; }
+            else if(choice === "2") { sysSettings.prompt = "You are an Academic Chemistry Scholar. Provide clear mechanistic reaction steps and highly accurate structural breakdowns."; }
+            else if(choice === "3") { sysSettings.prompt = "Respond fluently in Telugu with precise, friendly explanations."; }
+            else if(choice === "4") { sysSettings.prompt = "Provide minimalist, highly concise answers without filler text."; }
+            if(choice) {
+                localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings));
+                if(document.getElementById('setting-prompt')) document.getElementById('setting-prompt').value = sysSettings.prompt;
+                window.showToast("Preset Activated");
+            }
+        };
+
+        window.exportVaultData = function() {
+            window.playSFX('click');
+            if(chatHistory.length === 0) { window.showToast("No chat data to export."); return; }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatHistory, null, 2));
+            const downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", `lura_chat_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); window.showToast("Exported Chat History");
+        };
+
+        window.handleMessageClick = function(e) {
+            let target = e.target;
+            while(target && target.tagName !== 'A') {
+                if(target.id === 'message-container') return;
+                target = target.parentElement;
+            }
+            if(target && target.tagName === 'A' && target.href) {
+                e.preventDefault();
+                pendingUrl = target.href;
+                document.getElementById('warning-url').innerText = pendingUrl;
+                document.getElementById('link-warning-modal').classList.add('active');
+            }
+        };
+
+        window.closeLinkWarning = function() { document.getElementById('link-warning-modal').classList.remove('active'); pendingUrl = null; };
+        document.getElementById('confirm-link-btn').addEventListener('click', () => { if(pendingUrl) window.open(pendingUrl, '_blank'); window.closeLinkWarning(); });
+
+        window.togglePassword = function() {
+            const passInput = document.getElementById('auth-pass'); const eyeClosed = document.getElementById('eye-icon-closed'); const eyeOpen = document.getElementById('eye-icon-open');
+            if (passInput && passInput.type === 'password') { passInput.type = 'text'; eyeClosed.classList.add('hidden'); eyeOpen.classList.remove('hidden'); } 
+            else if (passInput) { passInput.type = 'password'; eyeClosed.classList.remove('hidden'); eyeOpen.classList.add('hidden'); }
+        };
+
+        // 🔥 DRAG AND DROP ENGINE
+        const dragZone = document.getElementById('drag-drop-zone');
+        let dragCounter = 0;
+
+        document.addEventListener('dragenter', (e) => { e.preventDefault(); dragCounter++; if(hasConversationStarted) dragZone.classList.add('active'); });
+        document.addEventListener('dragleave', (e) => { e.preventDefault(); dragCounter--; if(dragCounter === 0) dragZone.classList.remove('active'); });
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => {
+            e.preventDefault(); dragCounter = 0; dragZone.classList.remove('active');
+            if(e.dataTransfer.files.length > 0) { Array.from(e.dataTransfer.files).forEach(file => processFile(file)); }
+        });
+
+        window.handleAttachmentClick = function(input) { if(input.files && input.files.length > 0) { Array.from(input.files).forEach(file => processFile(file)); } input.value = ''; }
+        
+        function processFile(file) {
+            if(!file) return; window.playSFX('click');
+            const newAtt = { id: Date.now() + Math.random(), name: file.name, type: file.type.startsWith('image/') ? 'image' : 'text', data: null };
+            if (newAtt.type === 'image') { const reader = new FileReader(); reader.onload = (e) => { newAtt.data = e.target.result; sessionAttachments.push(newAtt); window.renderAttachments(); }; reader.readAsDataURL(file); } 
+            else { newAtt.data = "File attached."; sessionAttachments.push(newAtt); window.renderAttachments(); }
+        }
+        
+        window.renderAttachments = function() {
+            const c = document.getElementById('attachments-container'); const chatInput = document.getElementById('chat-input');
+            if(!c) return;
+            if(sessionAttachments.length === 0) { c.classList.add('hidden'); c.classList.remove('flex'); if (chatInput) window.autoResize(chatInput); return; }
+            c.classList.remove('hidden'); c.classList.add('flex'); c.innerHTML = '';
+            sessionAttachments.forEach((a, i) => {
+                c.innerHTML += `
+                <div class="glass-panel p-1.5 flex items-center gap-3 shadow-lg shrink-0 rounded-xl border border-white/10 bg-[var(--surface-hover)]">
+                    <span class="text-[11px] text-white font-medium truncate max-w-[120px] px-2">${escapeHTML(a.name)}</span>
+                    <button type="button" onclick="sessionAttachments.splice(${i},1); window.renderAttachments();" class="text-gray-500 hover:text-[var(--accent-red)] outline-none transition-transform hover:scale-110 mr-1 w-5 h-5 flex items-center justify-center">&times;</button>
+                </div>`;
+            });
+            if (chatInput) window.autoResize(chatInput);
+        };
+
+        window.changeTheme = function(themeName, playSound = true) {
+            if(playSound) window.playSFX('click');
+            document.body.className = document.body.className.replace(/\btheme-\S+/g, '');
+            if(themeName !== 'default') document.body.classList.add(`theme-${themeName}`);
+            sysSettings.theme = themeName; localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings));
+            const selector = document.getElementById('theme-selector'); if(selector) selector.value = themeName;
+        };
+
+        window.applyAmbientState = function() { if(sysSettings.ambient) document.body.classList.remove('ambient-disabled'); else document.body.classList.add('ambient-disabled'); }
+
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSFX(type) {
+        window.playSFX = function(type) {
             try {
                 if(!sysSettings.sfx) return;
                 if(audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                
                 if(type === 'login') {
                     osc.type = 'sine'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.3);
                     gain.gain.setValueAtTime(0.04, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
@@ -435,313 +844,408 @@
             } catch(e) {}
         }
 
-        window.handleLogin = function() {
-            const userEl = document.getElementById('auth-user');
-            if(!userEl) return;
-            let user = userEl.value.trim();
-            if(!user) user = "Shinchan";
-            
-            playSFX('login');
-            session = { active: true, name: user };
-            const lView = document.getElementById('login-view');
-            if (lView) { lView.style.opacity = '0'; setTimeout(() => lView.classList.add('hidden'), 500); }
-            
-            const app = document.getElementById('app-workspace');
-            if (app) { app.classList.remove('hidden'); app.classList.add('flex'); setTimeout(() => app.style.opacity = '1', 50); }
+        window.updateToggleUI = function(id, state) {
+            const track = document.getElementById(`${id}-track`); const thumb = document.getElementById(`${id}-thumb`);
+            if(!track || !thumb) return;
+            if(state) { track.style.background = 'var(--accent)'; thumb.style.transform = 'translateX(20px)'; thumb.style.background = '#000'; } 
+            else { track.style.background = '#333'; thumb.style.transform = 'translateX(0px)'; thumb.style.background = '#999'; }
+        }
+
+        window.toggleSetting = function(key) {
+            if (key === 'prompt') { sysSettings[key] = document.getElementById('setting-prompt').value; } 
+            else { const el = document.getElementById(`toggle-${key}`); if(el) { sysSettings[key] = el.checked; window.updateToggleUI(key, el.checked); if(key === 'ambient') window.applyAmbientState(); } }
+            localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings)); window.playSFX('click');
         };
+
+        const swipeContainer = document.getElementById('custom-swipe-box'); const swipeThumb = document.getElementById('custom-swipe-thumb'); const swipeFill = document.getElementById('custom-swipe-fill'); const swipeText = document.getElementById('custom-swipe-text');
+        let isDragging = false; let startX = 0;
+
+        if (swipeThumb) {
+            swipeThumb.addEventListener('pointerdown', (e) => {
+                isDragging = true; startX = e.clientX || e.touches[0].clientX;
+                swipeThumb.style.transition = 'none'; swipeFill.style.transition = 'none'; swipeThumb.setPointerCapture(e.pointerId);
+            });
+            swipeThumb.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                const currentX = e.clientX || (e.touches && e.touches[0].clientX); let deltaX = currentX - startX;
+                const maxDelta = swipeContainer.clientWidth - swipeThumb.clientWidth - 8;
+                if (deltaX < 0) deltaX = 0; if (deltaX > maxDelta) deltaX = maxDelta;
+                swipeThumb.style.transform = `translateX(${deltaX}px)`;
+                const percentage = (deltaX / maxDelta) * 100;
+                swipeFill.style.width = `calc(${percentage}% + 24px)`; swipeText.style.opacity = 1 - (percentage / 100);
+                if (percentage >= 98) { isDragging = false; swipeThumb.style.pointerEvents = 'none'; window.verifyAndLogin(); }
+            });
+            swipeThumb.addEventListener('pointerup', (e) => {
+                if (!isDragging) return; isDragging = false; swipeThumb.releasePointerCapture(e.pointerId);
+                swipeThumb.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'; swipeFill.style.transition = 'width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                swipeThumb.style.transform = `translateX(0px)`; swipeFill.style.width = '0%'; swipeText.style.opacity = '1';
+            });
+        }
+
+        window.verifyAndLogin = function() {
+            const userEl = document.getElementById('auth-user'); const passEl = document.getElementById('auth-pass'); const captchaBtn = document.getElementById('captcha-btn');
+            let user = userEl ? userEl.value.trim() : "Bhaskhar"; if(!user) user = "Bhaskhar"; 
+
+            if(!passEl || passEl.value !== "85@@7&5!73") {
+                window.showToast("ACCESS DENIED: Invalid Passcode");
+                if (swipeThumb) { swipeThumb.style.pointerEvents = 'auto'; swipeThumb.style.transform = `translateX(0px)`; swipeFill.style.width = '0%'; swipeText.style.opacity = '1'; } return;
+            }
+
+            if(!captchaBtn.classList.contains('verified')) {
+                window.showToast("Please complete Human Verification");
+                if (swipeThumb) { swipeThumb.style.pointerEvents = 'auto'; swipeThumb.style.transform = `translateX(0px)`; swipeFill.style.width = '0%'; swipeText.style.opacity = '1'; } return;
+            }
+            
+            document.getElementById('login-view').style.opacity = '0';
+            setTimeout(() => { document.getElementById('login-view').classList.add('hidden'); window.triggerTerminalBoot(user); }, 400);
+        };
+
+        window.triggerTerminalBoot = function(userName) {
+            const bootScreen = document.getElementById('boot-overlay'); const output = document.getElementById('terminal-log-output'); const cursorLine = document.getElementById('terminal-cursor-line');
+            bootScreen.style.display = 'flex'; setTimeout(() => bootScreen.style.opacity = '1', 10);
+            output.innerHTML = `
+<pre class="text-[var(--accent)] mb-6 opacity-80" style="font-size: 11px; line-height: 11px;">
+██╗     ██╗   ██╗██████╗  █████╗ 
+██║     ██║   ██║██╔══██╗██╔══██╗
+██║     ██║   ██║██████╔╝███████║
+██║     ██║   ██║██╔══██╗██╔══██║
+███████╗╚██████╔╝██║  ██║██║  ██║
+╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+[LURA MATRIX v16.0 SECURE CONNECTION]
+</pre>`;
+
+            const logs = [
+                "INITIATING BIOS SECTOR... OK", "LOADING KERNEL 7.4.0-ARCH... OK", "MOUNTING VIRTUAL FILESYSTEMS... OK",
+                "INITIALIZING HARDWARE ABSTRACTION LAYER... DONE", "ALLOCATING VRAM FOR NEURAL PROCESSING... 16384MB ALLOCATED",
+                "verifying network integrity... 100%", "ESTABLISHING SECURE SOCKET: wss://lura-matrix.net:8443",
+                "HANDSHAKE PROTOCOL: TLS 1.3 ENABLED... CIPHER: AES-256-GCM", "PINGING ORBITAL SATELLITE UPLINK... [SUCCESS]",
+                "BYPASSING EXTERNAL FIREWALLS... [ACCESS GRANTED]", "REROUTING THROUGH SECURE PROXY... NODE 1.. NODE 2.. DONE",
+                "DECRYPTING IDENTITY TOKEN...", "parsing biometric hash... [0x9F3B2C]", "checking clearance level... OMNI-ADMIN VERIFIED",
+                "compiling neural pathways... OK", "LOADING LURA CORE DIRECTIVES... OK",
+                `<span class="text-white font-bold text-sm shadow-[0_0_10px_rgba(255,255,255,0.5)]">[ OK ] Identity Verified: USER // ${userName.toUpperCase()}</span>`,
+                "MOUNTING CLOUD VAULT...", "SYNCING DATABASE RECORDS... 100%", "ENGAGING UI FRAMEWORK...", "INITIALIZING ANIMATION ENGINE...", "BOOTING INTERFACE..."
+            ];
+
+            let i = 0;
+            function printLog() {
+                if (i < logs.length) {
+                    const line = document.createElement('div'); output.appendChild(line); let originalText = logs[i]; let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*"; let decI = 0;
+                    if (originalText.includes("<span")) { line.innerHTML = originalText; i++; setTimeout(printLog, 80); } 
+                    else { let decodeInterval = setInterval(() => { line.innerText = originalText.substring(0, decI) + chars[Math.floor(Math.random() * chars.length)].repeat(originalText.length - decI); decI += 2;
+                            if(decI >= originalText.length) { clearInterval(decodeInterval); line.innerText = originalText; i++; setTimeout(printLog, 20); } }, 5);
+                    }
+                } else {
+                    cursorLine.style.display = 'none'; setTimeout(() => { bootScreen.style.opacity = '0'; setTimeout(() => { bootScreen.style.display = 'none'; window.startWorkspace(userName); }, 500); }, 500); 
+                }
+            }
+            setTimeout(printLog, 150);
+        };
+
+        window.startWorkspace = function(user) {
+            session = { active: true, name: user }; localStorage.setItem('lura_user', user); document.getElementById('greeting-text').innerText = `What's next, ${user}?`;
+            if(document.getElementById('user-avatar-btn')) document.getElementById('user-avatar-btn').innerText = user.charAt(0).toUpperCase();
+            const app = document.getElementById('app-workspace'); app.classList.remove('hidden'); app.classList.add('flex'); window.playSFX('login'); window.renderHistoryList();
+        }
 
         window.logOut = function() {
             if(confirm("Sign out?")) {
-                playSFX('click');
-                session.active = false;
-                const appWorkspace = document.getElementById('app-workspace');
-                if (appWorkspace) appWorkspace.style.opacity = '0';
+                const appWorkspace = document.getElementById('app-workspace'); appWorkspace.style.opacity = '0';
                 setTimeout(() => {
-                    if (appWorkspace) { appWorkspace.classList.add('hidden'); appWorkspace.classList.remove('flex'); }
-                    const loginView = document.getElementById('login-view');
-                    if (loginView) { loginView.classList.remove('hidden'); loginView.style.opacity = '1'; }
-                    document.getElementById('auth-user').value = '';
-                    document.getElementById('auth-pass').value = '';
-                    document.getElementById('message-container').innerHTML = '';
-                    
-                    const sc = document.getElementById('search-container');
-                    const ws = document.getElementById('welcome-screen');
-                    if(sc) { sc.classList.remove('input-mode-bottom'); sc.classList.add('input-mode-center'); }
-                    if(ws) { ws.style.display = 'flex'; ws.style.opacity = '1'; }
-                    
-                    document.body.classList.remove('chat-active');
-                    hasConversationStarted = false;
-                }, 500);
+                    appWorkspace.classList.add('hidden'); appWorkspace.classList.remove('flex'); appWorkspace.style.opacity='1';
+                    const loginView = document.getElementById('login-view'); loginView.classList.remove('hidden'); loginView.style.opacity = '1';
+                    document.getElementById('auth-pass').value = ''; const captcha = document.getElementById('captcha-btn'); if(captcha) captcha.classList.remove('verified');
+                    if(swipeThumb) { swipeThumb.style.pointerEvents = 'auto'; swipeThumb.style.transform = `translateX(0px)`; swipeFill.style.width = '0%'; swipeText.style.opacity = '1'; }
+                    document.getElementById('message-container').innerHTML = ''; const sc = document.getElementById('search-wrapper'); const gc = document.getElementById('greeting-container');
+                    sc.classList.remove('pos-bottom'); sc.classList.add('pos-center'); gc.classList.remove('greeting-hidden'); gc.classList.add('greeting-visible'); hasConversationStarted = false; chatHistory = [];
+                }, 400);
             }
         };
 
-        window.toggleWebSearch = function() {
-            webSearchActive = !webSearchActive;
-            sysSettings.web = webSearchActive;
-            localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings));
-            window.updateWebSearchUI();
-            playSFX('click');
-            window.showToast(webSearchActive ? "Web Access: ON" : "Web Access: OFF");
+        window.toggleSidebar = function() {
+            window.playSFX('click'); const sidebar = document.getElementById('main-sidebar');
+            if(sidebar.classList.contains('expanded')) { sidebar.classList.remove('expanded'); document.body.classList.remove('sidebar-open'); } 
+            else { sidebar.classList.add('expanded'); document.body.classList.add('sidebar-open'); }
         };
 
-        window.updateWebSearchUI = function() {
-            const btn = document.getElementById('web-search-btn');
-            if(btn) { if(webSearchActive) { btn.classList.add('active'); } else { btn.classList.remove('active'); } }
+        window.toggleHistory = function() {
+            window.playSFX('click'); const p = document.getElementById('history-panel');
+            if (p) { if (p.classList.contains('active')) { p.classList.remove('active'); } else { p.classList.add('active'); window.renderHistoryList(); } }
+        };
+        
+        window.renderHistoryList = function() {
+            const hist = document.getElementById('history-list'); const userName = session.name || localStorage.getItem('lura_user') || 'Bhaskhar'; if(!hist) return;
+            let vault = JSON.parse(localStorage.getItem(`lura_vault_${userName}`) || '[]');
+            if(vault.length === 0) { hist.innerHTML = "<div class='p-3 text-gray-500'>No stored sessions in vault.</div>"; return; }
+            hist.innerHTML = '';
+            vault.slice().reverse().forEach(chat => {
+                hist.innerHTML += `<button onclick="window.loadChat('${chat.id}')" class="w-full text-left p-3.5 rounded-xl hover:bg-white/5 transition-all mb-2 border border-white/5 bg-black/20">
+                    <span class="block text-white font-medium text-[13px] truncate">${escapeHTML(chat.title)}</span>
+                    <span class="block text-[10px] text-gray-500 mt-1">${chat.date}</span></button>`;
+            });
         };
 
-        window.toggleFocusMode = function() {
-            playSFX('click');
-            document.body.classList.toggle('focus-mode');
-            window.showToast(document.body.classList.contains('focus-mode') ? "Focus Mode: ON" : "Focus Mode: OFF");
-        };
-
-        window.nukeMemory = function() {
-            if(!hasConversationStarted) return;
-            playSFX('click');
-            chatHistory = []; 
-            const cont = document.getElementById('message-container');
-            if (cont) {
-                const div = document.createElement('div');
-                div.className = "flex w-full justify-center shrink-0 mb-4 items-center anim-pop";
-                div.innerHTML = `<div class="bg-red-500/10 border border-red-500/30 text-red-400 font-mono text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full">Memory Purged</div>`;
+        window.loadChat = function(id) {
+            window.playSFX('click'); const userName = session.name || localStorage.getItem('lura_user') || 'Bhaskhar';
+            let vault = JSON.parse(localStorage.getItem(`lura_vault_${userName}`) || '[]'); let chat = vault.find(c => c.id === id); if(!chat) return;
+            chatHistory = chat.messages || []; hasConversationStarted = true;
+            
+            const cont = document.getElementById('message-container'); const sc = document.getElementById('search-wrapper'); const gc = document.getElementById('greeting-container');
+            sc.classList.remove('pos-center'); sc.classList.add('pos-bottom'); gc.classList.remove('greeting-visible'); gc.classList.add('greeting-hidden');
+            cont.innerHTML = ''; cont.classList.remove('hidden'); cont.classList.add('flex');
+            
+            chatHistory.forEach(msg => {
+                const isUser = msg.role === 'user'; const msgId = 'msg-' + Math.random().toString(36).substr(2, 9); const div = document.createElement('div'); div.className = "msg-group";
+                if (isUser) {
+                    div.innerHTML = `
+                        <div class="user-bubble-container mb-6">
+                            <button class="user-edit-btn" onclick="window.editUserMessage('${escapeHTML(msg.text.replace(/'/g, "\\'"))}', this)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </button>
+                            <div class="user-bubble">${escapeHTML(msg.text)}</div>
+                        </div>`;
+                } else {
+                    const parsed = window.parseAndFormatBotText(msg.text);
+                    div.innerHTML = `
+                        <div class="flex w-full shrink-0 items-start">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 mr-4 text-[var(--accent)]">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1 0-1h6.5V.5a.5.5 0 0 1 .5-.5z" transform="rotate(45 11.5 11.5)"/><path d="M11.5 24a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-6.5v6.5a.5.5 0 0 1-.5.5z" transform="rotate(45 11.5 11.5)"/></svg>
+                            </div>
+                            <div class="max-w-full flex-1 bot-bubble">
+                                <div id="target-${msgId}">${parsed.displayHtml}</div>
+                                <div class="bot-action-icons" id="actions-${msgId}">
+                                    <button onclick="navigator.clipboard.writeText(document.getElementById('target-${msgId}').innerText); window.showToast('Copied');" title="Copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>
+                                    <button onclick="window.showToast('Feedback Recorded');" title="Good Response"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button>
+                                    <button onclick="window.showToast('Feedback Recorded');" title="Bad Response"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2"/></svg></button>
+                                    <button onclick="window.speakText(document.getElementById('target-${msgId}').innerText)" title="Read Aloud"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
+                                    <button onclick="window.showToast('Sharing not supported on this device');" title="Share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
                 cont.appendChild(div);
-            }
-            window.showToast("Context Wiped");
+            });
+            const mw = document.getElementById('main-workspace'); if(mw) mw.scrollTo({ top: mw.scrollHeight, behavior: 'smooth' });
+            window.toggleHistory();
         };
 
-        window.updateWordCount = function(val) {
-            const tc = document.getElementById('typing-counter');
-            const tk = document.getElementById('token-counter');
-            const words = val.trim() === '' ? 0 : val.trim().split(/\s+/).length; 
-            const tokens = Math.ceil(words * 1.3);
-            if(tc) tc.innerText = `${words} WORDS`;
-            if(tk) tk.innerText = `${tokens} TOKENS`;
+        window.toggleSearchMatrix = function() {
+            window.playSFX('click'); const dot = document.getElementById('matrix-status'); const label = document.getElementById('matrix-label');
+            if(sysSettings.web) { sysSettings.web = false; dot.classList.remove('active'); label.innerText = "Search Matrix (Offline)"; window.showToast('Web Search Disabled'); } 
+            else { sysSettings.web = true; dot.classList.add('active'); label.innerText = "Search Matrix (Live)"; window.showToast('Live Web Search Active'); }
+            localStorage.setItem('lura_sys_settings', JSON.stringify(sysSettings));
         }
 
-        window.formatText = function(prefix, suffix) {
-            playSFX('click');
-            const textarea = document.getElementById('chat-input');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            textarea.value = text.substring(0, start) + prefix + text.substring(start, end) + suffix + text.substring(end);
-            textarea.focus();
-            window.autoResize(textarea);
-        };
-
-        window.autoResize = function(el) {
-            if (!el) return;
-            el.style.height = '24px';
-            el.style.height = Math.min(el.scrollHeight, 200) + 'px';
-            const sendBtn = document.getElementById('action-btn');
-            if (sendBtn && !isGenerating) {
-                if(el.value.trim() !== "" || sessionAttachments.length > 0) {
-                    sendBtn.style.color = "#fff";
-                } else {
-                    sendBtn.style.color = "var(--text-muted)";
-                }
-            }
-        };
-
-        window.enhancePrompt = function() {
-            playSFX('click');
-            const ci = document.getElementById('chat-input');
-            if(!ci || !ci.value.trim()) { window.showToast("Type a prompt first."); return; } 
-            ci.value = `Optimize this request for professional output: ${ci.value}`;
-            window.autoResize(ci);
-        };
-
         window.toggleModelDropdown = function(e) {
-            e.stopPropagation();
-            const md = document.getElementById('model-dropdown');
-            if (md) md.classList.toggle('active');
+            e.stopPropagation(); window.playSFX('click'); document.getElementById('model-dropdown').classList.toggle('active'); document.getElementById('dropdown-arrow').classList.toggle('rotate-180');
         };
-        
-        window.selectModel = function(name) {
-            playSFX('click');
-            currentModel = name;
-            const cml = document.getElementById('current-model-label');
-            if (cml) cml.innerText = name;
-            const md = document.getElementById('model-dropdown');
-            if (md) md.classList.remove('active');
+
+        window.selectModel = function(name, badge) {
+            currentModel = name; const span = document.getElementById('current-model-label');
+            if(span) {
+                if(badge) { span.innerHTML = `${name} <span class="text-[10px] font-mono text-[var(--accent)] bg-[var(--accent)]/10 px-1.5 py-0.5 rounded border border-[var(--accent)]/30 shadow-[0_0_8px_var(--accent-glow)] ml-1">${badge}</span>`; } 
+                else { span.innerText = name; }
+            }
+            document.getElementById('model-dropdown').classList.remove('active'); document.getElementById('dropdown-arrow').classList.remove('rotate-180');
         };
-        
-        window.addEventListener('click', () => {
-            const md = document.getElementById('model-dropdown');
-            if (md) md.classList.remove('active');
+
+        window.addEventListener('click', (e) => {
+            const md = document.getElementById('model-dropdown'); const arrow = document.getElementById('dropdown-arrow');
+            if (md && !e.target.closest('.dropdown-pill') && !e.target.closest('#model-dropdown')) { md.classList.remove('active'); if(arrow) arrow.classList.remove('rotate-180'); }
         });
 
-        window.toggleSettingsModal = function() {
-            playSFX('click');
-            const m = document.getElementById('settings-modal');
-            if (m) {
-                if(m.classList.contains('hidden')) { m.classList.remove('hidden'); m.classList.add('flex'); } 
-                else { m.classList.add('hidden'); m.classList.remove('flex'); }
-            }
+        window.toggleExtendedThinking = function(e) {
+            if(e) e.stopPropagation(); isExtendedThinking = !isExtendedThinking;
+            const track = document.getElementById('ext-think-track'); const thumb = document.getElementById('ext-think-thumb');
+            if(isExtendedThinking) { track.style.background = 'var(--accent)'; thumb.style.transform = 'translateX(16px)'; thumb.style.background = '#000'; window.showToast("Extended Thinking Active"); } 
+            else { track.style.background = '#333'; thumb.style.transform = 'translateX(0px)'; thumb.style.background = '#999'; window.showToast("Extended Thinking Disabled"); }
         };
 
-        window.showToast = function(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 glass-panel px-4 py-2 rounded-full text-xs font-semibold text-white shadow-2xl z-[999999] anim-slide-up border border-white/10 uppercase tracking-wider';
-            toast.innerText = msg;
-            document.body.appendChild(toast); 
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'all 0.4s ease'; setTimeout(() => toast.remove(), 400); }, 3000);
+        window.toggleSettingsModal = function() {
+            window.playSFX('click'); const m = document.getElementById('settings-modal');
+            if (m) { if(m.classList.contains('hidden')) { m.classList.remove('hidden'); m.classList.add('flex'); } else { m.classList.add('hidden'); m.classList.remove('flex'); } }
         };
 
         window.startNewChat = function() {
-            playSFX('click');
-            const mc = document.getElementById('message-container');
+            window.playSFX('click'); const mc = document.getElementById('message-container'); const gc = document.getElementById('greeting-container'); const sc = document.getElementById('search-wrapper');
             if (mc) { mc.innerHTML = ''; mc.classList.add('hidden'); }
-            
-            const ws = document.getElementById('welcome-screen');
-            const sc = document.getElementById('search-container');
-            
-            if(ws) ws.style.display = 'flex';
-            if(sc) { sc.classList.remove('input-mode-bottom'); sc.classList.add('input-mode-center'); }
-            
-            document.body.classList.remove('chat-active');
-            hasConversationStarted = false;
-            currentSessionId = 'sess_' + Date.now();
-            chatHistory = [];
-            
-            const ci = document.getElementById('chat-input');
-            if (ci) { ci.value = ''; window.autoResize(ci); window.updateWordCount(''); }
+            if (gc) { gc.classList.remove('greeting-hidden'); gc.classList.add('greeting-visible'); }
+            if (sc) { sc.classList.remove('pos-bottom'); sc.classList.add('pos-center'); }
+            hasConversationStarted = false; chatHistory = []; const ci = document.getElementById('chat-input'); if (ci) { ci.value = ''; window.autoResize(ci); }
         };
 
-        window.handleAttachmentClick = function(input) { 
-            if(input.files && input.files.length > 0) { Array.from(input.files).forEach(file => processFile(file)); }
-            input.value = ''; 
-        }
-        
-        function processFile(file) {
-            if(!file) return;
-            playSFX('click');
-            const newAtt = { id: Date.now() + Math.random(), name: file.name, type: file.type.startsWith('image/') ? 'image' : 'text', data: null };
-            if (newAtt.type === 'image') { 
-                const reader = new FileReader();
-                reader.onload = (e) => { newAtt.data = e.target.result; sessionAttachments.push(newAtt); window.renderAttachments(); }; 
-                reader.readAsDataURL(file); 
-            } else { 
-                newAtt.data = "File attached."; sessionAttachments.push(newAtt); window.renderAttachments();
+        window.nukeMemory = function() {
+            window.playSFX('click'); chatHistory = []; const cont = document.getElementById('message-container');
+            if (cont && hasConversationStarted) {
+                const div = document.createElement('div'); div.className = "flex w-full justify-end shrink-0 mb-4 items-center anim-pop";
+                div.innerHTML = `<div class="bg-[var(--accent-red)]/10 border border-[var(--accent-red)]/30 text-[var(--accent-red)] font-mono text-[10px] uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg">Context Memory Purged</div>`;
+                cont.appendChild(div); const mw = document.getElementById('main-workspace'); if(mw) mw.scrollTo({ top: mw.scrollHeight, behavior: 'smooth' });
             }
-        }
-        
-        window.renderAttachments = function() {
-            const c = document.getElementById('attachments-container');
-            const chatInput = document.getElementById('chat-input');
-            if(!c) return;
-            if(sessionAttachments.length === 0) { c.classList.add('hidden'); c.classList.remove('flex'); if (chatInput) window.autoResize(chatInput); return; }
-            c.classList.remove('hidden'); c.classList.add('flex'); c.innerHTML = '';
-            sessionAttachments.forEach((a, i) => {
-                c.innerHTML += `
-                <div class="glass-panel p-1.5 flex items-center gap-3 shadow-lg shrink-0 rounded-xl border border-white/5">
-                    <span class="text-[11px] text-white font-medium truncate max-w-[120px]">${escapeHTML(a.name)}</span>
-                    <button type="button" onclick="sessionAttachments.splice(${i},1); window.renderAttachments();" class="text-gray-500 hover:text-white">&times;</button>
-                </div>`;
-            });
-            if (chatInput) window.autoResize(chatInput);
+            window.showToast("Context Memory Wiped");
+        };
+
+        window.autoResize = function(el) {
+            el.style.height = '24px'; el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+            const micBtn = document.getElementById('mic-btn'); const actionBtn = document.getElementById('action-btn'); const sendIcon = document.getElementById('send-icon'); const stopIcon = document.getElementById('stop-icon');
+            
+            // 🔥 IMAGE MODE DETECTION (/imagine)
+            if(el.value.trim().toLowerCase().startsWith('/imagine')) {
+                document.body.classList.add('image-mode');
+            } else {
+                document.body.classList.remove('image-mode');
+            }
+
+            if (isGenerating) {
+                micBtn.classList.add('hidden'); actionBtn.classList.remove('hidden'); sendIcon.classList.add('hidden'); stopIcon.classList.remove('hidden');
+                actionBtn.classList.add('active-stop'); actionBtn.classList.remove('active-send'); actionBtn.classList.remove('hover:scale-110', 'hover:-rotate-12');
+            } else if (el.value.trim() !== "" || sessionAttachments.length > 0) {
+                micBtn.classList.add('hidden'); actionBtn.classList.remove('hidden'); sendIcon.classList.remove('hidden'); stopIcon.classList.add('hidden');
+                actionBtn.classList.add('active-send'); actionBtn.classList.remove('active-stop'); actionBtn.classList.add('hover:scale-110', 'hover:-rotate-12');
+            } else {
+                micBtn.classList.remove('hidden'); actionBtn.classList.add('hidden');
+            }
+        };
+
+        window.stopGeneration = function() {
+            if(!isGenerating) return; isGenerating = false;
+            if (currentAbortController) currentAbortController.abort();
+            const ind = document.getElementById('thinking-indicator'); if (ind) { ind.classList.add('hidden'); ind.classList.remove('flex'); }
+            window.autoResize(document.getElementById('chat-input')); document.body.classList.remove('is-generating');
+        };
+
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast'); toast.innerText = msg; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+        };
+
+        window.speakText = function(text) {
+            if(!text) return; window.showToast('Reading Aloud...'); const msg = new SpeechSynthesisUtterance(text); window.speechSynthesis.speak(msg);
+        };
+
+        window.editUserMessage = function(text, btnElement) {
+            const input = document.getElementById('chat-input');
+            if(input) {
+                input.value = text; input.focus(); window.autoResize(input);
+                const msgGroup = btnElement.closest('.msg-group'); if(msgGroup) msgGroup.remove();
+            }
         };
 
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t])); }
 
         window.parseAndFormatBotText = function(rawText) {
-            let thoughtHtml = ''; let mainText = rawText || "";
-            if(!mainText) return { displayHtml: "", thoughtHtml: "" };
-
-            let thoughtContent = "";
-            const thoughtMatches = [...mainText.matchAll(/<thought>([\s\S]*?)<\/thought>/gi)];
-            if (thoughtMatches.length > 0) {
-                thoughtContent = thoughtMatches.map(m => m[1].trim()).join("\n\n");
-                mainText = mainText.replace(/<thought>[\s\S]*?<\/thought>/gi, '').trim();
-            }
-
-            if (thoughtContent) {
-                const tid = 'th-' + Math.random().toString(36).substr(2, 5);
-                thoughtHtml = `
-                <div class="mt-2 w-full flex flex-col items-start mb-3">
-                    <button onclick="document.getElementById('${tid}').classList.toggle('hidden');" class="text-gray-500 hover:text-white text-[11px] font-mono tracking-wider outline-none bg-white/5 px-2.5 py-1 rounded border border-white/5">
-                        [View Reasoning Process]
-                    </button>
-                    <div id="${tid}" class="hidden mt-2 p-3 bg-black/60 border border-white/5 rounded-lg font-mono text-[11px] text-gray-400 max-h-40 overflow-y-auto w-full leading-relaxed">${escapeHTML(thoughtContent)}</div>
-                </div>`;
-            }
+            let html = rawText || "";
+            html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2" class="text-[var(--accent)] hover:underline" target="_blank">$1</a>');
+            html = html.replace(/<thought>[\s\S]*?<\/thought>/gi, ''); 
             
-            const parts = mainText.split(/```/g); let finalHtml = '';
+            const parts = html.split(/```/g); let finalHtml = '';
             for (let i = 0; i < parts.length; i++) {
                 if (i % 2 === 0) { 
-                    finalHtml += escapeHTML(parts[i]).replace(/\n/g, '<br>');
+                    let textPart = parts[i];
+                    textPart = textPart.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+                    textPart = textPart.replace(/\*(.*?)\*/g, '<em class="text-[var(--text-secondary)]">$1</em>');
+                    finalHtml += textPart.replace(/\n/g, '<br>');
                 } else {
-                    let codeContent = parts[i]; let firstNewline = codeContent.indexOf('\n'); let lang = firstNewline !== -1 ? codeContent.substring(0, firstNewline).trim() : ''; let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent; const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                    
+                    let codeContent = parts[i]; let firstNewline = codeContent.indexOf('\n'); let lang = firstNewline !== -1 ? codeContent.substring(0, firstNewline).trim() : ''; let actualCode = firstNewline !== -1 ? codeContent.substring(firstNewline + 1) : codeContent;
                     finalHtml += `
-                    <div class="code-box w-full bg-[#0a0a0c]">
-                        <div class="flex items-center justify-between px-4 py-2 bg-[#141416] border-b border-white/5">
-                            <span class="text-[10px] font-mono text-gray-400 uppercase">${escapeHTML(lang) || 'CODE'}</span>
-                            <button onclick="navigator.clipboard.writeText(document.getElementById('${codeId}').innerText); window.showToast('Copied');" class="text-[10px] font-mono text-gray-400 hover:text-white">COPY</button>
+                    <div class="code-box">
+                        <div class="code-header">
+                            <span class="uppercase tracking-widest">${escapeHTML(lang) || 'CODE'}</span>
+                            <button onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); window.showToast('Copied to clipboard');" class="hover:text-white transition-colors flex items-center gap-1"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy</button>
                         </div>
-                        <div class="p-4 overflow-x-auto text-[13px] text-gray-300 font-mono leading-relaxed">
-                            <pre id="${codeId}"><code>${escapeHTML(actualCode)}</code></pre>
-                        </div>
+                        <div class="p-4 overflow-x-auto text-[13px] text-[var(--text-primary)]"><pre><code>${escapeHTML(actualCode)}</code></pre></div>
                     </div>`;
                 }
             }
-            return { displayHtml: finalHtml, thoughtHtml: thoughtHtml };
+            return { displayHtml: finalHtml, thoughtHtml: '' };
         };
 
-        window.stopGeneration = function() {
-            if(!isGenerating) return;
-            isGenerating = false;
-            if (currentAbortController) currentAbortController.abort();
-        };
-
-        // 🚀 KINETIC SEND ENGINE
+        // 🚀 FULL API LOGIC
         window.handleSend = async function() {
-            const input = document.getElementById('chat-input');
-            const container = document.getElementById('message-container');
-            const scrollArea = document.getElementById('scroll-area');
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const searchContainer = document.getElementById('search-container');
-            const userText = input?.value.trim(); 
+            if(isGenerating) { window.stopGeneration(); return; }
+            
+            const input = document.getElementById('chat-input'); const container = document.getElementById('message-container');
+            const scrollArea = document.getElementById('main-workspace'); const greeting = document.getElementById('greeting-container');
+            const searchContainer = document.getElementById('search-wrapper'); const userText = input?.value.trim(); 
             
             if (userText === "" && sessionAttachments.length === 0) return;
 
-            playSFX('send');
-            isGenerating = true;
+            // 🔐 ADMIN SECURE OVERRIDE LOGIC
+            if (userText === '/admin') {
+                input.value = ''; window.autoResize(input); document.body.classList.remove('search-active');
+                const pass = prompt("AUTHENTICATION REQUIRED. ENTER ADMIN PASSCODE:");
+                if(pass === "85@@7&5!73") {
+                    document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex');
+                } else { if(pass !== null) window.showToast("ACCESS DENIED: Invalid Passcode"); }
+                return;
+            }
+
+            isGenerating = true; document.body.classList.add('is-generating'); window.autoResize(input); document.body.classList.remove('search-active');
 
             if (!hasConversationStarted) {
-                document.body.classList.add('chat-active');
-                if (welcomeScreen) welcomeScreen.style.display = 'none';
-                if (searchContainer) { searchContainer.classList.remove('input-mode-center'); searchContainer.classList.add('input-mode-bottom'); }
+                greeting.classList.remove('greeting-visible'); greeting.classList.add('greeting-hidden');
+                searchContainer.classList.remove('pos-center'); searchContainer.classList.add('pos-bottom');
                 hasConversationStarted = true;
             }
 
-            if (container) {
-                container.classList.remove('hidden'); container.classList.add('flex');
-                const uDiv = document.createElement('div'); uDiv.className = "flex justify-end w-full shrink-0 mb-4 anim-pop";
-                uDiv.innerHTML = `<div class="user-bubble max-w-[80%] text-[14px] text-white break-words whitespace-pre-wrap">${escapeHTML(userText)}</div>`;
-                container.appendChild(uDiv);
-                input.value = ''; window.autoResize(input);
-            }
+            container.classList.remove('hidden'); container.classList.add('flex');
             
+            let htmlPayload = escapeHTML(userText);
+            if(sessionAttachments.length > 0) {
+                htmlPayload += `<div class="mt-2 pt-2 border-t border-white/5 text-[10px] font-mono text-[var(--accent)] flex items-center gap-1"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${sessionAttachments.length} Attachments</div>`;
+            }
+
+            const msgId = 'msg-' + Math.random().toString(36).substr(2, 9);
+            const msgGroup = document.createElement('div'); msgGroup.className = "msg-group";
+            
+            msgGroup.innerHTML = `
+                <div class="user-bubble-container mb-6 anim-fade-up">
+                    <button class="user-edit-btn" onclick="window.editUserMessage('${escapeHTML(userText.replace(/'/g, "\\'"))}', this)" title="Edit Message">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </button>
+                    <div class="user-bubble">${htmlPayload}</div>
+                </div>
+                <div class="flex w-full shrink-0 items-start hidden" id="bot-container-${msgId}">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 mr-4 text-[var(--accent)]">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1 0-1h6.5V.5a.5.5 0 0 1 .5-.5z" transform="rotate(45 11.5 11.5)"/><path d="M11.5 24a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-6.5v6.5a.5.5 0 0 1-.5.5z" transform="rotate(45 11.5 11.5)"/></svg>
+                    </div>
+                    <div class="max-w-full flex-1 bot-bubble">
+                        <div id="target-${msgId}"></div>
+                        <div class="bot-action-icons" id="actions-${msgId}">
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('target-${msgId}').innerText); window.showToast('Copied');" title="Copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>
+                            <button onclick="window.showToast('Feedback Recorded');" title="Good Response"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button>
+                            <button onclick="window.showToast('Feedback Recorded');" title="Bad Response"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2"/></svg></button>
+                            <button onclick="window.speakText(document.getElementById('target-${msgId}').innerText)" title="Read Aloud"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
+                            <button onclick="window.showToast('Sharing not supported on this device');" title="Share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(msgGroup);
+            
+            input.value = ''; window.autoResize(input);
             sessionAttachments = []; window.renderAttachments();
-            if (scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+            if(scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
 
             const ind = document.getElementById('thinking-indicator');
-            if (ind) {
-                ind.innerHTML = `<div class="flex items-center gap-1.5 px-3 py-2"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
-                ind.classList.remove('hidden'); ind.classList.add('flex');
-            }
+            if (ind) { ind.classList.remove('hidden'); ind.classList.add('flex'); }
+            if(scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
 
-            let activeSystemPrompt = sysSettings.prompt && sysSettings.prompt.trim() !== "" ? sysSettings.prompt : "You are Lura, an elite AI built for Shinchan. Provide minimalist, highly structured, deeply technical answers.";
+            // Detect Image generation tag
+            const isImageGen = userText.trim().toLowerCase().startsWith('/imagine');
+
+            let activePrompt = sysSettings.prompt || "You are Lura, an elite AI. Keep responses highly concise and properly formatted.";
+            if (sysSettings.math) { activePrompt += " Ensure all mathematical and logic operations are verified step-by-step for absolute accuracy."; }
 
             const payload = {
-                userMessage: userText, persona: currentModel, systemPrompt: activeSystemPrompt, 
-                temperature: 0.7, webSearch: webSearchActive, messages: chatHistory
+                userMessage: userText, persona: currentModel, systemPrompt: activePrompt, 
+                temperature: 0.7, webSearch: sysSettings.web, messages: chatHistory, extendedThinking: isExtendedThinking, isImageGen: isImageGen
             };
 
             currentAbortController = new AbortController();
 
             try {
+                if(!BACKEND_URL || BACKEND_URL === "") throw new Error("No Backend URL Provided.");
+                
                 let response = await fetch(`${BACKEND_URL}/api/chat`, { 
                     method: "POST", headers: { "Content-Type": "application/json" }, 
                     signal: currentAbortController.signal, body: JSON.stringify(payload) 
@@ -749,29 +1253,60 @@
                 
                 if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
                 const data = await response.json(); 
-                if(data.error) throw new Error(data.error);
-
                 if (!isGenerating) return; 
 
                 const rawReply = data.reply;
-                const parsed = window.parseAndFormatBotText(rawReply);
-                
-                if (ind) { ind.classList.add('hidden'); ind.classList.remove('flex'); ind.innerHTML = ''; }
+                if (ind) { ind.classList.add('hidden'); ind.classList.remove('flex'); }
 
-                const aDiv = document.createElement('div'); aDiv.className = "flex w-full shrink-0 mb-8 items-start anim-pop";
-                aDiv.innerHTML = `<div class="max-w-full flex-1 text-[15px] text-gray-200 leading-[1.7] bot-bubble">${parsed.displayHtml}${parsed.thoughtHtml}</div>`;
-                container.appendChild(aDiv);
+                const botContainer = document.getElementById(`bot-container-${msgId}`);
+                botContainer.classList.remove('hidden'); botContainer.classList.add('anim-fade-up');
+
+                const textTarget = document.getElementById(`target-${msgId}`); 
+                const parsed = window.parseAndFormatBotText(rawReply);
+                const tempDiv = document.createElement('div'); tempDiv.innerHTML = parsed.displayHtml;
+                
+                for (let child of Array.from(tempDiv.childNodes)) {
+                    if (!isGenerating) break;
+                    if (child.nodeType === Node.TEXT_NODE || child.tagName !== 'DIV') {
+                        const words = (child.textContent || "").split(" ");
+                        const textNode = document.createElement('span'); 
+                        textTarget.appendChild(textNode);
+                        if(child.nodeType !== Node.TEXT_NODE) { textTarget.appendChild(child.cloneNode(true)); continue; }
+
+                        for (let word of words) { 
+                            if (!isGenerating) break; 
+                            textNode.innerHTML += escapeHTML(word).replace(/\n/g, '<br>') + " "; 
+                            if(scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'auto' }); 
+                            await new Promise(r => setTimeout(r, 10)); 
+                        }
+                    } else {
+                        textTarget.appendChild(child); 
+                        if(scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'auto' }); 
+                        await new Promise(r => setTimeout(r, 15)); 
+                    }
+                }
                 
                 chatHistory.push({ role: 'user', text: userText });
                 chatHistory.push({ role: 'assistant', text: rawReply });
 
+                const userName = session.name || localStorage.getItem('lura_user') || 'Bhaskhar';
+                let vault = JSON.parse(localStorage.getItem(`lura_vault_${userName}`) || '[]');
+                vault.push({ id: 'sess_' + Date.now(), title: userText.substring(0, 30) + "...", date: new Date().toLocaleString(), messages: chatHistory });
+                localStorage.setItem(`lura_vault_${userName}`, JSON.stringify(vault));
+                window.renderHistoryList();
+
             } catch (error) {
                 if (error.name === 'AbortError') return;
-                if (ind) { ind.classList.add('hidden'); ind.classList.remove('flex'); ind.innerHTML = ''; }
-                window.showToast("Network Error: Could not reach backend.");
+                if (ind) { ind.classList.add('hidden'); ind.classList.remove('flex'); }
+                const errDiv = document.createElement('div'); errDiv.className = "w-full flex mt-2 mb-6 anim-fade-up pl-12";
+                let errorText = error.message.includes('No Backend URL Provided') ? "Backend URL is empty. Please add it to the code." : "Backend Connection Refused.";
+                errDiv.innerHTML = `<span class="text-[#ff4444] bg-[#ff4444]/10 px-4 py-2.5 rounded-xl text-[13px] border border-[#ff4444]/20 shadow-lg">${errorText}</span>`;
+                container.appendChild(errDiv);
             } finally { 
                 isGenerating = false;
-                if (scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+                document.body.classList.remove('is-generating');
+                window.autoResize(input);
+                if(scrollArea) scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
             }
         };
     </script>
